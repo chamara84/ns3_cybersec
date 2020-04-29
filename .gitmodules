@@ -1,0 +1,6 @@
+[submodule "ns-allinone-3.29/bake/source/pybindgen"]
+	path = ns-allinone-3.29/bake/source/pybindgen
+	url = git@github.com:chamara84/NS3_Cybersec.git
+[submodule "ns-allinone-3.29/ns3_cybersec"]
+	path = ns-allinone-3.29/ns3_cybersec
+	url = git@github.com:chamara84/NS3_Cybersec.git

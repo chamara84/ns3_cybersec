@@ -1,0 +1,20 @@
+## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+def build(bld):
+    obj = bld.create_ns3_program('rtds-dos-simulation', ['csma', 'internet', 'applications','wifi', 'olsr', 'netanim','flow-monitor','point-to-point'])
+    obj.source = 'rtds-dos-simulation.cc'
+    obj = bld.create_ns3_program('rtds-dos-simulation_UDP_BiDir', ['csma', 'internet', 'applications','wifi', 'olsr', 'netanim','flow-monitor','point-to-point'])
+    obj.source = 'rtds-dos-simulation_UDP_BiDir.cc'
+    obj = bld.create_ns3_program('rtds-dos-simulation_TCP_BiDir', ['csma', 'internet', 'applications','wifi', 'olsr', 'netanim','flow-monitor','point-to-point'])
+    obj.source = 'rtds-dos-simulation_TCP_BiDir.cc'
+    obj = bld.create_ns3_program('arp1', ['csma', 'internet', 'applications','wifi', 'olsr', 'netanim','flow-monitor','point-to-point'])
+    obj.source = 'arp1.cc'
+    obj = bld.create_ns3_program('icmpv4-redirect', ['csma', 'internet', 'applications','wifi', 'olsr', 'netanim','flow-monitor','point-to-point'])
+    obj.source = 'icmpv4-redirect.cc'
+    
+    
+    
+    
+    
+    
+    

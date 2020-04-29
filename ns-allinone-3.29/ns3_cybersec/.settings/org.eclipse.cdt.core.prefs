@@ -1,0 +1,16 @@
+eclipse.preferences.version=1
+environment/project/0.318490671/LD_LIBRARY_PATH/delimiter=\:
+environment/project/0.318490671/LD_LIBRARY_PATH/operation=append
+environment/project/0.318490671/LD_LIBRARY_PATH/value=${workspace_loc\:ns-3-dev}/build/lib
+environment/project/0.318490671/append=true
+environment/project/0.318490671/appendContributed=true
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1905602015/LD_LIBRARY_PATH/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1905602015/LD_LIBRARY_PATH/operation=replace
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1905602015/LD_LIBRARY_PATH/value=/home/rtds-cybersec/repos/ns-3-allinone/ns-3.29/build/lib/
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1905602015/append=true
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1905602015/appendContributed=true
+environment/project/cdt.managedbuild.config.gnu.exe.release.285816863/LD_LIBRARY_PATH/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.exe.release.285816863/LD_LIBRARY_PATH/operation=append
+environment/project/cdt.managedbuild.config.gnu.exe.release.285816863/LD_LIBRARY_PATH/value="${workspace_loc\:ns-3-dev}/build/lib"
+environment/project/cdt.managedbuild.config.gnu.exe.release.285816863/append=true
+environment/project/cdt.managedbuild.config.gnu.exe.release.285816863/appendContributed=true
