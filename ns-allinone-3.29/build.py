@@ -56,9 +56,9 @@ def build_netanim(qmakepath):
 
 def build_ns3(config, build_examples, build_tests, args, build_options):
     cmd = [sys.executable, "waf", "configure"] + args
-     cmd.append("--enable-examples")
-     cmd.append("--enable-tests")
-     cmd.append("--enable-sudo")
+    cmd.append("--enable-examples")
+    cmd.append("--enable-tests")
+    cmd.append("--enable-sudo")
     if build_examples:
         cmd.append("--enable-examples")
 
