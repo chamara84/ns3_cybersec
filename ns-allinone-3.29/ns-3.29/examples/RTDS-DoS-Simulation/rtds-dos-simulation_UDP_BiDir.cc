@@ -1062,7 +1062,7 @@ main (int argc, char *argv[])
 
            
        Ptr<FdNetDevice> dev = d0.Get (0)->GetObject<FdNetDevice> ();
-       dev->SetAddress (Mac48Address (intMAC[0]));
+       dev->SetAddress (Mac48Address (intMAC[0].c_str()));
        NS_LOG_INFO ("Assign IP Address of EMU interface.");
        i0 = address.Assign (d0); //IP address for node n0 with emulation
        dev->Initialize();
@@ -1217,7 +1217,7 @@ main (int argc, char *argv[])
 
 
              Ptr<FdNetDevice> dev1 = d1.Get (0)->GetObject<FdNetDevice> ();
-             dev1->SetAddress (Mac48Address (intMAC[1]));
+             dev1->SetAddress (Mac48Address (intMAC[1].c_str()));
              NS_LOG_INFO ("Assign IP Address of EMU interface2.");
              i1 = address.Assign (d1); //IP address for node n3 with emulation
 	     
@@ -1325,7 +1325,7 @@ main (int argc, char *argv[])
          Ptr<Ipv4StaticRouting> staticRouting_egressNode = ipv4RoutingHelper.GetStaticRouting (ipv4_egressNode);
           // The ifIndex for this outbound route is 1; the first p2p link added
 
-         staticRouting_egressNode->SetDefaultRoute(Ipv4Address (gateway),7,0);
+         staticRouting_egressNode->SetDefaultRoute(Ipv4Address (gateway.c_str()),7,0);
 
 
             Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
