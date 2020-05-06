@@ -29,7 +29,7 @@
 #include<string>
 #include<iostream>
 #include "ns3/tcp-option.h"
-
+#include <bits/stdc++.h>
 
 
 
@@ -42,6 +42,10 @@ NS_LOG_COMPONENT_DEFINE ("AttackApp");
 
 NS_OBJECT_ENSURE_REGISTERED (AttackApp);
 
+typedef struct _configuration
+  {
+	  dnp3_config_t dnp3;
+  }configuration;
 
 TypeId
 AttackApp::GetTypeId (void)
@@ -86,6 +90,7 @@ AttackApp::Setup (Ptr<Node> aNode, Ptr<NetDevice> aDev, Ptr<Ipv4Interface> iface
   m_vMac = vMac;
   Ptr<ArpL3Protocol> arpProtocol = m_node->GetObject<ArpL3Protocol>();
   arpProtocol->EnableDisableSpoofedARP(true);
+  multimap< string , int> mp;
 }
 
 void
@@ -151,6 +156,30 @@ bool AttackApp::NonPromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Pa
   NS_LOG_FUNCTION (this << device << packet << protocol << &from);
   packet->Print(std::cout);
   return ReceiveFromDevice (device, packet, protocol, from, device->GetAddress (), NetDevice::PacketType (0), false);
+}
+
+int readConfigFile( configuration * config)
+{
+	//this function reads the config file at attack-app setup and stores the data in config
+	std::ifstream infile("/etc/ns3/ns3.conf");
+	std::string line, linePrev;
+	int protocolNum = 0, readNewProtocol=0;
+	while (std::getline(infile, line))
+	{
+	    if((!readNewProtocol && line.find("dnp3",0)) || (readNewProtocol && linePrev.find("dnp3",0)))
+	    {
+	    	while (std::getline(infile, line))
+	    	{
+
+	    	}
+	    }
+
+
+	}
+
+
+
+return 0;
 }
 
 vector<string> AttackApp::giveParsingString(int msgType)
@@ -362,7 +391,7 @@ if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()!=20000 &
 	  	       }
 	  	       bufferFloat[0] = htonl(bufferFloat[0]);
 	  	       bufferFloat[1] = htonl(bufferFloat[1]);
-	  	       memcpy(&buffer, &bufferFloat, packetCopy->GetSize ());
+	  	       memcpy(&buffer, &bufferFloat, (unsigned long int)packetCopy->GetSize ());
     packetNew = Create<Packet>(buffer,packetCopy->GetSize ());
 
 	tcpHdr.EnableChecksums();
@@ -375,6 +404,38 @@ if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()!=20000 &
 	 ipV4Hdr.SetPayloadSize(packetNew->GetSize());
 	 ipV4Hdr.EnableChecksum();
      packetNew->AddHeader(ipV4Hdr);
+}
+
+
+else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20000 || tcpHdr1.GetSourcePort()==20000))
+{
+	Ipv4Address senderIp;
+	uint32_t senderIntIP;
+	uint64_t key;
+	unsigned short int dataSize = packetCopy->GetSize ();
+	unsigned char buffer[dataSize] ;
+		//if(packetCopy->GetSize ()>0){
+
+
+	packetCopy->CopyData (buffer, dataSize);
+
+	if (tcpHdr1.GetDestinationPort()==20000)
+	{
+		senderIp = ipV4Hdr.GetSource();
+		senderIntIP = senderIp;
+		key = senderIntIP<<16 + tcpHdr1.GetSourcePort();
+		dnp3_session_data_t* session = mmapOfdnp3Data.find(key)->second;
+		if(session)
+		{
+			DNP3FullReassembly(&configDnp3, session, packet, (char *)buffer,dataSize);
+		}
+		else
+		{
+			 session  =  new dnp3_session_data_t();
+			 mmapOfdnp3Data.insert({key, session});
+			 DNP3FullReassembly(&configDnp3, session, packet, (char *)buffer,dataSize);
+		}
+	}
 }
 
 //else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()!=20000 && tcpHdr1.GetSourcePort()!=20000))

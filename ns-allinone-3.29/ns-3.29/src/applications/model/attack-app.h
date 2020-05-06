@@ -31,8 +31,16 @@
 #include "ns3/node.h"
 #include <sstream>
 #include <iostream>
+#include <fstream>
 #include <vector>
+#include <map>
 #include<string>
+#include <arpa/inet.h>
+#include <stddef.h>
+#include<cstring>
+#include<cstdio>
+#include<stdlib.h>
+#include "dnp3-app.h"
 
 #define FIR_MASK 0x40
 
@@ -53,18 +61,11 @@ public:
   bool ReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol,
                            const Address &from, const Address &to, NetDevice::PacketType packetType, bool promiscuous);
   std::vector<std::string>  giveParsingString(int msgType);
-
- typedef struct dnp3Header
-  {
-	  uint16_t astart;
-	  uint8_t aLen;
-	  uint8_t aCtrl;
-	  uint16_t aSrc;
-	  uint16_t aDest;
-	  uint16_t aCrc;
+  int readConfigFile( dnp3_config_t *);
 
 
-  }dnp3Header;
+
+
 
 private:
   virtual void StartApplication (void);
@@ -86,6 +87,8 @@ private:
 
   ArpL3Protocol m_attacker;
   Ptr<ArpCache> m_arpCache;
+  std::multimap<uint64_t,dnp3_session_data_t *> mmapOfdnp3Data;
+  dnp3_config_t configDnp3;
 };
 
 
