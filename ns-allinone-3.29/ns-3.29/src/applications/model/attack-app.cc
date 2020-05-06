@@ -163,13 +163,65 @@ int readConfigFile( configuration * config)
 	//this function reads the config file at attack-app setup and stores the data in config
 	std::ifstream infile("/etc/ns3/ns3.conf");
 	std::string line, linePrev;
-	int protocolNum = 0, readNewProtocol=0;
+	int protocolNum = 0, readNewProtocol=0, indexNum=0;
+
 	while (std::getline(infile, line))
 	{
 	    if((!readNewProtocol && line.find("dnp3",0)) || (readNewProtocol && linePrev.find("dnp3",0)))
 	    {
+	    	if(readNewProtocol)
+	    	{
+	    		readNewProtocol=0;
+	    	}
 	    	while (std::getline(infile, line))
 	    	{
+	    		if(line.find("protocol",0))
+	    			{
+	    			readNewProtocol++;
+	    			linePrev = line;
+	    			indexNum=0;
+	    			break;
+	    			}
+	    		std::istringstream iss(line);
+	    		int parameter = 0;
+	    		for(std::string s; iss >> s; )
+	    		{
+	    			switch(parameter)
+	    			{
+	    			case 0:
+	    				config->dnp3.values_to_alter[indexNum].func_code = stoi(s,nullptr,10);
+	    				parameter++;
+	    				break;
+	    			case 1:
+	    				config->dnp3.values_to_alter[indexNum].obj_group = stoi(s,nullptr,10);
+	    				parameter++;
+	    			    break;
+	    			case 2:
+						config->dnp3.values_to_alter[indexNum].obj_var = stoi(s,nullptr,10);
+						parameter++;
+						break;
+
+	    			case 3: config->dnp3.values_to_alter[indexNum].identifier = stol(s,nullptr,10);
+	    			parameter++;
+	    			        break;
+	    			case 4:
+	    				if((config->dnp3.values_to_alter[indexNum].obj_group)==1 || (config->dnp3.values_to_alter[indexNum]).obj_group==10)
+	    				{
+	    					(config->dnp3.values_to_alter[indexNum]).integer_value =stol(s,nullptr,10);
+
+	    				}
+	    				else
+	    				{
+	    					(config->dnp3.values_to_alter[indexNum]).floating_point_val =stof(s,nullptr);
+	    				}
+	    				parameter++;
+	    				break;
+	    			default:
+	    				break;
+	    			}
+
+	    		}
+	    		indexNum++;
 
 	    	}
 	    }
