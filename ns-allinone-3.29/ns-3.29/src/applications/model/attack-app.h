@@ -40,7 +40,7 @@
 #include<cstring>
 #include<cstdio>
 #include<stdlib.h>
-#include "dnp3-app.h"
+
 
 #define FIR_MASK 0x40
 

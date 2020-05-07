@@ -13,12 +13,6 @@
 #include "ns3/network-module.h"
 #include "ns3/csma-module.h"
 #include "ns3/internet-module.h"
-#include "ns3/point-to-point-module.h"
-#include "ns3/applications-module.h"
-#include "ns3/ipv4-global-routing-helper.h"
-#include "ns3/traffic-control-module.h"
- #include "ns3/mobility-module.h"
-#include "ns3/netanim-module.h"
 #include "ns3/node.h"
 #include "ns3/packet.h"
 #include <sstream>
@@ -125,7 +119,7 @@ typedef struct _dnp3_alter_values //structure introduced to keep the obj, varian
 /* DNP3 preprocessor configuration */
 typedef struct _dnp3_config
 {
-
+	uint8_t  check_crc;
     dnp3_alter_values values_to_alter[50];
     int numAlteredVal;
 } dnp3_config_t;
@@ -216,6 +210,6 @@ typedef struct _dnp3_app_response_header_t
 #define DNP3_CHUNK_SIZE     16
 #define DNP3_CRC_SIZE        2
 
-
+int DNP3FullReassembly(dnp3_config_t *config, dnp3_session_data_t *session, ns3::Ptr<const ns3::Packet> packet, uint8_t *pdu_start, uint16_t pdu_length);
 
 #endif /* SRC_APPLICATIONS_MODEL_DNP3_APP_H_ */

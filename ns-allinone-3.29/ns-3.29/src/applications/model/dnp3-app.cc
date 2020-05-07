@@ -56,7 +56,7 @@ static uint16_t crcLookUpTable[256] =
     DNP3_OK:    Segment queued successfully.
     DNP3_FAIL:  Data copy failed. Segment did not fit in reassembly buffer.
  */
-static int DNP3QueueSegment(dnp3_reassembly_data_t *rdata, char *buf, uint16_t buflen)
+static int DNP3QueueSegment(dnp3_reassembly_data_t *rdata, uint8_t *buf, uint16_t buflen)
 {
 	if (rdata == NULL || buf == NULL)
 		return DNP3_FAIL;
@@ -97,7 +97,7 @@ static void DNP3ReassemblyReset(dnp3_reassembly_data_t *rdata)
     DNP3_FAIL:     Segment was discarded.
     DNP3_OK:       Segment was queued.
  */
-static int DNP3ReassembleTransport(dnp3_reassembly_data_t *rdata, char *buf, uint16_t buflen)
+static int DNP3ReassembleTransport(dnp3_reassembly_data_t *rdata, uint8_t *buf, uint16_t buflen)
 {
 	dnp3_transport_header_t *trans_header;
 
@@ -277,7 +277,7 @@ static int DNP3CheckCRC(unsigned char *buf, uint16_t buflen)
 
 /* Check CRCs in a Link-Layer Frame, then fill a buffer containing just the user data  */
 static int DNP3CheckRemoveCRC(dnp3_config_t *config, uint8_t *pdu_start,
-		uint16_t pdu_length, char *buf, uint16_t *buflen)
+		uint16_t pdu_length, uint8_t *buf, uint16_t *buflen)
 {
 	char *cursor;
 	uint16_t bytes_left;
@@ -330,24 +330,24 @@ static int DNP3CheckRemoveCRC(dnp3_config_t *config, uint8_t *pdu_start,
 	return DNP3_OK;
 }
 
-static int DNP3CheckReservedAddrs(dnp3_link_header_t *link)
-{
-	int bad_addr = 0;
-
-	if ((link->src >= DNP3_MIN_RESERVED_ADDR) && (link->src <= DNP3_MAX_RESERVED_ADDR))
-		bad_addr = 1;
-
-	else if ((link->dest >= DNP3_MIN_RESERVED_ADDR) && (link->dest <= DNP3_MAX_RESERVED_ADDR))
-		bad_addr = 1;
-
-	if (bad_addr)
-	{
-
-		return DNP3_FAIL;
-	}
-
-	return DNP3_OK;
-}
+//static int DNP3CheckReservedAddrs(dnp3_link_header_t *link)
+//{
+//	int bad_addr = 0;
+//
+//	if ((link->src >= DNP3_MIN_RESERVED_ADDR) && (link->src <= DNP3_MAX_RESERVED_ADDR))
+//		bad_addr = 1;
+//
+//	else if ((link->dest >= DNP3_MIN_RESERVED_ADDR) && (link->dest <= DNP3_MAX_RESERVED_ADDR))
+//		bad_addr = 1;
+//
+//	if (bad_addr)
+//	{
+//
+//		return DNP3_FAIL;
+//	}
+//
+//	return DNP3_OK;
+//}
 static int modifyData(dnp3_config_t *config, dnp3_reassembly_data_t *rdata,uint16_t buflen,uint8_t * pdu_start, uint16_t pdu_length,uint8_t direction)
 {
 
@@ -364,7 +364,7 @@ static int modifyData(dnp3_config_t *config, dnp3_reassembly_data_t *rdata,uint1
 	int segment = 0;
 	int offSet = 0;
 	int byteNumberNewPktBuffer =0;
-	int lengthOfCurrentPktAppData = 0;
+	//int lengthOfCurrentPktAppData = 0;
 	int startingIndex = 0;
 	int startingIndexAlteredVal = 0;
 	dnp3_app_request_header_t *request = NULL;
@@ -1433,7 +1433,7 @@ default:
 	 sizeOfQuality = rdata->sizeOfQuality;
 	 sizeOfIndex = rdata->sizeOfIndex;
 	 sizeOfCtrlStatus = rdata->sizeOfCtrlStatus;
-	 uint8_t indexSize = rdata->qualifier>>4;
+	// uint8_t indexSize = rdata->qualifier>>4;
 	 		uint8_t absAddress = 0;
 	 		uint8_t quantity = 0;
 	 		uint8_t minBufferLength = 0;
@@ -1529,13 +1529,13 @@ while(!done) //it will be done when we reach the end of buffer in rdata->server_
 				//if starting index is a negative with modulus less than the length of data that means the first bytes are already in the session buffer
 				//should change partial data existing at the end of the pdu
 				startingIndex = byteNumber-(rdata->buflen-buflen+1);    // buflen is the length of data in the current packet
-				if(startingIndex<0 && abs(startingIndex)>=(sizeOfOneDataPoint+sizeOfQuality))
+				if(startingIndex<0 && abs(startingIndex)>=(int)(sizeOfOneDataPoint+sizeOfQuality))
 				{
 					//you have missed the point
 					continue;
 				}
 
-				else if(startingIndex<0 && abs(startingIndex)<(sizeOfOneDataPoint+sizeOfQuality))
+				else if(startingIndex<0 && abs(startingIndex)<(int)(sizeOfOneDataPoint+sizeOfQuality))
 				{
 
 					//the data is split between two packets
@@ -1576,7 +1576,7 @@ while(!done) //it will be done when we reach the end of buffer in rdata->server_
 								//copy byte by byte since the value can be between two application segments then calculate the CRC for both segments
 								int twoSegments =0;
 								int count = 0;
-								for(int j=0;j<sizeOfOneDataPoint-startingIndexAlteredVal;j++){
+								for(int j=0;j<(int)(sizeOfOneDataPoint-startingIndexAlteredVal);j++){
 									int temp = 1+byteNumberNewPktBuffer+sizeOfQuality+startingIndexAlteredVal+j-26;
 
 									if((temp)==0 || ((temp)>0 && (temp)%18==0))
@@ -1679,8 +1679,8 @@ while(!done) //it will be done when we reach the end of buffer in rdata->server_
 				 rdata->qualifier= rdata->buffer[rdata->indexOfCurrentResponceObjHeader+2];
 				rdata->start = 0;
 				rdata->stop = 0;
-				uint8_t absAddress = 0;
-				uint8_t quantity = 0;
+				//uint8_t absAddress;
+				//uint8_t quantity;
 				uint8_t minBufferLength = 0;
 
 
@@ -1702,17 +1702,17 @@ while(!done) //it will be done when we reach the end of buffer in rdata->server_
 					break;
 				case 3:
 					sizeOfRange = 1;
-					absAddress= 1;
+					//absAddress= 1;
 					minBufferLength = 7 + sizeOfRange;
 					break;
 				case 4:
 					sizeOfRange = 2;
-					absAddress= 1;
+					//absAddress= 1;
 					minBufferLength = 7 + sizeOfRange;
 					break;
 				case 5:
 					sizeOfRange = 4;
-					absAddress= 1;
+					//absAddress= 1;
 					minBufferLength = 7 + sizeOfRange;
 					break;
 				case 6:
@@ -1721,17 +1721,17 @@ while(!done) //it will be done when we reach the end of buffer in rdata->server_
 					break;
 				case 7:
 					sizeOfRange = 1;
-					quantity= 1;
+					//quantity= 1;
 					minBufferLength = 7 + sizeOfRange;
 					break;
 				case 8:
 					sizeOfRange = 2;
-					quantity= 1;
+					//quantity= 1;
 					minBufferLength = 7 + sizeOfRange;
 					break;
 				case 9:
 					sizeOfRange = 4;
-					quantity= 1;
+					//quantity= 1;
 					minBufferLength = 7 + sizeOfRange;
 					break;
 				default:
@@ -2625,13 +2625,13 @@ else if(quantity==1 && absAddress ==0){
 					//if starting index is a negative with modulus less than the length of data that means the first bytes are already in the session buffer
 					//should change partial data existing at the end of the pdu
 					startingIndex = byteNumber-(rdata->buflen-buflen+1);    // buflen is the length of data in the current packet
-					if(startingIndex<0 && abs(startingIndex)>=(sizeOfOneDataPoint+sizeOfQuality))
+					if(startingIndex<0 && abs(startingIndex)>=(int)(sizeOfOneDataPoint+sizeOfQuality))
 					{
 						//you have missed the point
 						continue;
 					}
 
-					else if(startingIndex<0 && abs(startingIndex)<(sizeOfOneDataPoint+sizeOfIndex+sizeOfCtrlStatus))
+					else if(startingIndex<0 && abs(startingIndex)<(int)(sizeOfOneDataPoint+sizeOfIndex+sizeOfCtrlStatus))
 					{
 
 						//the data is split between two packets
@@ -2672,7 +2672,7 @@ else if(quantity==1 && absAddress ==0){
 									//copy byte by byte since the value can be between two application segments then calculate the CRC for both segments
 									int twoSegments =0;
 									int count = 0;
-									for(int j=0;j<sizeOfOneDataPoint-startingIndexAlteredVal;j++){
+									for(int j=0;j<(int)(sizeOfOneDataPoint-startingIndexAlteredVal);j++){
 										int temp = 1+byteNumberNewPktBuffer+sizeOfQuality+startingIndexAlteredVal+j-26;
 
 										if((temp)==0 || ((temp)>0 && (temp)%18==0))
@@ -2776,8 +2776,8 @@ else if(quantity==1 && absAddress ==0){
 					rdata->start = 0;
 					rdata->stop = 0;
 					rdata->numberOfValues = 0;
-					uint8_t absAddress = 0;
-					uint8_t quantity = 0;
+					//uint8_t absAddress ;
+					//uint8_t quantity ;
 					uint8_t minBufferLength = 0;
 
 
@@ -2799,17 +2799,17 @@ else if(quantity==1 && absAddress ==0){
 						break;
 					case 3:
 						sizeOfRange = 1;
-						absAddress= 1;
+						//absAddress= 1;
 						minBufferLength = 7 + sizeOfRange;
 						break;
 					case 4:
 						sizeOfRange = 2;
-						absAddress= 1;
+						//absAddress= 1;
 						minBufferLength = 7 + sizeOfRange;
 						break;
 					case 5:
 						sizeOfRange = 4;
-						absAddress= 1;
+						//absAddress= 1;
 						minBufferLength = 7 + sizeOfRange;
 						break;
 					case 6:
@@ -2818,17 +2818,17 @@ else if(quantity==1 && absAddress ==0){
 						break;
 					case 7:
 						sizeOfRange = 1;
-						quantity= 1;
+						//quantity= 1;
 						minBufferLength = 7 + sizeOfRange;
 						break;
 					case 8:
 						sizeOfRange = 2;
-						quantity= 1;
+					//	quantity= 1;
 						minBufferLength = 7 + sizeOfRange;
 						break;
 					case 9:
 						sizeOfRange = 4;
-						quantity= 1;
+						//quantity= 1;
 						minBufferLength = 7 + sizeOfRange;
 						break;
 					default:
@@ -2888,9 +2888,9 @@ else if(quantity==1 && absAddress ==0){
    spp_dnp3 and dnp3_reassembly. */
 int DNP3FullReassembly(dnp3_config_t *config, dnp3_session_data_t *session, Ptr<const Packet> packet, uint8_t *pdu_start, uint16_t pdu_length)
 {
-	char buf[DNP3_TPDU_MAX];
+	uint8_t buf[DNP3_TPDU_MAX];
 	uint16_t buflen = sizeof(buf);
-	dnp3_link_header_t *link;
+
 	dnp3_reassembly_data_t *rdata;
 
 	if (pdu_length < (sizeof(dnp3_link_header_t) + sizeof(dnp3_transport_header_t) + 2))
@@ -2909,14 +2909,6 @@ int DNP3FullReassembly(dnp3_config_t *config, dnp3_session_data_t *session, Ptr<
 		return DNP3_FAIL;
 	}
 
-	/* Check reserved addresses */
-	if ( DNP3CheckReservedAddrs(link) == DNP3_FAIL )
-	{
-#ifdef DUMP_BUFFER
-		dumpBuffer(DNP3_RESERVED_BAD_ADDR_DUMP,packet->payload,packet->payload_size);
-#endif
-		return DNP3_FAIL;
-	}
 
 	/* XXX: NEED TO TRACK SEPARATE DNP3 SESSIONS OVER SINGLE TCP SESSION */
 
@@ -2925,9 +2917,7 @@ int DNP3FullReassembly(dnp3_config_t *config, dnp3_session_data_t *session, Ptr<
 	/* Step 2: Remove CRCs */
 	if ( DNP3CheckRemoveCRC(config, pdu_start, pdu_length, buf, &buflen) == DNP3_FAIL )
 	{
-#ifdef DUMP_BUFFER
-		dumpBuffer(DNP3_BAD_CRC_DUMP,packet->payload,packet->payload_size);
-#endif
+
 		return DNP3_FAIL;
 	}
 

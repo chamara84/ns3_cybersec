@@ -90,7 +90,7 @@ AttackApp::Setup (Ptr<Node> aNode, Ptr<NetDevice> aDev, Ptr<Ipv4Interface> iface
   m_vMac = vMac;
   Ptr<ArpL3Protocol> arpProtocol = m_node->GetObject<ArpL3Protocol>();
   arpProtocol->EnableDisableSpoofedARP(true);
-  multimap< string , int> mp;
+
 }
 
 void
@@ -163,7 +163,7 @@ int readConfigFile( configuration * config)
 	//this function reads the config file at attack-app setup and stores the data in config
 	std::ifstream infile("/etc/ns3/ns3.conf");
 	std::string line, linePrev;
-	int protocolNum = 0, readNewProtocol=0, indexNum=0;
+	int readNewProtocol=0, indexNum=0;
 
 	while (std::getline(infile, line))
 	{
@@ -362,7 +362,7 @@ if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()!=20000 &
 	//if(packetCopy->GetSize ()>0){
 
 	  	       unsigned int bufferFloat[packetCopy->GetSize ()];
-	  	       packetCopy->CopyData (buffer, packetCopy->GetSize ());
+	  	       packetCopy->CopyData (&buffer[0], packetCopy->GetSize ());
 	  	       int integerData;
 	  	       int DERIndex ;
 	  	       float floatingPointData;
@@ -474,18 +474,18 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 	if (tcpHdr1.GetDestinationPort()==20000)
 	{
 		senderIp = ipV4Hdr.GetSource();
-		senderIntIP = senderIp;
-		key = senderIntIP<<16 + tcpHdr1.GetSourcePort();
+		senderIntIP = senderIp.Get();
+		key = (senderIntIP<<16) + tcpHdr1.GetSourcePort();
 		dnp3_session_data_t* session = mmapOfdnp3Data.find(key)->second;
 		if(session)
 		{
-			DNP3FullReassembly(&configDnp3, session, packet, (char *)buffer,dataSize);
+			DNP3FullReassembly(&configDnp3, session, packet, (uint8_t *)buffer,dataSize);
 		}
 		else
 		{
 			 session  =  new dnp3_session_data_t();
 			 mmapOfdnp3Data.insert({key, session});
-			 DNP3FullReassembly(&configDnp3, session, packet, (char *)buffer,dataSize);
+			 DNP3FullReassembly(&configDnp3, session, packet, (uint8_t *)buffer,dataSize);
 		}
 	}
 }
