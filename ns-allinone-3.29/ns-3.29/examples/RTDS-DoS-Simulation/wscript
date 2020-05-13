@@ -11,10 +11,11 @@ def build(bld):
     obj.source = 'arp1.cc'
     obj = bld.create_ns3_program('icmpv4-redirect', ['csma', 'internet', 'applications','wifi', 'olsr', 'netanim','flow-monitor','point-to-point'])
     obj.source = 'icmpv4-redirect.cc'
+    obj = bld.create_ns3_program('rtds-Tap-ICS-Mod', ['csma', 'internet', 'applications','wifi', 'olsr', 'netanim','flow-monitor','point-to-point', 'tap-bridge'])
+    obj.source = 'rtds-Tap-ICS-Mod.cc'
     
     
     
-    
-    
+ 
     
     
