@@ -111,14 +111,14 @@ main (int argc, char *argv[])
   //
   TapBridgeHelper tapBridge;
   tapBridge.SetAttribute ("Mode", StringValue ("UseBridge"));
-  tapBridge.SetAttribute ("DeviceName", StringValue ("tap-left"));
+  tapBridge.SetAttribute ("DeviceName", StringValue ("tap00"));
   tapBridge.Install (nodes.Get (0), devices.Get (0));
 
   //
   // Connect the right side tap to the right side CSMA device on the right-side
   // ghost node.
   //
-  tapBridge.SetAttribute ("DeviceName", StringValue ("tap-right"));
+  tapBridge.SetAttribute ("DeviceName", StringValue ("tap01"));
   tapBridge.Install (nodes.Get (1), devices.Get (1));
 
   //

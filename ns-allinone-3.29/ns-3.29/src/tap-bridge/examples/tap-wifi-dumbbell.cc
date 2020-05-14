@@ -78,7 +78,7 @@
 //    traffic data rate and watch the ping timing change dramatically.
 //
 //    ./waf --run "tap-wifi-dumbbell --ns3::OnOffApplication::DataRate=100kb/s"&
-//    sudo route add -net 10.1.3.0 netmask 255.255.255.0 dev thetap gw 10.1.1.2
+//    ./waf --run tap-wifi-dumbbell
 //    ping 10.1.3.4
 //
 // 4) Try to run this in UseBridge mode.  This allows you to bridge an ns-3
@@ -161,12 +161,12 @@ main (int argc, char *argv[])
   internetLeft.Install (nodesLeft);
 
   Ipv4AddressHelper ipv4Left;
-  ipv4Left.SetBase ("10.1.1.0", "255.255.255.0");
+  ipv4Left.SetBase ("192.168.19.0", "255.255.255.0","0.0.0.3");
   Ipv4InterfaceContainer interfacesLeft = ipv4Left.Assign (devicesLeft);
 
   TapBridgeHelper tapBridge (interfacesLeft.GetAddress (1));
-  tapBridge.SetAttribute ("Mode", StringValue (mode));
-  tapBridge.SetAttribute ("DeviceName", StringValue (tapName));
+  tapBridge.SetAttribute ("Mode", StringValue ("UseBridge"));
+  tapBridge.SetAttribute ("DeviceName", StringValue ("tap00"));
   tapBridge.Install (nodesLeft.Get (0), devicesLeft.Get (0));
 
   //
@@ -223,7 +223,7 @@ main (int argc, char *argv[])
   csmaRight.EnablePcapAll ("tap-wifi-dumbbell", false);
   Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
-  Simulator::Stop (Seconds (60.));
+  Simulator::Stop (Seconds (600.));
   Simulator::Run ();
   Simulator::Destroy ();
 }
