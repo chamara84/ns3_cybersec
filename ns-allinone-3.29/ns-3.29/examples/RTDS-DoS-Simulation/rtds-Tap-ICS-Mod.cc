@@ -201,10 +201,10 @@ stack.Install (inN3);
 
 Ipv4AddressHelper ipv4;
 
-ipv4.SetBase ("10.0.2.0", "255.255.255.0","0.0.0.6");
+ipv4.SetBase ("172.24.0.0", "255.255.0.0","0.0.9.245");
 Ipv4InterfaceContainer ipinN0n0 = ipv4.Assign (dinN0dn0);
 
-ipv4.SetBase ("10.0.3.0", "255.255.255.0","0.0.0.5");
+ipv4.SetBase ("172.24.0.0", "255.255.0.0","0.0.9.250");
 Ipv4InterfaceContainer ipinN3n3 = ipv4.Assign (dinN3dn3);
 
 //ipv4.SetBase ("192.168.22.0", "255.255.255.0");
@@ -236,6 +236,7 @@ Ipv4InterfaceContainer in0n1n2n3 = ipv4.Assign (dn0n1n2n3);
 
 // Get access to the IPv4 stack of the nodes to push routing tables
  Ptr<Ipv4> ipv4n0 = n0->GetObject<Ipv4> ();
+ Ptr<Ipv4> ipv4inN0 = inN0->GetObject<Ipv4> ();
  Ptr<Ipv4> ipv4n1 = n1->GetObject<Ipv4> ();
  Ptr<Ipv4> ipv4n2 = n2->GetObject<Ipv4> ();
  Ptr<Ipv4> ipv4n3 = n3->GetObject<Ipv4> ();
@@ -274,14 +275,19 @@ staticRoutingA->AddHostRouteTo (Ipv4Address ("192.168.10.1"), Ipv4Address ("192.
  // routing from n0 to n1,n2,n3,n4
  // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
 
- staticRoutingn0->AddNetworkRouteTo(Ipv4Address ("10.0.2.0"), Ipv4Mask ("255.255.255.0"), 2, 0);
+staticRoutingn0->SetDefaultRoute(Ipv4Address ("172.24.0.1"), 2,0);
+
+Ptr<Ipv4StaticRouting> staticRoutinginN0 = ipv4RoutingHelper.GetStaticRouting (ipv4inN0);
+//staticRoutinginN0->SetDefaultRoute(Ipv4Address ("172.24.0.1"), 2,0);
+
+
  // routing from n1 to n0,n2,n3,n4
  // Create static routes
  Ptr<Ipv4StaticRouting> staticRoutingn1 = ipv4RoutingHelper.GetStaticRouting (ipv4n1);
 
  // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
 
-  staticRoutingn1->AddNetworkRouteTo (Ipv4Address ("172.24.0.0"), Ipv4Mask ("255.255.0.0"), 1,0);
+ // staticRoutingn1->AddNetworkRouteTo (Ipv4Address ("172.24.0.0"), Ipv4Mask ("255.255.0.0"), 1,0);
 
  // routing from n2 to n0,n1,n3,n4
  // Create static routes
@@ -289,7 +295,7 @@ staticRoutingA->AddHostRouteTo (Ipv4Address ("192.168.10.1"), Ipv4Address ("192.
  //from B to C
  // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
 
-  staticRoutingn2->AddNetworkRouteTo(Ipv4Address ("172.24.0.0"), Ipv4Mask ("255.255.0.0"), 1,0);
+ // staticRoutingn2->AddNetworkRouteTo(Ipv4Address ("172.24.0.0"), Ipv4Mask ("255.255.0.0"), 1,0);
 
  // routing from n3 to n0,n1,n2,n4
  // Create static routes
@@ -297,7 +303,7 @@ staticRoutingA->AddHostRouteTo (Ipv4Address ("192.168.10.1"), Ipv4Address ("192.
 
 
  // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
- staticRoutingn3->SetDefaultRoute(Ipv4Address ("172.24.0.1"), 1,0); // or next hop ip is: 192.168.12.1
+//  staticRoutingn3->SetDefaultRoute(Ipv4Address ("172.24.0.1"), 1,0); // or next hop ip is: 192.168.12.1
 
 
 
@@ -316,7 +322,7 @@ staticRoutingA->AddHostRouteTo (Ipv4Address ("192.168.10.1"), Ipv4Address ("192.
   TapBridgeHelper tapBridge;
 tapBridge.SetAttribute ("Mode", StringValue ("UseBridge"));
 tapBridge.SetAttribute ("DeviceName", StringValue ("tap00"));
-tapBridge.Install (n0, dn0dinN0.Get (1));
+tapBridge.Install (n0, dinN0dn0.Get (1));
 
 //
 // Connect the right side tap to the right side CSMA device in ghost node n3
@@ -325,7 +331,7 @@ tapBridge.Install (n0, dn0dinN0.Get (1));
 //
 
 tapBridge.SetAttribute ("DeviceName", StringValue ("tap01"));
-tapBridge.Install (n3, dn3dinN3.Get (1));
+tapBridge.Install (n3, dinN3dn3.Get (1));
 
 Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
           //Print Routin Table

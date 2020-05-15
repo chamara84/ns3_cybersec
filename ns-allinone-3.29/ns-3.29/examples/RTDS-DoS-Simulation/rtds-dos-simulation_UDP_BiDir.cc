@@ -815,8 +815,8 @@ main (int argc, char *argv[])
 	  // arguments
 	  //
 	  CommandLine cmd;
-	  std::string deviceName1 ("enp0s3");
-	   std::string deviceName2 ("enp0s8"); //edit the name corresponding to the device name
+	  std::string deviceName1 ("em1");
+	   std::string deviceName2 ("p24p1"); //edit the name corresponding to the device name
 	  std::string encapMode ("Dix");
 
 	  int subnet;
