@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'qteditorfactory.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.9.5)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.13.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "qtpropertybrowser/src/qteditorfactory.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'qteditorfactory.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.9.5. It"
+#error "This file was generated using the moc from 5.13.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -52,7 +53,7 @@ QT_MOC_LITERAL(8, 122, 19) // "slotEditorDestroyed"
 static const uint qt_meta_data_QtSpinBoxFactory[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        6,   14, // methods
@@ -84,7 +85,7 @@ static const uint qt_meta_data_QtSpinBoxFactory[] = {
 void QtSpinBoxFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtSpinBoxFactory *_t = static_cast<QtSpinBoxFactory *>(_o);
+        auto *_t = static_cast<QtSpinBoxFactory *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->d_func()->slotPropertyChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
@@ -98,10 +99,14 @@ void QtSpinBoxFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int
     }
 }
 
-const QMetaObject QtSpinBoxFactory::staticMetaObject = {
-    { &QtAbstractEditorFactory<QtIntPropertyManager>::staticMetaObject, qt_meta_stringdata_QtSpinBoxFactory.data,
-      qt_meta_data_QtSpinBoxFactory,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtSpinBoxFactory::staticMetaObject = { {
+    &QtAbstractEditorFactory<QtIntPropertyManager>::staticMetaObject,
+    qt_meta_stringdata_QtSpinBoxFactory.data,
+    qt_meta_data_QtSpinBoxFactory,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtSpinBoxFactory::metaObject() const
@@ -164,7 +169,7 @@ QT_MOC_LITERAL(7, 101, 19) // "slotEditorDestroyed"
 static const uint qt_meta_data_QtSliderFactory[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        5,   14, // methods
@@ -194,7 +199,7 @@ static const uint qt_meta_data_QtSliderFactory[] = {
 void QtSliderFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtSliderFactory *_t = static_cast<QtSliderFactory *>(_o);
+        auto *_t = static_cast<QtSliderFactory *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->d_func()->slotPropertyChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
@@ -207,10 +212,14 @@ void QtSliderFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
     }
 }
 
-const QMetaObject QtSliderFactory::staticMetaObject = {
-    { &QtAbstractEditorFactory<QtIntPropertyManager>::staticMetaObject, qt_meta_stringdata_QtSliderFactory.data,
-      qt_meta_data_QtSliderFactory,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtSliderFactory::staticMetaObject = { {
+    &QtAbstractEditorFactory<QtIntPropertyManager>::staticMetaObject,
+    qt_meta_stringdata_QtSliderFactory.data,
+    qt_meta_data_QtSliderFactory,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtSliderFactory::metaObject() const
@@ -273,7 +282,7 @@ QT_MOC_LITERAL(7, 104, 19) // "slotEditorDestroyed"
 static const uint qt_meta_data_QtScrollBarFactory[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        5,   14, // methods
@@ -303,7 +312,7 @@ static const uint qt_meta_data_QtScrollBarFactory[] = {
 void QtScrollBarFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtScrollBarFactory *_t = static_cast<QtScrollBarFactory *>(_o);
+        auto *_t = static_cast<QtScrollBarFactory *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->d_func()->slotPropertyChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
@@ -316,10 +325,14 @@ void QtScrollBarFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, i
     }
 }
 
-const QMetaObject QtScrollBarFactory::staticMetaObject = {
-    { &QtAbstractEditorFactory<QtIntPropertyManager>::staticMetaObject, qt_meta_stringdata_QtScrollBarFactory.data,
-      qt_meta_data_QtScrollBarFactory,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtScrollBarFactory::staticMetaObject = { {
+    &QtAbstractEditorFactory<QtIntPropertyManager>::staticMetaObject,
+    qt_meta_stringdata_QtScrollBarFactory.data,
+    qt_meta_data_QtScrollBarFactory,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtScrollBarFactory::metaObject() const
@@ -380,7 +393,7 @@ QT_MOC_LITERAL(6, 87, 19) // "slotEditorDestroyed"
 static const uint qt_meta_data_QtCheckBoxFactory[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        4,   14, // methods
@@ -408,7 +421,7 @@ static const uint qt_meta_data_QtCheckBoxFactory[] = {
 void QtCheckBoxFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtCheckBoxFactory *_t = static_cast<QtCheckBoxFactory *>(_o);
+        auto *_t = static_cast<QtCheckBoxFactory *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->d_func()->slotPropertyChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
@@ -420,10 +433,14 @@ void QtCheckBoxFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, in
     }
 }
 
-const QMetaObject QtCheckBoxFactory::staticMetaObject = {
-    { &QtAbstractEditorFactory<QtBoolPropertyManager>::staticMetaObject, qt_meta_stringdata_QtCheckBoxFactory.data,
-      qt_meta_data_QtCheckBoxFactory,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtCheckBoxFactory::staticMetaObject = { {
+    &QtAbstractEditorFactory<QtBoolPropertyManager>::staticMetaObject,
+    qt_meta_stringdata_QtCheckBoxFactory.data,
+    qt_meta_data_QtCheckBoxFactory,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtCheckBoxFactory::metaObject() const
@@ -489,7 +506,7 @@ QT_MOC_LITERAL(9, 148, 19) // "slotEditorDestroyed"
 static const uint qt_meta_data_QtDoubleSpinBoxFactory[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        7,   14, // methods
@@ -523,7 +540,7 @@ static const uint qt_meta_data_QtDoubleSpinBoxFactory[] = {
 void QtDoubleSpinBoxFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtDoubleSpinBoxFactory *_t = static_cast<QtDoubleSpinBoxFactory *>(_o);
+        auto *_t = static_cast<QtDoubleSpinBoxFactory *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->d_func()->slotPropertyChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2]))); break;
@@ -538,10 +555,14 @@ void QtDoubleSpinBoxFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _
     }
 }
 
-const QMetaObject QtDoubleSpinBoxFactory::staticMetaObject = {
-    { &QtAbstractEditorFactory<QtDoublePropertyManager>::staticMetaObject, qt_meta_stringdata_QtDoubleSpinBoxFactory.data,
-      qt_meta_data_QtDoubleSpinBoxFactory,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtDoubleSpinBoxFactory::staticMetaObject = { {
+    &QtAbstractEditorFactory<QtDoublePropertyManager>::staticMetaObject,
+    qt_meta_stringdata_QtDoubleSpinBoxFactory.data,
+    qt_meta_data_QtDoubleSpinBoxFactory,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtDoubleSpinBoxFactory::metaObject() const
@@ -605,7 +626,7 @@ QT_MOC_LITERAL(8, 122, 19) // "slotEditorDestroyed"
 static const uint qt_meta_data_QtLineEditFactory[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        6,   14, // methods
@@ -637,7 +658,7 @@ static const uint qt_meta_data_QtLineEditFactory[] = {
 void QtLineEditFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtLineEditFactory *_t = static_cast<QtLineEditFactory *>(_o);
+        auto *_t = static_cast<QtLineEditFactory *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->d_func()->slotPropertyChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2]))); break;
@@ -651,10 +672,14 @@ void QtLineEditFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, in
     }
 }
 
-const QMetaObject QtLineEditFactory::staticMetaObject = {
-    { &QtAbstractEditorFactory<QtStringPropertyManager>::staticMetaObject, qt_meta_stringdata_QtLineEditFactory.data,
-      qt_meta_data_QtLineEditFactory,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtLineEditFactory::staticMetaObject = { {
+    &QtAbstractEditorFactory<QtStringPropertyManager>::staticMetaObject,
+    qt_meta_stringdata_QtLineEditFactory.data,
+    qt_meta_data_QtLineEditFactory,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtLineEditFactory::metaObject() const
@@ -715,7 +740,7 @@ QT_MOC_LITERAL(6, 81, 19) // "slotEditorDestroyed"
 static const uint qt_meta_data_QtDateEditFactory[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        4,   14, // methods
@@ -743,7 +768,7 @@ static const uint qt_meta_data_QtDateEditFactory[] = {
 void QtDateEditFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtDateEditFactory *_t = static_cast<QtDateEditFactory *>(_o);
+        auto *_t = static_cast<QtDateEditFactory *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->d_func()->slotPropertyChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< const QDate(*)>(_a[2]))); break;
@@ -755,10 +780,14 @@ void QtDateEditFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, in
     }
 }
 
-const QMetaObject QtDateEditFactory::staticMetaObject = {
-    { &QtAbstractEditorFactory<QtDatePropertyManager>::staticMetaObject, qt_meta_stringdata_QtDateEditFactory.data,
-      qt_meta_data_QtDateEditFactory,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtDateEditFactory::staticMetaObject = { {
+    &QtAbstractEditorFactory<QtDatePropertyManager>::staticMetaObject,
+    qt_meta_stringdata_QtDateEditFactory.data,
+    qt_meta_data_QtDateEditFactory,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtDateEditFactory::metaObject() const
@@ -817,7 +846,7 @@ QT_MOC_LITERAL(5, 64, 19) // "slotEditorDestroyed"
 static const uint qt_meta_data_QtTimeEditFactory[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        3,   14, // methods
@@ -843,7 +872,7 @@ static const uint qt_meta_data_QtTimeEditFactory[] = {
 void QtTimeEditFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtTimeEditFactory *_t = static_cast<QtTimeEditFactory *>(_o);
+        auto *_t = static_cast<QtTimeEditFactory *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->d_func()->slotPropertyChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< const QTime(*)>(_a[2]))); break;
@@ -854,10 +883,14 @@ void QtTimeEditFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, in
     }
 }
 
-const QMetaObject QtTimeEditFactory::staticMetaObject = {
-    { &QtAbstractEditorFactory<QtTimePropertyManager>::staticMetaObject, qt_meta_stringdata_QtTimeEditFactory.data,
-      qt_meta_data_QtTimeEditFactory,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtTimeEditFactory::staticMetaObject = { {
+    &QtAbstractEditorFactory<QtTimePropertyManager>::staticMetaObject,
+    qt_meta_stringdata_QtTimeEditFactory.data,
+    qt_meta_data_QtTimeEditFactory,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtTimeEditFactory::metaObject() const
@@ -916,7 +949,7 @@ QT_MOC_LITERAL(5, 68, 19) // "slotEditorDestroyed"
 static const uint qt_meta_data_QtDateTimeEditFactory[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        3,   14, // methods
@@ -942,7 +975,7 @@ static const uint qt_meta_data_QtDateTimeEditFactory[] = {
 void QtDateTimeEditFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtDateTimeEditFactory *_t = static_cast<QtDateTimeEditFactory *>(_o);
+        auto *_t = static_cast<QtDateTimeEditFactory *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->d_func()->slotPropertyChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< const QDateTime(*)>(_a[2]))); break;
@@ -953,10 +986,14 @@ void QtDateTimeEditFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c
     }
 }
 
-const QMetaObject QtDateTimeEditFactory::staticMetaObject = {
-    { &QtAbstractEditorFactory<QtDateTimePropertyManager>::staticMetaObject, qt_meta_stringdata_QtDateTimeEditFactory.data,
-      qt_meta_data_QtDateTimeEditFactory,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtDateTimeEditFactory::staticMetaObject = { {
+    &QtAbstractEditorFactory<QtDateTimePropertyManager>::staticMetaObject,
+    qt_meta_stringdata_QtDateTimeEditFactory.data,
+    qt_meta_data_QtDateTimeEditFactory,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtDateTimeEditFactory::metaObject() const
@@ -1016,7 +1053,7 @@ QT_MOC_LITERAL(5, 73, 19) // "slotEditorDestroyed"
 static const uint qt_meta_data_QtKeySequenceEditorFactory[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        3,   14, // methods
@@ -1042,7 +1079,7 @@ static const uint qt_meta_data_QtKeySequenceEditorFactory[] = {
 void QtKeySequenceEditorFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtKeySequenceEditorFactory *_t = static_cast<QtKeySequenceEditorFactory *>(_o);
+        auto *_t = static_cast<QtKeySequenceEditorFactory *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->d_func()->slotPropertyChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< const QKeySequence(*)>(_a[2]))); break;
@@ -1053,10 +1090,14 @@ void QtKeySequenceEditorFactory::qt_static_metacall(QObject *_o, QMetaObject::Ca
     }
 }
 
-const QMetaObject QtKeySequenceEditorFactory::staticMetaObject = {
-    { &QtAbstractEditorFactory<QtKeySequencePropertyManager>::staticMetaObject, qt_meta_stringdata_QtKeySequenceEditorFactory.data,
-      qt_meta_data_QtKeySequenceEditorFactory,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtKeySequenceEditorFactory::staticMetaObject = { {
+    &QtAbstractEditorFactory<QtKeySequencePropertyManager>::staticMetaObject,
+    qt_meta_stringdata_QtKeySequenceEditorFactory.data,
+    qt_meta_data_QtKeySequenceEditorFactory,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtKeySequenceEditorFactory::metaObject() const
@@ -1115,7 +1156,7 @@ QT_MOC_LITERAL(5, 66, 19) // "slotEditorDestroyed"
 static const uint qt_meta_data_QtCharEditorFactory[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        3,   14, // methods
@@ -1141,7 +1182,7 @@ static const uint qt_meta_data_QtCharEditorFactory[] = {
 void QtCharEditorFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtCharEditorFactory *_t = static_cast<QtCharEditorFactory *>(_o);
+        auto *_t = static_cast<QtCharEditorFactory *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->d_func()->slotPropertyChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< const QChar(*)>(_a[2]))); break;
@@ -1152,10 +1193,14 @@ void QtCharEditorFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, 
     }
 }
 
-const QMetaObject QtCharEditorFactory::staticMetaObject = {
-    { &QtAbstractEditorFactory<QtCharPropertyManager>::staticMetaObject, qt_meta_stringdata_QtCharEditorFactory.data,
-      qt_meta_data_QtCharEditorFactory,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtCharEditorFactory::staticMetaObject = { {
+    &QtAbstractEditorFactory<QtCharPropertyManager>::staticMetaObject,
+    qt_meta_stringdata_QtCharEditorFactory.data,
+    qt_meta_data_QtCharEditorFactory,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtCharEditorFactory::metaObject() const
@@ -1219,7 +1264,7 @@ QT_MOC_LITERAL(8, 124, 19) // "slotEditorDestroyed"
 static const uint qt_meta_data_QtEnumEditorFactory[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        5,   14, // methods
@@ -1249,7 +1294,7 @@ static const uint qt_meta_data_QtEnumEditorFactory[] = {
 void QtEnumEditorFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtEnumEditorFactory *_t = static_cast<QtEnumEditorFactory *>(_o);
+        auto *_t = static_cast<QtEnumEditorFactory *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->d_func()->slotPropertyChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
@@ -1262,10 +1307,14 @@ void QtEnumEditorFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, 
     }
 }
 
-const QMetaObject QtEnumEditorFactory::staticMetaObject = {
-    { &QtAbstractEditorFactory<QtEnumPropertyManager>::staticMetaObject, qt_meta_stringdata_QtEnumEditorFactory.data,
-      qt_meta_data_QtEnumEditorFactory,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtEnumEditorFactory::staticMetaObject = { {
+    &QtAbstractEditorFactory<QtEnumPropertyManager>::staticMetaObject,
+    qt_meta_stringdata_QtEnumEditorFactory.data,
+    qt_meta_data_QtEnumEditorFactory,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtEnumEditorFactory::metaObject() const
@@ -1325,7 +1374,7 @@ QT_MOC_LITERAL(5, 71, 19) // "slotEditorDestroyed"
 static const uint qt_meta_data_QtCursorEditorFactory[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        3,   14, // methods
@@ -1351,7 +1400,7 @@ static const uint qt_meta_data_QtCursorEditorFactory[] = {
 void QtCursorEditorFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtCursorEditorFactory *_t = static_cast<QtCursorEditorFactory *>(_o);
+        auto *_t = static_cast<QtCursorEditorFactory *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->d_func()->slotPropertyChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< const QCursor(*)>(_a[2]))); break;
@@ -1362,10 +1411,14 @@ void QtCursorEditorFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c
     }
 }
 
-const QMetaObject QtCursorEditorFactory::staticMetaObject = {
-    { &QtAbstractEditorFactory<QtCursorPropertyManager>::staticMetaObject, qt_meta_stringdata_QtCursorEditorFactory.data,
-      qt_meta_data_QtCursorEditorFactory,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtCursorEditorFactory::staticMetaObject = { {
+    &QtAbstractEditorFactory<QtCursorPropertyManager>::staticMetaObject,
+    qt_meta_stringdata_QtCursorEditorFactory.data,
+    qt_meta_data_QtCursorEditorFactory,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtCursorEditorFactory::metaObject() const
@@ -1425,7 +1478,7 @@ QT_MOC_LITERAL(5, 74, 12) // "slotSetValue"
 static const uint qt_meta_data_QtColorEditorFactory[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        3,   14, // methods
@@ -1451,7 +1504,7 @@ static const uint qt_meta_data_QtColorEditorFactory[] = {
 void QtColorEditorFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtColorEditorFactory *_t = static_cast<QtColorEditorFactory *>(_o);
+        auto *_t = static_cast<QtColorEditorFactory *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->d_func()->slotPropertyChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< const QColor(*)>(_a[2]))); break;
@@ -1462,10 +1515,14 @@ void QtColorEditorFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c,
     }
 }
 
-const QMetaObject QtColorEditorFactory::staticMetaObject = {
-    { &QtAbstractEditorFactory<QtColorPropertyManager>::staticMetaObject, qt_meta_stringdata_QtColorEditorFactory.data,
-      qt_meta_data_QtColorEditorFactory,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtColorEditorFactory::staticMetaObject = { {
+    &QtAbstractEditorFactory<QtColorPropertyManager>::staticMetaObject,
+    qt_meta_stringdata_QtColorEditorFactory.data,
+    qt_meta_data_QtColorEditorFactory,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtColorEditorFactory::metaObject() const
@@ -1525,7 +1582,7 @@ QT_MOC_LITERAL(5, 73, 12) // "slotSetValue"
 static const uint qt_meta_data_QtFontEditorFactory[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        3,   14, // methods
@@ -1551,7 +1608,7 @@ static const uint qt_meta_data_QtFontEditorFactory[] = {
 void QtFontEditorFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtFontEditorFactory *_t = static_cast<QtFontEditorFactory *>(_o);
+        auto *_t = static_cast<QtFontEditorFactory *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->d_func()->slotPropertyChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< const QFont(*)>(_a[2]))); break;
@@ -1562,10 +1619,14 @@ void QtFontEditorFactory::qt_static_metacall(QObject *_o, QMetaObject::Call _c, 
     }
 }
 
-const QMetaObject QtFontEditorFactory::staticMetaObject = {
-    { &QtAbstractEditorFactory<QtFontPropertyManager>::staticMetaObject, qt_meta_stringdata_QtFontEditorFactory.data,
-      qt_meta_data_QtFontEditorFactory,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtFontEditorFactory::staticMetaObject = { {
+    &QtAbstractEditorFactory<QtFontPropertyManager>::staticMetaObject,
+    qt_meta_stringdata_QtFontEditorFactory.data,
+    qt_meta_data_QtFontEditorFactory,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtFontEditorFactory::metaObject() const

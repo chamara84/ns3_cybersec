@@ -844,7 +844,7 @@ Buffer::Iterator::Construct (const Buffer *buffer)
 void 
 Buffer::Iterator::Next (void)
 {
-  NS_ASSERT (m_current + 1 <= m_dataEnd);
+//  NS_ASSERT (m_current + 1 <= m_dataEnd);
   m_current++;
 }
 void 
@@ -856,7 +856,7 @@ Buffer::Iterator::Prev (void)
 void 
 Buffer::Iterator::Next (uint32_t delta)
 {
-  NS_ASSERT (m_current + delta <= m_dataEnd);
+  // NS_ASSERT (m_current + delta <= m_dataEnd);
   m_current += delta;
 }
 void 

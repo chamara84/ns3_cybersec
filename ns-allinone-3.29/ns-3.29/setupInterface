@@ -2,8 +2,8 @@
 # Setup Interfaces
 sudo brctl addbr br00
 sudo brctl addbr br01
-sudo tunctl -t tap00
-sudo tunctl -t tap01
+sudo ip tuntap add mode tap tap00
+sudo ip tuntap add mode tap tap01
 
 sudo ifconfig tap00 hw ether 00:00:00:00:01:20
 sudo ifconfig tap00 0.0.0.0 promisc up
@@ -11,8 +11,8 @@ sudo ifconfig tap01 hw ether 00:00:00:00:01:21
 sudo ifconfig tap01 0.0.0.0 promisc up
 
 sudo brctl addif br00 tap00
-sudo brctl addif br00 enp0s3
+sudo brctl addif br00 em1
 sudo ifconfig br00 up
 sudo brctl addif br01 tap01
-sudo brctl addif br01 enp0s8
+sudo brctl addif br01 p24p1
 sudo ifconfig br01 up

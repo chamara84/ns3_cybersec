@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'filepathmanager.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.9.5)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.13.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "qtpropertybrowser/src/filepathmanager.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'filepathmanager.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.9.5. It"
+#error "This file was generated using the moc from 5.13.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -52,7 +53,7 @@ QT_MOC_LITERAL(9, 82, 9) // "setFilter"
 static const uint qt_meta_data_FilePathManager[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        4,   14, // methods
@@ -84,7 +85,7 @@ static const uint qt_meta_data_FilePathManager[] = {
 void FilePathManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        FilePathManager *_t = static_cast<FilePathManager *>(_o);
+        auto *_t = static_cast<FilePathManager *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->valueChanged((*reinterpret_cast< QtProperty*(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2]))); break;
@@ -96,14 +97,14 @@ void FilePathManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            typedef void (FilePathManager::*_t)(QtProperty * , const QString & );
+            using _t = void (FilePathManager::*)(QtProperty * , const QString & );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&FilePathManager::valueChanged)) {
                 *result = 0;
                 return;
             }
         }
         {
-            typedef void (FilePathManager::*_t)(QtProperty * , const QString & );
+            using _t = void (FilePathManager::*)(QtProperty * , const QString & );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&FilePathManager::filterChanged)) {
                 *result = 1;
                 return;
@@ -112,10 +113,14 @@ void FilePathManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
     }
 }
 
-const QMetaObject FilePathManager::staticMetaObject = {
-    { &QtAbstractPropertyManager::staticMetaObject, qt_meta_stringdata_FilePathManager.data,
-      qt_meta_data_FilePathManager,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject FilePathManager::staticMetaObject = { {
+    &QtAbstractPropertyManager::staticMetaObject,
+    qt_meta_stringdata_FilePathManager.data,
+    qt_meta_data_FilePathManager,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *FilePathManager::metaObject() const
@@ -151,14 +156,14 @@ int FilePathManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 // SIGNAL 0
 void FilePathManager::valueChanged(QtProperty * _t1, const QString & _t2)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 
 // SIGNAL 1
 void FilePathManager::filterChanged(QtProperty * _t1, const QString & _t2)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 QT_WARNING_POP
