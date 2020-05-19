@@ -217,11 +217,11 @@ stack.Install (inN3);
 
 Ipv4AddressHelper ipv4;
 
-ipv4.SetBase ("172.24.0.0", "255.255.0.0","0.0.9.245");
-Ipv4InterfaceContainer ipinN0n0 = ipv4.Assign (dinN0dn0);
+//ipv4.SetBase ("172.24.0.0", "255.255.0.0","0.0.9.241");
+//Ipv4InterfaceContainer ipn0n1n2n3 = ipv4.Assign (dn0n1n2n3);
 
 ipv4.SetBase ("172.24.0.0", "255.255.0.0","0.0.9.250");
-Ipv4InterfaceContainer ipinN3n3 = ipv4.Assign (dinN3dn3);
+Ipv4InterfaceContainer ipinN3n3 = ipv4.Assign (dinN3n3);
 
 //ipv4.SetBase ("192.168.22.0", "255.255.255.0");
 //Ipv4InterfaceContainer inIn2n2 = ipv4.Assign (dn2dinN2);
@@ -235,8 +235,8 @@ Ipv4InterfaceContainer ipinN3n3 = ipv4.Assign (dinN3dn3);
 // hard to allocate custom network IPs using Ipv4AddressHelper
 // And add IP addresses
 
-ipv4.SetBase ("192.168.10.0", "255.255.255.0","0.0.0.2");
-Ipv4InterfaceContainer in0n1n2n3 = ipv4.Assign (dn0n1n2n3);
+ipv4.SetBase ("172.24.0.0", "255.255.0.0","0.0.9.241");
+Ipv4InterfaceContainer ipn0n1n2n3 = ipv4.Assign (dn0n1n2n3);
 
 //ipv4.SetBase ("192.168.11.0", "255.255.255.0");
 //Ipv4InterfaceContainer in1in2 = ipv4.Assign (dn1dn2);
@@ -316,7 +316,7 @@ Ptr<Ipv4StaticRouting> staticRoutinginN0 = ipv4RoutingHelper.GetStaticRouting (i
 
 
  // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
-//  staticRoutingn3->SetDefaultRoute(Ipv4Address ("172.24.0.1"), 1,0); // or next hop ip is: 192.168.12.1
+  staticRoutingn3->SetDefaultRoute(Ipv4Address ("172.24.0.1"), 2,0); // or next hop ip is: 192.168.12.1
 
 
 
@@ -335,7 +335,7 @@ Ptr<Ipv4StaticRouting> staticRoutinginN0 = ipv4RoutingHelper.GetStaticRouting (i
   TapBridgeHelper tapBridge;
 tapBridge.SetAttribute ("Mode", StringValue ("UseBridge"));
 tapBridge.SetAttribute ("DeviceName", StringValue ("tap00"));
-tapBridge.Install (n0, dinN0dn0.Get (1));
+tapBridge.Install (n0, dn0n1n2n3.Get (0));
 
 //
 // Connect the right side tap to the right side CSMA device in ghost node n3
@@ -344,7 +344,7 @@ tapBridge.Install (n0, dinN0dn0.Get (1));
 //
 
 tapBridge.SetAttribute ("DeviceName", StringValue ("tap01"));
-tapBridge.Install (n3, dinN3dn3.Get (1));
+tapBridge.Install (n3, dn0n1n2n3.Get (3));
 
 Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
           //Print Routin Table
@@ -352,13 +352,45 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
           Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
           std::cout<<"Routing Table inN0"<<endl;
           ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), inN0, routingStream);
-          std::cout<<"Routing Table inN3"<<endl;
-          ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), inN3, routingStream);
-          std::cout<<"Routing Table n0"<<endl;
-          ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), n0, routingStream);
+//          std::cout<<"Routing Table n3"<<endl;
+//          ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), n3, routingStream);
+//          std::cout<<"Routing Table n0"<<endl;
+//          ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), n0, routingStream);
 
 
 
+
+          //setup application
+
+          std::stringstream macAddr;
+                                uint32_t attackerId = 1;
+                                uint32_t victimDer = 2;
+                                uint32_t csmaSwitch = 3;
+                                Address victimAddr;
+                                for( uint32_t i = 0; i <  n0n1n2n3.GetN(); i++ )
+                                  {
+
+                                    Ptr<NetDevice> nd = dn0n1n2n3.Get (i);
+                                    Ptr<CsmaNetDevice> cd = nd->GetObject<CsmaNetDevice> ();
+                                   // cd->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
+                                    // take a copy of victim addr
+                                    if(i == victimDer)
+                                      victimAddr = cd->GetAddress();
+
+                                  }
+                                std::pair<Ptr<Ipv4>, uint32_t> returnValue = ipn0n1n2n3.Get (attackerId);
+
+                                Ptr<Ipv4> ipv4Val = returnValue.first;
+                                uint32_t index = returnValue.second;
+
+                                Ptr<Ipv4Interface> iface =  ipv4Val->GetObject<Ipv4L3Protocol> ()->GetInterface (index);
+
+
+                                Ptr<AttackApp> attacker = CreateObject<AttackApp> ();
+                                attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, ipn0n1n2n3.GetAddress(csmaSwitch), ipn0n1n2n3.GetAddress(victimDer), victimAddr);
+                                n0n1n2n3.Get (attackerId)->AddApplication (attacker);
+                                attacker->SetStartTime (Seconds (1.0));
+                                attacker->SetStopTime (Seconds (10.0));
 
 csmaNetwork.EnablePcapAll ("pmuconnectiontestNet", true);
 csmaIngress.EnablePcapAll ("pmuconnectiontestIng", true);
