@@ -29,6 +29,13 @@
 //######																########
 
 
+/*
+ * Use two hostonly interfaces in the virtual box
+ * Run the setupInterface script
+ * Add routes to the NS3 networks in windows
+ * route ADD 192.168.10.0 MASK 255.255.255.0  192.168.19.4 METRIC 3 IF 3
+ */
+
 // Includes
 #include <stdio.h>
 #include <stdlib.h>
@@ -155,9 +162,19 @@ int main (int argc, char *argv[])
   // channel can be set through the command-line parser.
 
   //CsmaHelper assits in adding csma links(interfaces) to the grouped nodes inside the containers.
-  CsmaHelper csma;
-  csma.SetChannelAttribute ("DataRate", StringValue ("100Mbps"));
-  csma.SetChannelAttribute ("Delay", TimeValue (NanoSeconds (6560))); // be very carefull about the delay that is applied to CSMA link, excessive delays will stack due to half duplex behaviour of the link
+  CsmaHelper csmaIngress;
+  CsmaHelper csmaEgress;
+  CsmaHelper csmaNetwork;
+  csmaIngress.SetChannelAttribute ("DataRate", StringValue ("100Mbps"));
+  csmaIngress.SetChannelAttribute ("Delay", TimeValue (NanoSeconds (6560))); // be very carefull about the delay that is applied to CSMA link, excessive delays will stack due to half duplex behaviour of the link
+
+
+
+  csmaEgress.SetChannelAttribute ("DataRate", StringValue ("100Mbps"));
+    csmaEgress.SetChannelAttribute ("Delay", TimeValue (NanoSeconds (6560))); // be very carefull about the delay that is applied to CSMA link, excessive delays will stack due to half duplex behaviour of the link
+
+    csmaNetwork.SetChannelAttribute ("DataRate", StringValue ("100Mbps"));
+      csmaNetwork.SetChannelAttribute ("Delay", TimeValue (NanoSeconds (6560))); // be very carefull about the delay that is applied to CSMA link, excessive delays will stack due to half duplex behaviour of the link
 
 
 //  PointToPointHelper p2p;
@@ -167,9 +184,10 @@ int main (int argc, char *argv[])
 
 
   // connecting linux interfaces to nodes, Connecting a cable to all the devices within a container in these cases between 2 nodes
-     NetDeviceContainer dinN0dn0 = csma.Install (inN0n0);
-     NetDeviceContainer dinN3dn3 = csma.Install (inN3n3);
-     NetDeviceContainer dn0n1n2n3 = csma.Install (n0n1n2n3);
+
+     NetDeviceContainer dn0n1n2n3 = csmaNetwork.Install (n0n1n2n3);
+     NetDeviceContainer dinN0n0 = csmaIngress.Install(inN0n0);
+     NetDeviceContainer dinN3n3 = csmaEgress.Install(inN3n3);
    //  NetDeviceContainer dn3dinN3 = csma.Install (n3inN3);
    //  NetDeviceContainer dn4dinN4 = csma.Install (n4inN4);
   // connecting nodes for the simulation
@@ -190,8 +208,6 @@ stack.Install (n3);
 //stack.Install (n4);
 stack.Install (inN0);
 stack.Install (inN3);
-//stack.Install (inN2);
-//stack.Install (inN3);
 //stack.Install (inN4);
 
 
@@ -276,10 +292,7 @@ staticRoutingA->AddHostRouteTo (Ipv4Address ("192.168.10.1"), Ipv4Address ("192.
  // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
 
 staticRoutingn0->SetDefaultRoute(Ipv4Address ("172.24.0.1"), 2,0);
-
 Ptr<Ipv4StaticRouting> staticRoutinginN0 = ipv4RoutingHelper.GetStaticRouting (ipv4inN0);
-//staticRoutinginN0->SetDefaultRoute(Ipv4Address ("172.24.0.1"), 2,0);
-
 
  // routing from n1 to n0,n2,n3,n4
  // Create static routes
@@ -337,17 +350,19 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
           //Print Routin Table
 
           Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
+          std::cout<<"Routing Table inN0"<<endl;
+          ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), inN0, routingStream);
+          std::cout<<"Routing Table inN3"<<endl;
+          ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), inN3, routingStream);
           std::cout<<"Routing Table n0"<<endl;
           ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), n0, routingStream);
-          std::cout<<"Routing Table n1"<<endl;
-          ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), n3, routingStream);
-          std::cout<<"Routing Table n3"<<endl;
-          ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), n3, routingStream);
 
 
 
 
-csma.EnablePcapAll ("pmuconnectiontest", true);
+csmaNetwork.EnablePcapAll ("pmuconnectiontestNet", true);
+csmaIngress.EnablePcapAll ("pmuconnectiontestIng", true);
+csmaEgress.EnablePcapAll ("pmuconnectiontestEgr", true);
 
 
   // Run the simulation for ten minutes to give the user time to play around
