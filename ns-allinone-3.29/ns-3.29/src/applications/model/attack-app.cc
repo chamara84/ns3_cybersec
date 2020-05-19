@@ -305,11 +305,11 @@ AttackApp::ReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, u
   UdpHeader udpHdr1;
   Ptr<Packet> packetCopy= packet->Copy();
   int lengthOfData;
-  packetCopy->RemoveHeader (ipV4Hdr);
-  int ipProtocol = ipV4Hdr.GetProtocol();
+  int ipProtocol = 0;
 
   if(protocol == 2048) {
-
+	  packetCopy->RemoveHeader (ipV4Hdr);
+	    ipProtocol = ipV4Hdr.GetProtocol();
   //only if UDP comment out if raw sockets or TCP sockets are used
 
 
@@ -343,7 +343,7 @@ AttackApp::ReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, u
 	     }
 
 	 lengthOfData = ipV4Hdr.GetPayloadSize()-tcpHdr1.GetLength()*4;
-	 printf("Payload Length : %d", lengthOfData);
+	// printf("Payload Length : %d \n Src Port : %d Dst Port : %d", lengthOfData, tcpHdr1.GetSourcePort(),tcpHdr1.GetDestinationPort());
 
 
 
@@ -469,7 +469,7 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 	unsigned char buffer[dataSize] ;
 		//if(packetCopy->GetSize ()>0){
 
-
+	printf("DNP3 \n");
 	packetCopy->CopyData (buffer, dataSize);
 
 	if (tcpHdr1.GetDestinationPort()==20000)
@@ -670,17 +670,16 @@ if(ipProtocol == 17 && (udpHdr1.GetDestinationPort()==4888 || udpHdr1.GetSourceP
   for (Node::ProtocolHandlerList::iterator i = protocolList.begin ();
        i != protocolList.end (); i++)
     {
-      if (i->device == 0 ||
-          (i->device != 0 && i->device == device))
+      if ((i->device != 0 && i->device == device))
         {
-          if (i->protocol == 0 ||
-              i->protocol == protocol)
+          if (i->protocol == protocol)
             {
               if (promiscuous == i->promiscuous)
                 {
             	  if( packetNew && protocol == 2048 && ((ipProtocol == 6 && (lengthOfData>0))||ipProtocol == 17))
             	  {
             		  i->handler (device, packetNew, protocol, from, to, packetType);
+            		  printf("Payload Length : %d \n Src Port : %d Dst Port : %d", lengthOfData, tcpHdr1.GetSourcePort(),tcpHdr1.GetDestinationPort());
             	  }
             	  else
             	  {
@@ -688,7 +687,7 @@ if(ipProtocol == 17 && (udpHdr1.GetDestinationPort()==4888 || udpHdr1.GetSourceP
             	  }
 
                   found = true;
-                  printf("Found\n");
+
                 }
             }
         }

@@ -95,7 +95,7 @@
 using namespace ns3;
 using namespace std;
 
-NS_LOG_COMPONENT_DEFINE ("emulationLog");
+NS_LOG_COMPONENT_DEFINE ("RTDS-Tap-Log");
 
 
 int main (int argc, char *argv[])
@@ -220,8 +220,8 @@ Ipv4AddressHelper ipv4;
 //ipv4.SetBase ("172.24.0.0", "255.255.0.0","0.0.9.241");
 //Ipv4InterfaceContainer ipn0n1n2n3 = ipv4.Assign (dn0n1n2n3);
 
-ipv4.SetBase ("172.24.0.0", "255.255.0.0","0.0.9.250");
-Ipv4InterfaceContainer ipinN3n3 = ipv4.Assign (dinN3n3);
+//ipv4.SetBase ("172.24.0.0", "255.255.0.0","0.0.9.250");
+//Ipv4InterfaceContainer ipinN3n3 = ipv4.Assign (dinN3n3);
 
 //ipv4.SetBase ("192.168.22.0", "255.255.255.0");
 //Ipv4InterfaceContainer inIn2n2 = ipv4.Assign (dn2dinN2);
@@ -300,7 +300,7 @@ Ptr<Ipv4StaticRouting> staticRoutinginN0 = ipv4RoutingHelper.GetStaticRouting (i
 
  // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
 
- // staticRoutingn1->AddNetworkRouteTo (Ipv4Address ("172.24.0.0"), Ipv4Mask ("255.255.0.0"), 1,0);
+ staticRoutingn1->AddNetworkRouteTo (Ipv4Address ("172.24.0.0"), Ipv4Mask ("255.255.0.0"), 1,0);
 
  // routing from n2 to n0,n1,n3,n4
  // Create static routes
@@ -308,7 +308,7 @@ Ptr<Ipv4StaticRouting> staticRoutinginN0 = ipv4RoutingHelper.GetStaticRouting (i
  //from B to C
  // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
 
- // staticRoutingn2->AddNetworkRouteTo(Ipv4Address ("172.24.0.0"), Ipv4Mask ("255.255.0.0"), 1,0);
+  staticRoutingn2->AddNetworkRouteTo(Ipv4Address ("172.24.0.0"), Ipv4Mask ("255.255.0.0"), 1,0);
 
  // routing from n3 to n0,n1,n2,n4
  // Create static routes
@@ -364,7 +364,7 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
           std::stringstream macAddr;
                                 uint32_t attackerId = 1;
-                                uint32_t victimDer = 2;
+                                uint32_t victimDer = ;
                                 uint32_t csmaSwitch = 3;
                                 Address victimAddr;
                                 for( uint32_t i = 0; i <  n0n1n2n3.GetN(); i++ )
