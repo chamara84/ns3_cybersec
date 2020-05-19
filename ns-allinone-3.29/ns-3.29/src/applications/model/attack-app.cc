@@ -302,6 +302,7 @@ AttackApp::ReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, u
   UdpHeader udpHdr;
   TcpHeader tcpHdr;
   TcpHeader tcpHdr1;
+  UdpHeader udpHdr1;
   Ptr<Packet> packetCopy= packet->Copy();
   int lengthOfData;
   packetCopy->RemoveHeader (ipV4Hdr);
@@ -314,7 +315,7 @@ AttackApp::ReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, u
 
  if(ipProtocol==17)
  {
-         UdpHeader udpHdr1;
+
   		 packetCopy->RemoveHeader (udpHdr1);
 
   		 udpHdr.InitializeChecksum(ipV4Hdr.GetSource(),ipV4Hdr.GetDestination(),17);
@@ -355,7 +356,7 @@ AttackApp::ReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, u
 
  // }
 
-if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()!=20000 && tcpHdr1.GetSourcePort()!=20000))
+if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==4888 && tcpHdr1.GetSourcePort()==4888))
 {
 
 	unsigned char buffer[packetCopy->GetSize ()] ;
@@ -487,6 +488,19 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 			 mmapOfdnp3Data.insert({key, session});
 			 DNP3FullReassembly(&configDnp3, session, packet, (uint8_t *)buffer,dataSize);
 		}
+
+		packetNew = Create<Packet>(buffer,packetCopy->GetSize ());
+
+			tcpHdr.EnableChecksums();
+			packetNew->AddHeader(tcpHdr);
+			printf("Flags %x OrgLength: %d NewLength: %d Packet size: %d\n",tcpHdr.GetFlags()&TcpHeader::SYN,tcpHdr1.GetLength(),tcpHdr.GetLength(),packetCopy->GetSize ());
+			if(tcpHdr1.IsChecksumOk() && ipV4Hdr.IsChecksumOk())
+				printf("Checksum ok\n");
+			else
+				printf("Checksum error");
+			 ipV4Hdr.SetPayloadSize(packetNew->GetSize());
+			 ipV4Hdr.EnableChecksum();
+		     packetNew->AddHeader(ipV4Hdr);
 	}
 }
 
@@ -532,7 +546,7 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 
 
   	    //only if UDP comment out if raw sockets or TCP sockets are used
-if(ipProtocol == 17){
+if(ipProtocol == 17 && (udpHdr1.GetDestinationPort()==4888 || udpHdr1.GetSourcePort()==4888)){
 
 	unsigned char buffer[packetCopy->GetSize ()] ;
 	//if(packetCopy->GetSize ()>0){
@@ -664,7 +678,7 @@ if(ipProtocol == 17){
             {
               if (promiscuous == i->promiscuous)
                 {
-            	  if(protocol == 2048 && ((ipProtocol == 6 && (lengthOfData>0))||ipProtocol == 17))
+            	  if( packetNew && protocol == 2048 && ((ipProtocol == 6 && (lengthOfData>0))||ipProtocol == 17))
             	  {
             		  i->handler (device, packetNew, protocol, from, to, packetType);
             	  }
