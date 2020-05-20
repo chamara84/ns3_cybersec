@@ -122,6 +122,7 @@ public:
     CONFIGURE_LOCAL, /**< ns-3 creates and configures tap device */
     USE_LOCAL,       /**< ns-3 uses a pre-created tap, without configuring it */
     USE_BRIDGE, /**< ns-3 uses a pre-created tap, and bridges to a bridging net device */
+	USE_BRIDGE_MOD, //same as USE_BRIDGE with modification of GOOSE and SV frames
   };
 
   TapBridge ();
