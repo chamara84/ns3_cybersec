@@ -1,4 +1,3 @@
-#define __SSP_STRONG__ 3
 #define __DBL_MIN_EXP__ (-1021)
 #define __FLT32X_MAX_EXP__ 1024
 #define __cpp_attributes 200809
@@ -39,7 +38,7 @@
 #define __DBL_MIN_10_EXP__ (-307)
 #define __FINITE_MATH_ONLY__ 0
 #define __cpp_variable_templates 201304
-#define __GNUC_PATCHLEVEL__ 0
+#define __GNUC_PATCHLEVEL__ 1
 #define __FLT32_HAS_DENORM__ 1
 #define __UINT_FAST8_MAX__ 0xff
 #define __has_include(STR) __has_include__(STR)
@@ -74,7 +73,6 @@
 #define __DBL_DIG__ 15
 #define __GCC_ATOMIC_POINTER_LOCK_FREE 2
 #define __FLT64X_MANT_DIG__ 64
-#define _FORTIFY_SOURCE 2
 #define __SIZEOF_INT__ 4
 #define __SIZEOF_POINTER__ 8
 #define __GCC_ATOMIC_CHAR16_T_LOCK_FREE 2
@@ -95,7 +93,7 @@
 #define __INT_WIDTH__ 32
 #define __SIZEOF_LONG__ 8
 #define __STDC_IEC_559__ 1
-#define __STDC_ISO_10646__ 201706L
+#define __STDC_ISO_10646__ 201103L
 #define __UINT16_C(c) c
 #define __PTRDIFF_WIDTH__ 64
 #define __DECIMAL_DIG__ 21
@@ -107,9 +105,8 @@
 #define __FLT64X_MIN_10_EXP__ (-4931)
 #define __LDBL_HAS_QUIET_NAN__ 1
 #define __FLT64_MANT_DIG__ 53
-#define __GNUC__ 7
+#define __GNUC__ 8
 #define __GXX_RTTI 1
-#define __pie__ 2
 #define __MMX__ 1
 #define __cpp_delegating_constructors 200604
 #define __FLT_HAS_DENORM__ 1
@@ -122,7 +119,6 @@
 #define __cpp_raw_strings 200710
 #define __INT_FAST32_MAX__ 0x7fffffffffffffffL
 #define __DBL_HAS_INFINITY__ 1
-#define __INT64_MAX__ 0x7fffffffffffffffL
 #define __DEC32_MIN_EXP__ (-94)
 #define __INTPTR_WIDTH__ 64
 #define __FLT32X_HAS_DENORM__ 1
@@ -146,7 +142,7 @@
 #define __STDC_NO_THREADS__ 1
 #define __ATOMIC_HLE_ACQUIRE 65536
 #define __FLT32_HAS_QUIET_NAN__ 1
-#define __GNUG__ 7
+#define __GNUG__ 8
 #define __LONG_LONG_MAX__ 0x7fffffffffffffffLL
 #define __SIZEOF_SIZE_T__ 8
 #define __cpp_rvalue_reference 200610
@@ -158,7 +154,7 @@
 #define __FLT32_MAX_EXP__ 128
 #define __cpp_hex_float 201603
 #define __GCC_HAVE_DWARF2_CFI_ASM 1
-#define __GXX_ABI_VERSION 1011
+#define __GXX_ABI_VERSION 1013
 #define __FLT128_HAS_INFINITY__ 1
 #define __FLT_MIN_EXP__ (-125)
 #define __cpp_lambdas 200907
@@ -166,7 +162,6 @@
 #define __INT_FAST64_TYPE__ long int
 #define __FLT64_DENORM_MIN__ 4.94065645841246544176568792868221372e-324F64
 #define __DBL_MIN__ double(2.22507385850720138309023271733240406e-308L)
-#define __PIE__ 2
 #define __LP64__ 1
 #define __FLT32X_EPSILON__ 2.22044604925031308084726333618164062e-16F32x
 #define __DECIMAL_BID_FORMAT__ 1
@@ -180,7 +175,7 @@
 #define __UINT8_TYPE__ unsigned char
 #define __FLT_MANT_DIG__ 24
 #define __LDBL_DECIMAL_DIG__ 21
-#define __VERSION__ "7.3.0"
+#define __VERSION__ "8.3.1 20190311 (Red Hat 8.3.1-3)"
 #define __UINT64_C(c) c ## UL
 #define __cpp_unicode_characters 200704
 #define _STDC_PREDEF_H 1
@@ -215,11 +210,11 @@
 #define __INT_LEAST16_TYPE__ short int
 #define __LDBL_EPSILON__ 1.08420217248550443400745280086994171e-19L
 #define __UINTMAX_C(c) c ## UL
+#define __GNUC_RH_RELEASE__ 3
 #define __GLIBCXX_BITSIZE_INT_N_0 128
 #define __k8 1
 #define __SIG_ATOMIC_MAX__ 0x7fffffff
 #define __GCC_ATOMIC_WCHAR_T_LOCK_FREE 2
-#define __cpp_sized_deallocation 201309
 #define __SIZEOF_PTRDIFF_T__ 8
 #define __FLT32X_MANT_DIG__ 53
 #define __x86_64__ 1
@@ -245,6 +240,7 @@
 #define __SEG_FS 1
 #define __INT_LEAST16_MAX__ 0x7fff
 #define __DEC64_MANT_DIG__ 16
+#define __INT64_MAX__ 0x7fffffffffffffffL
 #define __UINT_LEAST32_MAX__ 0xffffffffU
 #define __SEG_GS 1
 #define __FLT32_DENORM_MIN__ 1.40129846432481707092372958328991613e-45F32
@@ -257,6 +253,7 @@
 #define __INT_FAST8_MAX__ 0x7f
 #define __FLT128_MAX__ 1.18973149535723176508575932662800702e+4932F128
 #define __INTPTR_MAX__ 0x7fffffffffffffffL
+#define __cpp_sized_deallocation 201309
 #define linux 1
 #define __cpp_range_based_for 200907
 #define __FLT64_HAS_QUIET_NAN__ 1
@@ -275,7 +272,6 @@
 #define __UINT16_TYPE__ short unsigned int
 #define __WCHAR_TYPE__ int
 #define __SIZEOF_FLOAT__ 4
-#define __pic__ 2
 #define __UINTPTR_MAX__ 0xffffffffffffffffUL
 #define __INT_FAST64_WIDTH__ 64
 #define __DEC64_MIN_EXP__ (-382)
@@ -336,7 +332,6 @@
 #define __FLT_DENORM_MIN__ 1.40129846432481707092372958328991613e-45F
 #define __INT8_MAX__ 0x7f
 #define __LONG_WIDTH__ 64
-#define __PIC__ 2
 #define __UINT_FAST32_TYPE__ long unsigned int
 #define __CHAR32_TYPE__ unsigned int
 #define __FLT_MAX__ 3.40282346638528859811704183484516925e+38F

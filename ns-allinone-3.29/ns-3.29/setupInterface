@@ -11,8 +11,10 @@ sudo ifconfig tap01 hw ether 00:00:00:00:01:21
 sudo ifconfig tap01 0.0.0.0 promisc up
 
 sudo brctl addif br00 tap00
-sudo brctl addif br00 em1
+sudo brctl addif br00 p3p1
 sudo ifconfig br00 up
 sudo brctl addif br01 tap01
-sudo brctl addif br01 p24p1
+sudo brctl addif br01 p1p1
 sudo ifconfig br01 up
+sudo ifconfig p1p1 promisc
+sudo ifconfig p3p1 promisc

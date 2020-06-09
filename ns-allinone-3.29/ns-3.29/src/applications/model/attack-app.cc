@@ -42,10 +42,7 @@ NS_LOG_COMPONENT_DEFINE ("AttackApp");
 
 NS_OBJECT_ENSURE_REGISTERED (AttackApp);
 
-typedef struct _configuration
-  {
-	  dnp3_config_t dnp3;
-  }configuration;
+
 
 TypeId
 AttackApp::GetTypeId (void)
@@ -102,6 +99,7 @@ AttackApp::StartApplication (void)
   m_arpCache = m_attacker.CreateCache(m_device, m_iface);
   m_running = true;
   m_device->SetReceiveCallback(MakeCallback(&AttackApp::NonPromiscReceiveFromDevice,this));
+  readConfigFile( &config);
 
 //  Ptr<Ipv4> ipv4_n2 = m_node->GetObject<Ipv4>();
 //
@@ -158,7 +156,7 @@ bool AttackApp::NonPromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Pa
   return ReceiveFromDevice (device, packet, protocol, from, device->GetAddress (), NetDevice::PacketType (0), false);
 }
 
-int readConfigFile( configuration * config)
+int AttackApp::readConfigFile( configuration * config)
 {
 	//this function reads the config file at attack-app setup and stores the data in config
 	std::ifstream infile("/etc/ns3/ns3.conf");
@@ -175,13 +173,14 @@ int readConfigFile( configuration * config)
 	    	}
 	    	while (std::getline(infile, line))
 	    	{
-	    		if(line.find("protocol",0))
+	    		if(line.find("protocol",0)!=string::npos)
 	    			{
 	    			readNewProtocol++;
 	    			linePrev = line;
 	    			indexNum=0;
 	    			break;
 	    			}
+
 	    		std::istringstream iss(line);
 	    		int parameter = 0;
 	    		for(std::string s; iss >> s; )
@@ -215,6 +214,7 @@ int readConfigFile( configuration * config)
 	    					(config->dnp3.values_to_alter[indexNum]).floating_point_val =stof(s,nullptr);
 	    				}
 	    				parameter++;
+
 	    				break;
 	    			default:
 	    				break;
@@ -465,11 +465,12 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 	Ipv4Address senderIp;
 	uint32_t senderIntIP;
 	uint64_t key;
+	dnp3_session_data_t* session;
 	unsigned short int dataSize = packetCopy->GetSize ();
-	unsigned char buffer[dataSize] ;
+	unsigned char * buffer =  new unsigned char[dataSize] ;
 		//if(packetCopy->GetSize ()>0){
 
-	printf("DNP3 \n");
+	printf("DNP3 \n"); // @suppress("Function cannot be resolved")
 	packetCopy->CopyData (buffer, dataSize);
 
 	if (tcpHdr1.GetDestinationPort()==20000)
@@ -477,16 +478,29 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 		senderIp = ipV4Hdr.GetSource();
 		senderIntIP = senderIp.Get();
 		key = (senderIntIP<<16) + tcpHdr1.GetSourcePort();
-		dnp3_session_data_t* session = mmapOfdnp3Data.find(key)->second;
+	}
+
+	else
+	{
+		senderIp = ipV4Hdr.GetDestination();
+				senderIntIP = senderIp.Get();
+				key = (senderIntIP<<16) + tcpHdr1.GetDestinationPort();
+	}
+		session = mmapOfdnp3Data.find(key)->second;
 		if(session)
 		{
-			DNP3FullReassembly(&configDnp3, session, packet, (uint8_t *)buffer,dataSize);
+			DNP3FullReassembly(&config.dnp3, session, packetCopy, (uint8_t *)buffer,dataSize);
+			printf("found session for key: %ld \n",key);
 		}
 		else
 		{
-			 session  =  new dnp3_session_data_t();
+			 session  =  new dnp3_session_data_t;
+			 session->client_rdata = new dnp3_reassembly_data_t;
+			 session->server_rdata = new dnp3_reassembly_data_t;
+			 session->linkHeader = new dnp3_link_header_t;
 			 mmapOfdnp3Data.insert({key, session});
-			 DNP3FullReassembly(&configDnp3, session, packet, (uint8_t *)buffer,dataSize);
+			 DNP3FullReassembly(&config.dnp3, session, packetCopy, (uint8_t *)buffer,dataSize);
+			 printf("create session for Key: %ld\n",key);
 		}
 
 		packetNew = Create<Packet>(buffer,packetCopy->GetSize ());
@@ -501,7 +515,7 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 			 ipV4Hdr.SetPayloadSize(packetNew->GetSize());
 			 ipV4Hdr.EnableChecksum();
 		     packetNew->AddHeader(ipV4Hdr);
-	}
+
 }
 
 //else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()!=20000 && tcpHdr1.GetSourcePort()!=20000))
@@ -679,7 +693,7 @@ if(ipProtocol == 17 && (udpHdr1.GetDestinationPort()==4888 || udpHdr1.GetSourceP
             	  if( packetNew && protocol == 2048 && ((ipProtocol == 6 && (lengthOfData>0))||ipProtocol == 17))
             	  {
             		  i->handler (device, packetNew, protocol, from, to, packetType);
-            		  printf("Payload Length : %d \n Src Port : %d Dst Port : %d", lengthOfData, tcpHdr1.GetSourcePort(),tcpHdr1.GetDestinationPort());
+            		  printf("Payload Length : %d \n Src Port : %d Dst Port : %d \n", lengthOfData, tcpHdr1.GetSourcePort(),tcpHdr1.GetDestinationPort());
             	  }
             	  else
             	  {

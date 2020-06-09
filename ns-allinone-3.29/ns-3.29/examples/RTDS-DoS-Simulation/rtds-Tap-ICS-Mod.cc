@@ -223,7 +223,7 @@ Ipv4AddressHelper ipv4;
 ipv4.SetBase ("172.24.0.0", "255.255.0.0","0.0.9.241"); //this is the outer network
 Ipv4InterfaceContainer ipn0n1n2n3 = ipv4.Assign (dn0n1n2n3);
 
-ipv4.SetBase ("192.168.11.0", "255.255.255.0"); //this is the network in the inner side
+ipv4.SetBase ("192.168.100.0", "255.255.255.0"); //this is the network in the inner side
 Ipv4InterfaceContainer ipinNx = ipv4.Assign (dinNx);
 //
 ipv4.SetBase ("192.168.12.0", "255.255.255.252");  //this is the p2p link
@@ -280,7 +280,7 @@ staticRoutingA->AddHostRouteTo (Ipv4Address ("192.168.10.1"), Ipv4Address ("192.
  // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
 
 staticRoutingn0->SetDefaultRoute(Ipv4Address ("172.24.0.1"), 2,0);
-staticRoutingn0->AddNetworkRouteTo(Ipv4Address ("192.168.11.0"),Ipv4Mask ("255.255.255.0"),Ipv4Address ("172.24.9.245"),1,3); //may be not needed since Ns3 knows the existence and routing for the network
+staticRoutingn0->AddNetworkRouteTo(Ipv4Address ("192.168.100.0"),Ipv4Mask ("255.255.255.0"),Ipv4Address ("172.24.9.245"),1,3); //may be not needed since Ns3 knows the existence and routing for the network
 
 
 

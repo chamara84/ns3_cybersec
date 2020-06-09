@@ -40,11 +40,17 @@
 #include<cstring>
 #include<cstdio>
 #include<stdlib.h>
+#include"ns3/dnp3-app.h"
 
 
 #define FIR_MASK 0x40
 
 namespace ns3 {
+
+typedef struct _configuration
+  {
+	  dnp3_config_t dnp3;
+  }configuration;
 
 
 
@@ -61,7 +67,7 @@ public:
   bool ReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol,
                            const Address &from, const Address &to, NetDevice::PacketType packetType, bool promiscuous);
   std::vector<std::string>  giveParsingString(int msgType);
-  int readConfigFile( dnp3_config_t *);
+  int readConfigFile( ns3::configuration *);
 
 
 
@@ -88,7 +94,7 @@ private:
   ArpL3Protocol m_attacker;
   Ptr<ArpCache> m_arpCache;
   std::multimap<uint64_t,dnp3_session_data_t *> mmapOfdnp3Data;
-  dnp3_config_t configDnp3;
+  ns3::configuration config;
 };
 
 
