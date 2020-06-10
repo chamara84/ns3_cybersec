@@ -85,7 +85,8 @@ typedef enum _dnp3_reassembly_state_t
 
 typedef struct _dnp3_reassembly_data_t
 {
-    char buffer[DNP3_BUFFER_SIZE];
+
+	unsigned char buffer[DNP3_BUFFER_SIZE];
     uint16_t buflen;
     dnp3_reassembly_state_t state;
     uint8_t last_seq;

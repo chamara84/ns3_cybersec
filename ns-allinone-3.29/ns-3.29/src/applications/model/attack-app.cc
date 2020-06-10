@@ -87,6 +87,8 @@ AttackApp::Setup (Ptr<Node> aNode, Ptr<NetDevice> aDev, Ptr<Ipv4Interface> iface
   m_vMac = vMac;
   Ptr<ArpL3Protocol> arpProtocol = m_node->GetObject<ArpL3Protocol>();
   arpProtocol->EnableDisableSpoofedARP(true);
+  PacketMetadata::Enable();
+  Packet::EnablePrinting();
 
 }
 
@@ -189,6 +191,7 @@ int AttackApp::readConfigFile( configuration * config)
 	    			{
 	    			case 0:
 	    				config->dnp3.values_to_alter[indexNum].func_code = stoi(s,nullptr,10);
+	    				(config->dnp3.values_to_alter[indexNum]).operation=1;
 	    				parameter++;
 	    				break;
 	    			case 1:
@@ -222,7 +225,7 @@ int AttackApp::readConfigFile( configuration * config)
 
 	    		}
 	    		indexNum++;
-
+	    		config->dnp3.numAlteredVal = indexNum;
 	    	}
 	    }
 
@@ -480,24 +483,45 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 		key = (senderIntIP<<16) + tcpHdr1.GetSourcePort();
 	}
 
-	else
+	else if (tcpHdr1.GetSourcePort()==20000)
 	{
 		senderIp = ipV4Hdr.GetDestination();
 				senderIntIP = senderIp.Get();
 				key = (senderIntIP<<16) + tcpHdr1.GetDestinationPort();
 	}
-		session = mmapOfdnp3Data.find(key)->second;
-		if(session)
+
+		if(mmapOfdnp3Data.find(key)!=mmapOfdnp3Data.end())
 		{
-			DNP3FullReassembly(&config.dnp3, session, packetCopy, (uint8_t *)buffer,dataSize);
+			session = mmapOfdnp3Data.find(key)->second;
 			printf("found session for key: %ld \n",key);
+			if (tcpHdr1.GetDestinationPort()==20000)
+				{
+				session->direction = DNP3_CLIENT;
+				printf("In Client direction\n");
+				}
+			else if (tcpHdr1.GetSourcePort()==20000)
+			{
+			session->direction = DNP3_SERVER;
+			printf("In Server direction\n");
+			}
+
+			DNP3FullReassembly(&config.dnp3, session, packetCopy, (uint8_t *)buffer,dataSize);
+
 		}
 		else
 		{
 			 session  =  new dnp3_session_data_t;
-			 session->client_rdata = new dnp3_reassembly_data_t;
-			 session->server_rdata = new dnp3_reassembly_data_t;
+			 //session->client_rdata = new dnp3_reassembly_data_t;
+			 //session->server_rdata = new dnp3_reassembly_data_t;
 			 session->linkHeader = new dnp3_link_header_t;
+			 if (tcpHdr1.GetDestinationPort()==20000)
+			 				{
+			 				session->direction = DNP3_CLIENT;
+			 				}
+			 			else if (tcpHdr1.GetSourcePort()==20000)
+			 			{
+			 			session->direction = DNP3_SERVER;
+			 			}
 			 mmapOfdnp3Data.insert({key, session});
 			 DNP3FullReassembly(&config.dnp3, session, packetCopy, (uint8_t *)buffer,dataSize);
 			 printf("create session for Key: %ld\n",key);

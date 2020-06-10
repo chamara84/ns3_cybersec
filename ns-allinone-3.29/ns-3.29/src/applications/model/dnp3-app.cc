@@ -2901,6 +2901,7 @@ int DNP3FullReassembly(dnp3_config_t *config, dnp3_session_data_t *session, Ptr<
 		return DNP3_FAIL;
 
 	/* Step 1: Decode header and skip to data */
+	if(session->linkHeader)
 	session->linkHeader = (dnp3_link_header_t *) pdu_start;
 
 	if (session->linkHeader->len < DNP3_MIN_TRANSPORT_LEN)

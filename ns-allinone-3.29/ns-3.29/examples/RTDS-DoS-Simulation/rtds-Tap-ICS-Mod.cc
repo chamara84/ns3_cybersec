@@ -24,9 +24,6 @@
 
 
 
-//######																########
-//		For topology check https://photos.app.goo.gl/b3mxt5PAN0NCYeyz1
-//######																########
 
 
 /*
@@ -113,7 +110,11 @@ int main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 */
 
-
+	Time::SetResolution (Time::NS);
+		PacketMetadata::Enable();
+		Packet::EnablePrinting();
+		MobilityHelper mobility;
+			  mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
 
   //
   // We are interacting with the outside, real, world.  This means we have to
@@ -366,11 +367,17 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
                                 uint32_t victimDer = 2;
                                 uint32_t csmaSwitch = 4;
                                 Address victimAddr;
+
+
+                                //attack on the company side network
                                 for( uint32_t i = 0; i <  n0n1n2n3.GetN(); i++ )
                                   {
+                                	macAddr << "00:00:00:00:00:0" << i;
+                                	Ptr<NetDevice> nd = dn0n1n2n3.Get (i);
+                                	Ptr<CsmaNetDevice> cd = nd->GetObject<CsmaNetDevice> ();
+								   cd->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
 
-                                    Ptr<NetDevice> nd = dn0n1n2n3.Get (i);
-                                    Ptr<CsmaNetDevice> cd = nd->GetObject<CsmaNetDevice> ();
+
                                    // cd->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
                                     // take a copy of victim addr
                                     if(i == victimDer)
@@ -386,14 +393,80 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
 
                                 Ptr<AttackApp> attacker = CreateObject<AttackApp> ();
-                                attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, ipn0n1n2n3.GetAddress(csmaSwitch), ipn0n1n2n3.GetAddress(victimDer), victimAddr);
+                                attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, ipn0n1n2n3.GetAddress(csmaSwitch), Ipv4Address ("172.24.9.90"), ns3::Mac48Address("00:30:a7:1d:75:bd"));
                                 n0n1n2n3.Get (attackerId)->AddApplication (attacker);
                                 attacker->SetStartTime (Seconds (1.0));
-                                attacker->SetStopTime (Seconds (10.0));
+                                attacker->SetStopTime (Seconds (3600.0));
+
+
+
+                                //attack on the my side network
+                                                               for( uint32_t i = 0; i <  inNx.GetN(); i++ )
+                                                                 {
+                                                            	   macAddr << "00:00:00:00:00:1" << i;
+                                                            	   Ptr<NetDevice> nd1 = dinNx.Get (i);
+                                                            	   Ptr<CsmaNetDevice> cd1 = nd1->GetObject<CsmaNetDevice> ();
+                                                            	   cd1->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
+
+                                                                  // cd->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
+                                                                   // take a copy of victim addr
+                                                                   if(i == victimDer)
+                                                                     victimAddr = cd1->GetAddress();
+
+                                                                 }
+                                                               std::pair<Ptr<Ipv4>, uint32_t> returnValue1 = ipinNx.Get (attackerId);
+
+                                                               Ptr<Ipv4> ipv4Val1 = returnValue1.first;
+                                                               uint32_t index1 = returnValue1.second;
+
+                                                               Ptr<Ipv4Interface> iface1 =  ipv4Val1->GetObject<Ipv4L3Protocol> ()->GetInterface (index1);
+
+
+                                                               Ptr<AttackApp> attacker1 = CreateObject<AttackApp> (); //Ipv4Address ("192.168.100.10"), ns3::Mac48Address("00:50:c2:4f:9b:73")
+                                                               attacker1->Setup(inNx.Get(attackerId), dinNx.Get(attackerId), iface1, ipinNx.GetAddress(csmaSwitch), Ipv4Address ("192.168.100.10"), ns3::Mac48Address("00:50:c2:4f:9b:73"));
+                                                               inNx.Get (attackerId)->AddApplication (attacker1);
+                                                               attacker1->SetStartTime (Seconds (1.0));
+                                                               attacker1->SetStopTime (Seconds (3600.0));
 
 //csmaNetwork.EnablePcapAll ("pmuconnectiontestNet", true);
-csmaIngress.EnablePcapAll ("pmuconnectiontestIng", true);
 
+                                                               AnimationInterface anim("rtds-dos-sim.xml");
+                                                               Packet::EnablePrinting();
+                                                             anim.EnablePacketMetadata (true);
+                                                                    anim.SetConstantPosition (n0n1n2n3.Get (0), 10 , 10);
+
+                                                                    anim.UpdateNodeDescription(n0n1n2n3.Get (0),"TAP_P3P1");
+                                                                 	anim.UpdateNodeDescription(n0n1n2n3.Get (1),"n1");
+                                                                 	anim.UpdateNodeDescription(n0n1n2n3.Get (2),"n2");
+                                                                 	anim.UpdateNodeDescription(n0n1n2n3.Get (3),"n3");
+                                                                 	anim.UpdateNodeDescription(n0n1n2n3.Get (4),"Router 1");
+
+                                                                 	anim.SetConstantPosition (n0n1n2n3.Get (1), 15 , 10);
+
+                                                                 	anim.SetConstantPosition (n0n1n2n3.Get (2), 10 , 15);
+
+                                                                 	anim.SetConstantPosition (n0n1n2n3.Get (3), 15 , 20);
+                                                                 	anim.SetConstantPosition (n0n1n2n3.Get (4), 15 , 15);
+
+
+                                                                 anim.SetConstantPosition (inNx.Get (0), 5 , 0);
+                                                                 anim.UpdateNodeDescription(inNx.Get (0),"inN0");
+                                                                 	anim.SetConstantPosition (inNx.Get (1), 5 , 5);
+                                                                 	  	anim.UpdateNodeDescription(inNx.Get (1),"inN1");
+                                                                 	  anim.SetConstantPosition (inNx.Get (2), 5 , 10);
+                                                                 	  	anim.UpdateNodeDescription(inNx.Get (2),"inN2");
+                                                                 	  anim.SetConstantPosition (inNx.Get (3), 5 , 15);
+                                                                 	  	anim.UpdateNodeDescription(inNx.Get (3),"inN3");
+                                                                 	  	anim.SetConstantPosition (inNx.Get (4), 0 , 25);
+                                                                 	  	anim.UpdateNodeDescription(inNx.Get (4),"inN4");
+
+
+
+                                                                 anim.SetStartTime (Seconds(1.0));
+                                                                 anim.SetStopTime (Seconds(3600));
+csmaIngress.EnablePcapAll ("pmuconnectiontestIng", false);
+csmaNetwork.EnablePcapAll ("pmuconnectiontestNet", false);
+p2p.EnablePcapAll("pmuconnectiontestP2P", false);
 
 
   // Run the simulation for ten minutes to give the user time to play around
