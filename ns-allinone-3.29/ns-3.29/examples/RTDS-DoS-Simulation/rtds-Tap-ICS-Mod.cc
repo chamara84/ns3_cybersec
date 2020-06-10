@@ -372,10 +372,10 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
                                 //attack on the company side network
                                 for( uint32_t i = 0; i <  n0n1n2n3.GetN(); i++ )
                                   {
-                                	macAddr << "00:00:00:00:00:0" << i;
+                                	//macAddr << "00:00:00:00:00:0" << i;
                                 	Ptr<NetDevice> nd = dn0n1n2n3.Get (i);
                                 	Ptr<CsmaNetDevice> cd = nd->GetObject<CsmaNetDevice> ();
-								   cd->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
+								   //cd->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
 
 
                                    // cd->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
@@ -403,10 +403,10 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
                                 //attack on the my side network
                                                                for( uint32_t i = 0; i <  inNx.GetN(); i++ )
                                                                  {
-                                                            	   macAddr << "00:00:00:00:00:1" << i;
+                                                            	  // macAddr << "00:00:00:00:00:1" << i;
                                                             	   Ptr<NetDevice> nd1 = dinNx.Get (i);
                                                             	   Ptr<CsmaNetDevice> cd1 = nd1->GetObject<CsmaNetDevice> ();
-                                                            	   cd1->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
+                                                            	   //cd1->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
 
                                                                   // cd->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
                                                                    // take a copy of victim addr
@@ -432,7 +432,7 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
                                                                AnimationInterface anim("rtds-dos-sim.xml");
                                                                Packet::EnablePrinting();
-                                                             anim.EnablePacketMetadata (true);
+                                                            // anim.EnablePacketMetadata (true);
                                                                     anim.SetConstantPosition (n0n1n2n3.Get (0), 10 , 10);
 
                                                                     anim.UpdateNodeDescription(n0n1n2n3.Get (0),"TAP_P3P1");

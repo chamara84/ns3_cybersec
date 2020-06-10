@@ -2942,7 +2942,7 @@ int DNP3FullReassembly(dnp3_config_t *config, dnp3_session_data_t *session, Ptr<
 
 
 //	{
-		if(modifyData(config,rdata,buflen,buf, buflen,session->direction))
+		if(modifyData(config,rdata,buflen,pdu_start, pdu_length,session->direction))
 		{
 			printf("Direction %s \n",session->direction==0?"ClientDirection":"ServerDirection");
 
