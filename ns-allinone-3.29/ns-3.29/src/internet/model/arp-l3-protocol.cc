@@ -127,9 +127,11 @@ ArpL3Protocol::NotifyNewAggregate ()
   Object::NotifyNewAggregate ();
 }
 
-void ArpL3Protocol::EnableDisableSpoofedARP(bool enable)
+void ArpL3Protocol::EnableDisableSpoofedARP(bool enable, Ipv4Address vaddr1, Ipv4Address vAddr2)
 {
 	m_spoofARP = enable;
+	m_vaddr1 = vaddr1;
+	m_vAddr2 = vAddr2;
 }
 
 void 

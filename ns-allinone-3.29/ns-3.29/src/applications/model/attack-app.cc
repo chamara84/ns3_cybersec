@@ -77,16 +77,16 @@ AttackApp::~AttackApp()
 }
 
 void
-AttackApp::Setup (Ptr<Node> aNode, Ptr<NetDevice> aDev, Ptr<Ipv4Interface> iface, Ipv4Address addr, Ipv4Address vAddr, Address vMac)
+AttackApp::Setup (Ptr<Node> aNode, Ptr<NetDevice> aDev, Ptr<Ipv4Interface> iface, Ipv4Address vAddr1, Ipv4Address vAddr2, Address vMac)
 {
   m_node = aNode;
   m_device = aDev;
   m_iface = iface;
-  m_fakeAddr = addr;
-  m_vAddr = vAddr;
+  m_fakeAddr = vAddr1;
+  m_vAddr = vAddr2;
   m_vMac = vMac;
   Ptr<ArpL3Protocol> arpProtocol = m_node->GetObject<ArpL3Protocol>();
-  arpProtocol->EnableDisableSpoofedARP(true);
+  arpProtocol->EnableDisableSpoofedARP(true,vAddr1,vAddr2);
   PacketMetadata::Enable();
   Packet::EnablePrinting();
 

@@ -131,7 +131,7 @@ public:
    * Enabling spoofed ARP
    * \param enable set to true if spoofing arp else false
    */
-  void EnableDisableSpoofedARP(bool enable);
+  void EnableDisableSpoofedARP(bool enable,Ipv4Address vaddr1, Ipv4Address vAddr2);
 
 
 protected:
@@ -187,6 +187,8 @@ private:
   Ptr<RandomVariableStream> m_requestJitter; //!< jitter to de-sync ARP requests
   Ptr<TrafficControlLayer> m_tc; //!< The associated TrafficControlLayer
   bool m_spoofARP;
+  Ipv4Address m_vaddr1;
+  Ipv4Address m_vAddr2;
 };
 
 } // namespace ns3

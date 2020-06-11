@@ -13,6 +13,8 @@ def build(bld):
     obj.source = 'icmpv4-redirect.cc'
     obj = bld.create_ns3_program('rtds-Tap-ICS-Mod', ['csma', 'internet', 'applications','wifi', 'olsr', 'netanim','flow-monitor','point-to-point', 'tap-bridge'])
     obj.source = 'rtds-Tap-ICS-Mod.cc'
+    obj = bld.create_ns3_program('rtds-Tap-ICS-Mod-One_Net', ['csma', 'internet', 'applications','wifi', 'olsr', 'netanim','flow-monitor','point-to-point', 'tap-bridge'])
+    obj.source = 'rtds-Tap-ICS-Mod-One_Net.cc'
     
     
     
