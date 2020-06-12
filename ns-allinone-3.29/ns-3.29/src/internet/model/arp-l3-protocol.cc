@@ -131,7 +131,7 @@ void ArpL3Protocol::EnableDisableSpoofedARP(bool enable, Ipv4Address vaddr1, Ipv
 {
 	m_spoofARP = enable;
 	m_vaddr1 = vaddr1;
-	m_vAddr2 = vAddr2;
+	m_vaddr2 = vAddr2;
 }
 
 void 
@@ -235,14 +235,15 @@ ArpL3Protocol::Receive (Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t pro
                         arp.GetSourceHardwareAddress ());
           break;
         } 
-      else if (arp.IsRequest () && m_spoofARP)
+      else if (arp.IsRequest () && m_spoofARP && ((arp.GetDestinationIpv4Address () == m_vaddr1 && arp.GetSourceIpv4Address ()==m_vaddr2)|| (arp.GetDestinationIpv4Address () == m_vaddr2 && arp.GetSourceIpv4Address ()==m_vaddr1))) //&& && ((arp.GetDestinationIpv4Address () == m_vaddr1 && arp.GetSourceIpv4Address ()==m_vaddr2)|| (arp.GetDestinationIpv4Address () == m_vaddr2 && arp.GetSourceIpv4Address ()==m_vaddr1))
       {
     	  found = true;
     	            NS_LOG_LOGIC ("node="<<m_node->GetId () <<", got request from " <<
     	                          arp.GetSourceIpv4Address () << " -- send spoofed reply");
+
     	            SendArpReply (cache, arp.GetDestinationIpv4Address (), arp.GetSourceIpv4Address (),
     	                          arp.GetSourceHardwareAddress ());
-    	            break;
+    	       //     break;
       }
       else if (arp.IsReply () && 
                arp.GetDestinationIpv4Address ().IsEqual (cache->GetInterface ()->GetAddress (i).GetLocal ()) &&

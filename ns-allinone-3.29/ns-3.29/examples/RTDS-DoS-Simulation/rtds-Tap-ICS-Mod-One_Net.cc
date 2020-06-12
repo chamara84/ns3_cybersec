@@ -128,11 +128,11 @@ int main (int argc, char *argv[])
   // Create interface nodes inside ns3
 
   // create Bridges (Interface nodes) that will connect to the outside world
-  Ptr<Node> inN0 = CreateObject<Node> ();
-  Ptr<Node> inN1 = CreateObject<Node> ();
-  Ptr<Node> inN2 = CreateObject<Node> ();
-  Ptr<Node> inN3 = CreateObject<Node> ();
-  Ptr<Node> inN4 = CreateObject<Node> ();
+//  Ptr<Node> inN0 = CreateObject<Node> ();
+//  Ptr<Node> inN1 = CreateObject<Node> ();
+//  Ptr<Node> inN2 = CreateObject<Node> ();
+//  Ptr<Node> inN3 = CreateObject<Node> ();
+//  Ptr<Node> inN4 = CreateObject<Node> ();
 
   // Create ns3 nodes for simulating the communications network
   Ptr<Node> n0 = CreateObject<Node> ();
@@ -143,7 +143,7 @@ int main (int argc, char *argv[])
 
 
   //Containers for grouping nodes, used to group nodes which will have a common connection
-  NodeContainer inNx = NodeContainer(inN0,inN1,inN2,inN3,inN4);
+//  NodeContainer inNx = NodeContainer(inN0,inN1,inN2,inN3,inN4);
   //NodeContainer inN3n3 = NodeContainer(inN3,n3);
   //NodeContainer n2inN2 = NodeContainer(n2,inN2);
   //NodeContainer n3inN3 = NodeContainer(n3,inN3);
@@ -155,7 +155,7 @@ int main (int argc, char *argv[])
   NodeContainer n0n1n2n3 = NodeContainer(n0,n1,n2,n3,n4);
  // NodeContainer n1n2 = NodeContainer(n1,n2);
 //  NodeContainer n1n3 = NodeContainer(n1,n3);
-  NodeContainer n4inN4 = NodeContainer(n4,inN4);
+//  NodeContainer n4inN4 = NodeContainer(n4,inN4);
 
 
   // Use a CsmaHelper to get a CSMA channel created, and the needed net
@@ -205,11 +205,11 @@ stack.Install (n1);
 stack.Install (n2);
 stack.Install (n3);
 stack.Install (n4);
-stack.Install (inN0);
-stack.Install (inN1);
-stack.Install (inN2);
-stack.Install (inN3);
-stack.Install (inN4);
+//stack.Install (inN0);
+//stack.Install (inN1);
+//stack.Install (inN2);
+//stack.Install (inN3);
+//stack.Install (inN4);
 
 
 // For interfaces between real linux interface and interface between simulation node
@@ -242,11 +242,11 @@ Ipv4InterfaceContainer ipn0n1n2n3 = ipv4.Assign (dn0n1n2n3);
  Ptr<Ipv4> ipv4n2 = n2->GetObject<Ipv4> ();
  Ptr<Ipv4> ipv4n3 = n3->GetObject<Ipv4> ();
  Ptr<Ipv4> ipv4n4 = n4->GetObject<Ipv4> ();
- Ptr<Ipv4> ipv4inN0 = inN0->GetObject<Ipv4> ();
- Ptr<Ipv4> ipv4inN1 = inN1->GetObject<Ipv4> ();
- Ptr<Ipv4> ipv4inN2 = inN2->GetObject<Ipv4> ();
- Ptr<Ipv4> ipv4inN3 = inN3->GetObject<Ipv4> ();
- Ptr<Ipv4> ipv4inN4 = inN4->GetObject<Ipv4> ();
+// Ptr<Ipv4> ipv4inN0 = inN0->GetObject<Ipv4> ();
+// Ptr<Ipv4> ipv4inN1 = inN1->GetObject<Ipv4> ();
+// Ptr<Ipv4> ipv4inN2 = inN2->GetObject<Ipv4> ();
+// Ptr<Ipv4> ipv4inN3 = inN3->GetObject<Ipv4> ();
+// Ptr<Ipv4> ipv4inN4 = inN4->GetObject<Ipv4> ();
 // Setup routing
 
 //Automatic routing setup  does not work, cant see end device IP addresses
@@ -362,28 +362,29 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
           //setup application
 
-          std::stringstream macAddr;
+       //   std::stringstream macAddr;
                                 uint32_t attackerId = 1;
-                                uint32_t victimDer = 2;
+                                uint32_t attackerId2 = 2;
+
                                // uint32_t csmaSwitch = 4;
                                 Address victimAddr;
 
 
                                 //attack on the company side network
-                                for( uint32_t i = 0; i <  n0n1n2n3.GetN(); i++ )
-                                  {
-                                	//macAddr << "00:00:00:00:00:0" << i;
-                                	Ptr<NetDevice> nd = dn0n1n2n3.Get (i);
-                                	Ptr<CsmaNetDevice> cd = nd->GetObject<CsmaNetDevice> ();
-								   //cd->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
-
-
-                                   // cd->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
-                                    // take a copy of victim addr
-                                    if(i == victimDer)
-                                      victimAddr = cd->GetAddress();
-
-                                  }
+//                                for( uint32_t i = 0; i <  n0n1n2n3.GetN(); i++ )
+//                                  {
+//                                	//macAddr << "00:00:00:00:00:0" << i;
+//                                	Ptr<NetDevice> nd = dn0n1n2n3.Get (i);
+//                                	Ptr<CsmaNetDevice> cd = nd->GetObject<CsmaNetDevice> ();
+//								   //cd->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
+//
+//
+//                                   // cd->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
+//                                    // take a copy of victim addr
+//                                    if(i == victimDer)
+//                                      victimAddr = cd->GetAddress();
+//
+//                                  }
                                 std::pair<Ptr<Ipv4>, uint32_t> returnValue = ipn0n1n2n3.Get (attackerId);
 
                                 Ptr<Ipv4> ipv4Val = returnValue.first;
@@ -394,9 +395,27 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
                                 Ptr<AttackApp> attacker = CreateObject<AttackApp> ();
                                 attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, Ipv4Address ("172.24.9.250"), Ipv4Address ("172.24.9.90"), ns3::Mac48Address("00:30:a7:1d:75:bd"));
+                               // attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, Ipv4Address ("172.24.9.252"), Ipv4Address ("172.24.2.23"), ns3::Mac48Address("10:65:30:f5:c9:a5"));
                                 n0n1n2n3.Get (attackerId)->AddApplication (attacker);
                                 attacker->SetStartTime (Seconds (1.0));
                                 attacker->SetStopTime (Seconds (3600.0));
+
+
+
+                                std::pair<Ptr<Ipv4>, uint32_t> returnValue2 = ipn0n1n2n3.Get (attackerId2);
+
+                                                                Ptr<Ipv4> ipv4Val2 = returnValue2.first;
+                                                                uint32_t index2= returnValue2.second;
+
+                                                                Ptr<Ipv4Interface> iface2 =  ipv4Val2->GetObject<Ipv4L3Protocol> ()->GetInterface (index2);
+
+
+                                                                Ptr<AttackApp> attacker2 = CreateObject<AttackApp> ();
+                                                                attacker2->Setup(n0n1n2n3.Get(attackerId2), dn0n1n2n3.Get(attackerId2), iface2, Ipv4Address ("172.24.9.90"), Ipv4Address ("172.24.9.250"), ns3::Mac48Address("00:50:c2:4f:9b:73"));
+                                                               // attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, Ipv4Address ("172.24.9.252"), Ipv4Address ("172.24.2.23"), ns3::Mac48Address("10:65:30:f5:c9:a5"));
+                                                                n0n1n2n3.Get (attackerId2)->AddApplication (attacker2);
+                                                                attacker2->SetStartTime (Seconds (1.0));
+                                                                attacker2->SetStopTime (Seconds (3600.0));
 
 
 
@@ -439,7 +458,7 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
                                                                  	anim.UpdateNodeDescription(n0n1n2n3.Get (1),"n1");
                                                                  	anim.UpdateNodeDescription(n0n1n2n3.Get (2),"n2");
                                                                  	anim.UpdateNodeDescription(n0n1n2n3.Get (3),"n3");
-                                                                 	anim.UpdateNodeDescription(n0n1n2n3.Get (4),"Router 1");
+                                                                 	anim.UpdateNodeDescription(n0n1n2n3.Get (4),"TAP_P1P1");
 
                                                                  	anim.SetConstantPosition (n0n1n2n3.Get (1), 15 , 10);
 
@@ -449,16 +468,16 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
                                                                  	anim.SetConstantPosition (n0n1n2n3.Get (4), 15 , 15);
 
 
-                                                                 anim.SetConstantPosition (inNx.Get (0), 5 , 0);
-                                                                 anim.UpdateNodeDescription(inNx.Get (0),"inN0");
-                                                                 	anim.SetConstantPosition (inNx.Get (1), 5 , 5);
-                                                                 	  	anim.UpdateNodeDescription(inNx.Get (1),"inN1");
-                                                                 	  anim.SetConstantPosition (inNx.Get (2), 5 , 10);
-                                                                 	  	anim.UpdateNodeDescription(inNx.Get (2),"inN2");
-                                                                 	  anim.SetConstantPosition (inNx.Get (3), 5 , 15);
-                                                                 	  	anim.UpdateNodeDescription(inNx.Get (3),"inN3");
-                                                                 	  	anim.SetConstantPosition (inNx.Get (4), 0 , 25);
-                                                                 	  	anim.UpdateNodeDescription(inNx.Get (4),"inN4");
+//                                                                 anim.SetConstantPosition (inNx.Get (0), 5 , 0);
+//                                                                 anim.UpdateNodeDescription(inNx.Get (0),"inN0");
+//                                                                 	anim.SetConstantPosition (inNx.Get (1), 5 , 5);
+//                                                                 	  	anim.UpdateNodeDescription(inNx.Get (1),"inN1");
+//                                                                 	  anim.SetConstantPosition (inNx.Get (2), 5 , 10);
+//                                                                 	  	anim.UpdateNodeDescription(inNx.Get (2),"inN2");
+//                                                                 	  anim.SetConstantPosition (inNx.Get (3), 5 , 15);
+//                                                                 	  	anim.UpdateNodeDescription(inNx.Get (3),"inN3");
+//                                                                 	  	anim.SetConstantPosition (inNx.Get (4), 0 , 25);
+//                                                                 	  	anim.UpdateNodeDescription(inNx.Get (4),"inN4");
 
 
 

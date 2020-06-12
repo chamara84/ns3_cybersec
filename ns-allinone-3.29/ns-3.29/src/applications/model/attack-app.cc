@@ -4,6 +4,7 @@
  *  Created on: Mar. 19, 2019
  *
  *   Copyright (c) 2019 Chamara Devanarayana <chamara@rtds.com>
+ *   The sending of unsolicited ARP replies is taken from https://github.com/Dark-Rinnegan/ns3-arp-spoofing.git
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -89,7 +90,7 @@ AttackApp::Setup (Ptr<Node> aNode, Ptr<NetDevice> aDev, Ptr<Ipv4Interface> iface
   arpProtocol->EnableDisableSpoofedARP(true,vAddr1,vAddr2);
   PacketMetadata::Enable();
   Packet::EnablePrinting();
-
+  readConfigFile( &config);
 }
 
 void
@@ -101,8 +102,8 @@ AttackApp::StartApplication (void)
   m_arpCache = m_attacker.CreateCache(m_device, m_iface);
   m_running = true;
   m_device->SetReceiveCallback(MakeCallback(&AttackApp::NonPromiscReceiveFromDevice,this));
-  readConfigFile( &config);
 
+  SendPacket ();
 //  Ptr<Ipv4> ipv4_n2 = m_node->GetObject<Ipv4>();
 //
 //  Ptr<Icmpv4L4Protocol> icmpv4 =ipv4_n2->GetObject<Icmpv4L4Protocol> ();
@@ -137,7 +138,7 @@ AttackApp::SendPacket (void)
 {
   m_attacker.SendArpReply(m_arpCache, m_fakeAddr, m_vAddr, m_vMac);
   std::cout << "stucked here" << std::endl;
-  ScheduleTx ();
+  ScheduleTx();
 }
 
 void
@@ -154,7 +155,7 @@ bool AttackApp::NonPromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Pa
                                    const Address &from)
 {
   NS_LOG_FUNCTION (this << device << packet << protocol << &from);
-  packet->Print(std::cout);
+  //packet->Print(std::cout);
   return ReceiveFromDevice (device, packet, protocol, from, device->GetAddress (), NetDevice::PacketType (0), false);
 }
 
