@@ -791,7 +791,7 @@ main (int argc, char *argv[])
 	  uint32_t nNodes = 2;
 	  string DER[4];
 
-	  DER[0]="172.24.9.32";
+	  DER[0]="172.24.9.240";
 	  	  DER[1]="172.24.9.241";
 	  	  DER[2]="172.24.9.242";
 	  	  DER[3]="172.24.9.243";
@@ -802,12 +802,12 @@ main (int argc, char *argv[])
 	  	  AggregatorIP[3]="172.24.9.247";
 
 	  	  string intIP[2];
-	  	  intIP[0]="10.0.2.2";
-	  	  intIP[1] = "10.0.2.3";
+	  	  intIP[0]="172.24.2.139";
+	  	  intIP[1] = "172.24.2.155";
 		   string intMAC[2];
-	  	  intMAC[0]="08:00:27:48:57:c3";
-	  	  intMAC[1] ="08:00:27:20:6d:04" ;
-		  string gateway = "10.0.2.1";
+	  	  intMAC[0]="b8:85:84:c4:9f:3b";
+	  	  intMAC[1] ="00:e0:4c:67:77:d4" ;
+		  string gateway = "172.24.0.1";
 	  MobilityHelper mobility;
 	  mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
 	  //
@@ -816,11 +816,11 @@ main (int argc, char *argv[])
 	  //
 	  CommandLine cmd;
 	  std::string deviceName1 ("em1");
-	   std::string deviceName2 ("p24p1"); //edit the name corresponding to the device name
+	   std::string deviceName2 ("p3p1"); //edit the name corresponding to the device name
 	  std::string encapMode ("Dix");
 
 	  int subnet;
-	  subnet = 3;
+	  subnet = 2;
 	  
 	  cmd.AddValue ("deviceName1", "device name1", deviceName1);
 	  cmd.AddValue ("deviceName2", "device name1", deviceName2);
@@ -840,7 +840,7 @@ main (int argc, char *argv[])
 	  cmd.AddValue("Int2IP","IP address of NIC 2",intIP[1]);
 	  cmd.AddValue("Int1MAC","MAC address of NIC 1",intMAC[0]);
 	  cmd.AddValue("Int2MAC","MAC address of NIC 2",intMAC[1]);
-	  cmd.AddValue("Gateway","IP address of the gateway of interface enp0s8",gateway);
+	  cmd.AddValue("Gateway","IP address of the gateway of interface p3p1",gateway);
 	  
 	  //cmd.AddValue ("nNodes", "number of nodes to create (>= 2)", nNodes);
  cmd.AddValue("Subnet","Sub net: 1) /8 2)/16 or 3)/24",subnet );

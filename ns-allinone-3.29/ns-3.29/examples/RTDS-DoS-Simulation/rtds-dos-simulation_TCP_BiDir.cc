@@ -696,13 +696,13 @@ MyApp::pktProcessingEgressNode (Ptr<Socket> socket)
 	    	   case(1):
 						to=this->m_AggregatorIP[1];
 	    		   //socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.245"), 7001));
-	    	   std::cout <<"Sent to:"<<this->m_AggregatorIP[1]<<std::endl;
+	    	   std::cout <<"Egress Sent to:"<<this->m_AggregatorIP[1]<<std::endl;
 	    	   	   break;
 
 	    	   case(2):
 						to=this->m_AggregatorIP[3];
 	    		   //socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.247"), 7001));
-	    	   std::cout <<"Sent to:"<<this->m_AggregatorIP[3]<<std::endl;
+	    	   std::cout <<"Egress Sent to:"<<this->m_AggregatorIP[3]<<std::endl;
 	    	   	   break;
 
 
@@ -720,11 +720,13 @@ MyApp::pktProcessingEgressNode (Ptr<Socket> socket)
 	       	    	   {
 	       	    	   case(1):
 								to=this->m_DERIP[1];
+	       	    	std::cout <<"Egress Sent to:"<<this->m_DERIP[1]<<std::endl;
 	       	    		   //socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.241"), 7001));
 	       	    	   	   break;
 
 	       	    	   case(2):
 								to=this->m_DERIP[3];
+	       	    	   std::cout <<"Egress Sent to:"<<this->m_DERIP[3]<<std::endl;
 	       	    		   //socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.243"), 7001));
 	       	    	   	   break;
 
@@ -756,14 +758,19 @@ MyApp::pktProcessingEgressNode (Ptr<Socket> socket)
 
 
 	      	      	       	       }
+	       Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable> ();
+	       		       rand->SetAttribute( "Min", DoubleValue( 1 ) );
+	       		       rand->SetAttribute( "Max", DoubleValue( 65525 ) );
+
 
 	       if(!to.empty()){
 	       Ptr<Packet> packetNew = Create<Packet>(buffer,packet->GetSize ());
 	       Ptr<SocketFactory> rxSocketFactory = this->node->GetObject<TcpSocketFactory> ();
 	       	       	      	       	       Ptr<Socket>	Send_socket = rxSocketFactory->CreateSocket ();
-	       	       	      	       	       Send_socket->Bind();
+	       	       	      	       	       Send_socket->Bind(InetSocketAddress (m_raddress, rand->GetInteger ()));
 	       	       	      	       	       Send_socket->Connect (InetSocketAddress (Ipv4Address(to.c_str()), m_peer_port));
 	       	       	      	       	       Send_socket->Send(packetNew);
+	       	       	      	       std::cout <<"Egress Sent to:"<<to<<std::endl;
 	       	       	      	       	      // Send_socket->Close();
 	       m_packetsSent++;
 	       }
@@ -827,7 +834,8 @@ void MyApp::pktProcessingAggregatorNode (Ptr<Socket> socket)
 		       	    	   case(2):
 								to="10.1.7.4";
 		       	    		   //socket->Connect (InetSocketAddress (Ipv4Address("10.1.7.4"), 7001));
-		       	    	   	   break;
+		       	    	std::cout <<"Sent to:10.1.7.4"<<std::endl;
+		       	    	   break;
 
 		       	    	   case(3):
 								to="10.1.7.5";
@@ -859,11 +867,13 @@ void MyApp::pktProcessingAggregatorNode (Ptr<Socket> socket)
 		       	       	       	      	       	       {
 		       	       	       	      	       	    	   Send_socket->Connect (InetSocketAddress (Ipv4Address(to.c_str()), m_peer_port));
 		       	       	       	      	       	    	   Send_socket->Send(packetNew);
+		       	       	       	      	        std::cout <<"Aggregator Sent to:"<<to<<"port:"<<m_peer_port<<std::endl;
 		       	       	       	      	       	       }
 		       	       	       	      	       	    	else if(type==4 || type==7)
 		       	       	       	      	       	       {
 		       	       	       	      	       	    	   Send_socket->Connect (InetSocketAddress (m_peer, m_peer_port));
 		       	       	       	      	       	    	   Send_socket->Send(packetNew);
+		       	       	       	      	        std::cout <<"Aggregator Sent to:"<<to<<"port:"<<m_peer_port<<std::endl;
 		       	       	       	      	       	       }
 		       	       	       	      	       	       // Send_socket->Close();
 		       printf("At aggregator\n");
@@ -944,7 +954,7 @@ main (int argc, char *argv[])
 	  MobilityHelper mobility;
 	  mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
 	  string DER[4];
-	  DER[0]="172.24.9.32";
+	  DER[0]="172.24.9.240";
 	  DER[1]="172.24.9.241";
 	  DER[2]="172.24.9.242";
 	  DER[3]="172.24.9.243";
@@ -955,8 +965,8 @@ main (int argc, char *argv[])
 	  AggregatorIP[3]="172.24.9.247";
 
 	  string intIP[2];
-	  intIP[0]="172.24.2.158";
-	  intIP[1] = "172.24.2.171";
+	  intIP[0]="172.24.2.139";
+	  intIP[1] = "172.24.2.155";
 
 	  int subnet;
 	  subnet = 2;
@@ -965,8 +975,8 @@ main (int argc, char *argv[])
 	  // arguments
 	  //
 	  CommandLine cmd;
-	  std::string deviceName1 ("enp0s3");
-	   std::string deviceName2 ("enp0s8");
+	  std::string deviceName1 ("em1");
+	   std::string deviceName2 ("p3p1");
 	  
 	  std::string encapMode ("Dix");
 
@@ -1203,7 +1213,7 @@ main (int argc, char *argv[])
            	}
 
            address.SetBase (netID.c_str(), netMask.c_str(), hostID.c_str());
-       d0 = emu.Install (ingressNode);
+      d0 = emu.Install (ingressNode);
        Ptr<FdNetDevice> dev = d0.Get (0)->GetObject<FdNetDevice> ();
        dev->SetAddress (Mac48Address ("b8:85:84:c4:9f:3b"));
        NS_LOG_INFO ("Assign IP Address of EMU interface.");
@@ -1321,43 +1331,52 @@ main (int argc, char *argv[])
 
 		//Second Emulated interface Egress node
              
+
+
              std::string encapMode2 ("Dix");
              EmuFdNetDeviceHelper emu2;
              emu2.SetDeviceName (deviceName2);
              emu2.SetAttribute ("EncapsulationMode", StringValue (encapMode2));
              std::stringstream ss1(intIP[1]);
-                        tokenizedIP.clear();
+             std::vector<string> tokenizedIP1;
+             std::string s1;
+                        tokenizedIP1.clear();
 
-                        	while (std::getline(ss1, s, '.')) {
-                        		tokenizedIP.push_back(s);
+                        	while (std::getline(ss1, s1, '.')) {
+                        		tokenizedIP1.push_back(s1);
                         	}
+                        	string netID1;
+                        			           	string netMask1;
+                        			           	string hostID1;
+                        			           	vector<string>::iterator it1 = tokenizedIP1.begin();
 
 
+                        			           	if(subnet==1)
+                        			           			           	{
+                        			           			           		netID1 = *it1+".0.0.0";
+                        			           			           		netMask1="255.0.0.0";
+                        			           			           		hostID1 = "0."+*(it1+1)+"."+*(it1+2)+"."+*(it1+3);
+                        			           			           	}
+                        			           			           	else if(subnet==2)
+                        			           			           	{
+                        			           			           		netID1 = *it1+"."+*(it1+1)+".0.0";
+                        			           			           		netMask1="255.255.0.0";
+                        			           			           		hostID1 = "0.0."+*(it1+2)+"."+*(it1+3);
+                        			           			           	}
+                        			           			           	else if(subnet==3)
+                        			           			           	{
+                        			           			           		netID1 = *it1+"."+*(it1+1)+"."+*(it1+2)+".0";
+                        			           			           		netMask1="255.255.255.0";
+                        			           			           		hostID1 = "0.0.0."+*(it1+3);
+                        			           			           	}
 
-                        	if(subnet==1)
-                        	{
-                        		netID = *it+".0.0.0";
-                        		netMask="255.0.0.0";
-                        		hostID = "0."+*(++it)+"."+*(++it)+"."+*(++it);
-                        	}
-                        	else if(subnet==2)
-                        	{
-                        		netID = *it+"."+*(++it)+".0.0";
-                        		netMask="255.255.0.0";
-                        		hostID = "0.0."+*(++it)+"."+*(++it);
-                        	}
-                        	else if(subnet==3)
-                        	{
-                        		netID = *it+"."+*(++it)+"."+*(++it)+".0";
-                        		netMask="255.255.255.0";
-                        		hostID = "0.0.0."+*(++it);
-                        	}
-                        	address.SetBase (netID.c_str(), netMask.c_str(), hostID.c_str());
+                        	std::cout<<"NetID "<<netID1<<"Netmask "<<netMask1 << "HostID "<<hostID1;
+                        	address.SetBase (netID1.c_str(), netMask1.c_str(), hostID1.c_str());
              d1 = emu2.Install (egressNode);
 
 
              Ptr<FdNetDevice> dev1 = d1.Get (0)->GetObject<FdNetDevice> ();
-             dev1->SetAddress (Mac48Address ("B4:96:91:47:DB:35"));
+             dev1->SetAddress (Mac48Address ("00:e0:4c:67:77:d4"));
              NS_LOG_INFO ("Assign IP Address of EMU interface2.");
              i1 = address.Assign (d1); //IP address for node n3 with emulation
              dev1->Initialize();
@@ -1465,7 +1484,7 @@ main (int argc, char *argv[])
           //Print Routin Table
 
           Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
-          //ipv4RoutingHelper.PrintRoutingTableAt(Seconds(10), DERs.Get (0), routingStream);
+          ipv4RoutingHelper.PrintRoutingTableAt(Seconds(10), egressNode, routingStream);
           ipv4RoutingHelper.PrintRoutingTableAt(Seconds(10), DERsn0Attacker.Get(attackerId), routingStream);
        // rxSocket2->SetRecvCallback (MakeCallback (&SocketPrinter) );
        //PrintTraffic ( &n, rxSocketn0);
