@@ -211,11 +211,13 @@ int AttackApp::readConfigFile( configuration * config)
 	    				if((config->dnp3.values_to_alter[indexNum].obj_group)==1 || (config->dnp3.values_to_alter[indexNum]).obj_group==10)
 	    				{
 	    					(config->dnp3.values_to_alter[indexNum]).integer_value =stol(s,nullptr,10);
-
+	    					std::cout<<"Grp:"<<(int)(config->dnp3.values_to_alter[indexNum]).obj_group << "var:"<<(int)(config->dnp3.values_to_alter[indexNum]).obj_var <<"Val:"<<(config->dnp3.values_to_alter[indexNum]).integer_value <<std::endl;
 	    				}
 	    				else
 	    				{
 	    					(config->dnp3.values_to_alter[indexNum]).floating_point_val =stof(s,nullptr);
+	    					std::cout<<"Grp:"<<(int)(config->dnp3.values_to_alter[indexNum]).obj_group << "var:"<<(int)(config->dnp3.values_to_alter[indexNum]).obj_var <<"Val:"<<(config->dnp3.values_to_alter[indexNum]).floating_point_val <<std::endl;
+
 	    				}
 	    				parameter++;
 
@@ -347,7 +349,7 @@ AttackApp::ReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, u
 	     }
 
 	 lengthOfData = ipV4Hdr.GetPayloadSize()-tcpHdr1.GetLength()*4;
-	// printf("Payload Length : %d \n Src Port : %d Dst Port : %d", lengthOfData, tcpHdr1.GetSourcePort(),tcpHdr1.GetDestinationPort());
+///	 printf("Payload Length : %d \n Src Port : %d Dst Port : %d\n", lengthOfData, tcpHdr1.GetSourcePort(),tcpHdr1.GetDestinationPort());
 
 
 
@@ -360,7 +362,7 @@ AttackApp::ReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, u
 
  // }
 
-if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==4888 && tcpHdr1.GetSourcePort()==4888))
+if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==7001 || tcpHdr1.GetSourcePort()==7001))
 {
 
 	unsigned char buffer[packetCopy->GetSize ()] ;
@@ -379,6 +381,7 @@ if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==4888 &&
 	  	       DERIndex=bufferFloat[1];
 
 	  	       printf("msgType = %d\n", bufferFloat[0]);
+	  	       printf("DER Index = %d\n", bufferFloat[1]);
 
 	  	       //Ptr<Packet> copy = packet->Copy ();
 	  	       //Ipv4Header iph;
@@ -393,13 +396,13 @@ if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==4888 &&
                vector<string> parseString = giveParsingString(integerData);
                vector<string>::iterator it = parseString.begin();
 	  	       int i=0;
-	  	       if(Simulator::Now ().GetSeconds ()>0.0)
+	  	       if(Simulator::Now ().GetSeconds ()>1.0)
 	  	       {
-
-	  	       while(it!=parseString.end() )
+	  	    	 printf("dataType = %s\n", (*it).c_str());
+	  	       while(it!=parseString.end() && DERIndex != 2)
 	  	       {
-	  	    	   //printf("dataType = %s\n", string[i]);
-	  	    	   if(it->compare("float")==0 && DERIndex != 1)
+	  	    	 printf("dataType = %s\n", (*it).c_str());
+	  	    	   if((*it).compare("float")==0 )
 	  	    	   {
 
 
@@ -585,7 +588,7 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 
 
   	    //only if UDP comment out if raw sockets or TCP sockets are used
-if(ipProtocol == 17 && (udpHdr1.GetDestinationPort()==4888 || udpHdr1.GetSourcePort()==4888)){
+if(ipProtocol == 17 && (udpHdr1.GetDestinationPort()==7001 || udpHdr1.GetSourcePort()==7001)){
 
 	unsigned char buffer[packetCopy->GetSize ()] ;
 	//if(packetCopy->GetSize ()>0){
@@ -718,7 +721,7 @@ if(ipProtocol == 17 && (udpHdr1.GetDestinationPort()==4888 || udpHdr1.GetSourceP
             	  if( packetNew && protocol == 2048 && ((ipProtocol == 6 && (lengthOfData>0))||ipProtocol == 17))
             	  {
             		  i->handler (device, packetNew, protocol, from, to, packetType);
-            		  printf("Payload Length : %d \n Src Port : %d Dst Port : %d \n", lengthOfData, tcpHdr1.GetSourcePort(),tcpHdr1.GetDestinationPort());
+            		//  printf("Payload Length : %d \n Src Port : %d Dst Port : %d \n", lengthOfData, tcpHdr1.GetSourcePort(),tcpHdr1.GetDestinationPort());
             	  }
             	  else
             	  {

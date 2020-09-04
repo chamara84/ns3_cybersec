@@ -394,8 +394,8 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
 
                                 Ptr<AttackApp> attacker = CreateObject<AttackApp> ();
-                                attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, Ipv4Address ("172.24.9.250"), Ipv4Address ("172.24.9.90"), ns3::Mac48Address("00:30:a7:1d:75:bd"));
-                               // attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, Ipv4Address ("172.24.9.252"), Ipv4Address ("172.24.2.23"), ns3::Mac48Address("10:65:30:f5:c9:a5"));
+                                //attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, Ipv4Address ("172.24.9.250"), Ipv4Address ("172.24.2.90"), ns3::Mac48Address("00:30:a7:1d:75:bd"));
+                               attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, Ipv4Address ("172.24.9.250"), Ipv4Address ("172.24.2.43"), ns3::Mac48Address("10:65:30:f5:c9:a5"));
                                 n0n1n2n3.Get (attackerId)->AddApplication (attacker);
                                 attacker->SetStartTime (Seconds (1.0));
                                 attacker->SetStopTime (Seconds (3600.0));
@@ -411,8 +411,8 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
 
                                                                 Ptr<AttackApp> attacker2 = CreateObject<AttackApp> ();
-                                                                attacker2->Setup(n0n1n2n3.Get(attackerId2), dn0n1n2n3.Get(attackerId2), iface2, Ipv4Address ("172.24.9.90"), Ipv4Address ("172.24.9.250"), ns3::Mac48Address("00:50:c2:4f:9b:73"));
-                                                               // attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, Ipv4Address ("172.24.9.252"), Ipv4Address ("172.24.2.23"), ns3::Mac48Address("10:65:30:f5:c9:a5"));
+                                                             //   attacker2->Setup(n0n1n2n3.Get(attackerId2), dn0n1n2n3.Get(attackerId2), iface2, Ipv4Address ("172.24.9.90"), Ipv4Address ("172.24.9.250"), ns3::Mac48Address("00:50:c2:4f:9b:73"));
+                                                               attacker2->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface,  Ipv4Address ("172.24.2.43"), Ipv4Address ("172.24.9.250"),ns3::Mac48Address("00:50:c2:4f:9b:73"));
                                                                 n0n1n2n3.Get (attackerId2)->AddApplication (attacker2);
                                                                 attacker2->SetStartTime (Seconds (1.0));
                                                                 attacker2->SetStopTime (Seconds (3600.0));

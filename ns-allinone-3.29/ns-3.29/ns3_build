@@ -1,3 +1,3 @@
 ./waf distclean
-./waf configure --enable-examples --enable-tests --enable-sudo
+CXXFLAGS="-Wall" ./waf configure --enable-examples --enable-tests --enable-sudo
 ./waf build -j8

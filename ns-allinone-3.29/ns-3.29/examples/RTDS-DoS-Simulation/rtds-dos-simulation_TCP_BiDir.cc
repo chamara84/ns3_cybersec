@@ -366,7 +366,7 @@ MyApp::PrintTraffic (Ptr<Socket> socket)
 	       Send_socket->Bind();
 	       Send_socket->Connect (InetSocketAddress (m_peer, m_peer_port));
 	       Send_socket->Send(packet);
-	      // Send_socket->Close();
+	       Send_socket->Close();
 
 	       printf("DER Sent to\n");
 	       m_raddress.Print(std::cout);
@@ -771,7 +771,7 @@ MyApp::pktProcessingEgressNode (Ptr<Socket> socket)
 	       	       	      	       	       Send_socket->Connect (InetSocketAddress (Ipv4Address(to.c_str()), m_peer_port));
 	       	       	      	       	       Send_socket->Send(packetNew);
 	       	       	      	       std::cout <<"Egress Sent to:"<<to<<std::endl;
-	       	       	      	       	      // Send_socket->Close();
+	       	       	      	       	      Send_socket->Close();
 	       m_packetsSent++;
 	       }
 
@@ -875,7 +875,7 @@ void MyApp::pktProcessingAggregatorNode (Ptr<Socket> socket)
 		       	       	       	      	       	    	   Send_socket->Send(packetNew);
 		       	       	       	      	        std::cout <<"Aggregator Sent to:"<<to<<"port:"<<m_peer_port<<std::endl;
 		       	       	       	      	       	       }
-		       	       	       	      	       	       // Send_socket->Close();
+		       	       	       	      	       	        Send_socket->Close();
 		       printf("At aggregator\n");
 		       m_packetsSent++;
 		       //m_Event= Simulator::Schedule (Simulator::Now (), &MyApp::sendMessage, packetNew,m_socket);
@@ -1598,8 +1598,8 @@ if (dosEnabled){
     Ptr<TcpSynFlood> appSynFlood = CreateObject<TcpSynFlood>();
     appSynFlood->Setup(Attackers.Get(0),Ipv4Address ("10.1.8.5"),Ipv4Address ("10.1.7.1"), port,interSynTime );
     Attackers.Get(0)->AddApplication(appSynFlood);
-    appSynFlood->SetStartTime (Seconds (1.));
-    appSynFlood->SetStopTime (Seconds (50));
+    appSynFlood->SetStartTime (Seconds (100.));
+    appSynFlood->SetStopTime (Seconds (110));
 
 
 }
