@@ -785,29 +785,29 @@ main (int argc, char *argv[])
 
 	  bool dosEnabled = false;
 	  
-	  bool manInTheMiddle = false;
+	  bool manInTheMiddle = true;
 	  double stopTime = 500.0
 	    ;
 	  uint32_t nNodes = 2;
 	  string DER[4];
 
-	  DER[0]="172.24.9.240";
-	  	  DER[1]="172.24.9.241";
-	  	  DER[2]="172.24.9.242";
-	  	  DER[3]="172.24.9.243";
+	  DER[0]="172.20.28.53";
+	  	  DER[1]="172.20.28.54";
+	  	  DER[2]="172.20.28.55";
+	  	  DER[3]="172.20.28.56";
 	  	  string AggregatorIP[4];
-	  	  AggregatorIP[0]="172.24.9.244";
-	  	  AggregatorIP[1]="172.24.9.245";
-	  	  AggregatorIP[2]="172.24.9.246";
-	  	  AggregatorIP[3]="172.24.9.247";
+	  	  AggregatorIP[0]="172.20.28.57";
+	  	  AggregatorIP[1]="172.20.28.58";
+	  	  AggregatorIP[2]="172.20.28.59";
+	  	  AggregatorIP[3]="172.20.28.60";
 
 	  	  string intIP[2];
-	  	  intIP[0]="172.24.2.139";
-	  	  intIP[1] = "172.24.2.155";
+	  	  intIP[0]="172.20.28.173";
+	  	  intIP[1] = "172.20.28.151";
 		   string intMAC[2];
-	  	  intMAC[0]="b8:85:84:c4:9f:3b";
+	  	  intMAC[0]="00:E0:4C:67:77:D3";
 	  	  intMAC[1] ="00:e0:4c:67:77:d4" ;
-		  string gateway = "172.24.0.1";
+		  string gateway = "172.20.28.1";
 	  MobilityHelper mobility;
 	  mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
 	  //
@@ -815,12 +815,12 @@ main (int argc, char *argv[])
 	  // arguments
 	  //
 	  CommandLine cmd;
-	  std::string deviceName1 ("em1");
+	  std::string deviceName1 ("p1p1");
 	   std::string deviceName2 ("p3p1"); //edit the name corresponding to the device name
 	  std::string encapMode ("Dix");
 
 	  int subnet;
-	  subnet = 2;
+	  subnet = 3;
 	  
 	  cmd.AddValue ("deviceName1", "device name1", deviceName1);
 	  cmd.AddValue ("deviceName2", "device name1", deviceName2);
@@ -1457,7 +1457,7 @@ if (dosEnabled){
        //onoff.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=" + ON_TIME + "]"));
          //onoff.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=" + OFF_TIME + "]"));
        ApplicationContainer onOffapps = onoff.Install (n.Get(2));
-      onOffapps.Start (Seconds (100.0));
+      onOffapps.Start (Seconds (10.0));
        onOffapps.Stop (Seconds (200.0));
 
 }

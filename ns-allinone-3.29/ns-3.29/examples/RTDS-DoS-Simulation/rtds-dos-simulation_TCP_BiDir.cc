@@ -948,34 +948,38 @@ main (int argc, char *argv[])
 	  bool dosEnabled = false;
 	  bool manInTheMiddle = false;
 	  float interSynTime = 1000.0;
-	  double stopTime = 10;
+	  double stopTime = 500;
 	  uint32_t nNodes = 2;
 	  int maxParallelSessions=100;
 	  MobilityHelper mobility;
 	  mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
 	  string DER[4];
-	  DER[0]="172.24.9.240";
-	  DER[1]="172.24.9.241";
-	  DER[2]="172.24.9.242";
-	  DER[3]="172.24.9.243";
-	  string AggregatorIP[4];
-	  AggregatorIP[0]="172.24.9.244";
-	  AggregatorIP[1]="172.24.9.245";
-	  AggregatorIP[2]="172.24.9.246";
-	  AggregatorIP[3]="172.24.9.247";
+	  DER[0]="172.20.28.53";
+	  	  	  DER[1]="172.20.28.54";
+	  	  	  DER[2]="172.20.28.55";
+	  	  	  DER[3]="172.20.28.56";
+	  	  	  string AggregatorIP[4];
+	  	  	  AggregatorIP[0]="172.20.28.57";
+	  	  	  AggregatorIP[1]="172.20.28.58";
+	  	  	  AggregatorIP[2]="172.20.28.59";
+	  	  	  AggregatorIP[3]="172.20.28.60";
 
-	  string intIP[2];
-	  intIP[0]="172.24.2.139";
-	  intIP[1] = "172.24.2.155";
+	  	  	  string intIP[2];
+	  	  	  intIP[0]="172.20.28.173";
+	  	  	  intIP[1] = "172.20.28.151";
+	  		   string intMAC[2];
+	  	  	  intMAC[0]="00:e0:4c:67:77:d3";
+	  	  	  intMAC[1] ="00:e0:4c:67:77:d4" ;
+	  		  string gateway = "172.20.28.1";
 
 	  int subnet;
-	  subnet = 2;
+	  subnet = 3;
 	  //
 	  // Allow the user to override any of the defaults at run-time, via command-line
 	  // arguments
 	  //
 	  CommandLine cmd;
-	  std::string deviceName1 ("em1");
+	  std::string deviceName1 ("p1p1");
 	   std::string deviceName2 ("p3p1");
 	  
 	  std::string encapMode ("Dix");
@@ -1215,7 +1219,7 @@ main (int argc, char *argv[])
            address.SetBase (netID.c_str(), netMask.c_str(), hostID.c_str());
       d0 = emu.Install (ingressNode);
        Ptr<FdNetDevice> dev = d0.Get (0)->GetObject<FdNetDevice> ();
-       dev->SetAddress (Mac48Address ("b8:85:84:c4:9f:3b"));
+       dev->SetAddress (Mac48Address (intMAC[0].c_str()));
        NS_LOG_INFO ("Assign IP Address of EMU interface.");
        i0 = address.Assign (d0); //IP address for node n0 with emulation
        dev->Initialize();
@@ -1376,7 +1380,7 @@ main (int argc, char *argv[])
 
 
              Ptr<FdNetDevice> dev1 = d1.Get (0)->GetObject<FdNetDevice> ();
-             dev1->SetAddress (Mac48Address ("00:e0:4c:67:77:d4"));
+             dev1->SetAddress (Mac48Address (intMAC[1].c_str()));
              NS_LOG_INFO ("Assign IP Address of EMU interface2.");
              i1 = address.Assign (d1); //IP address for node n3 with emulation
              dev1->Initialize();
