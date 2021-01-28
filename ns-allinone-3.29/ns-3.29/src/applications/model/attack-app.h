@@ -61,7 +61,9 @@ public:
   AttackApp ();
   virtual ~AttackApp();
 
-  void Setup (Ptr<Node> aNode, Ptr<NetDevice> aDev, Ptr<Ipv4Interface> iface,  Ipv4Address addr, Ipv4Address vAddr, Address vMac);
+  void
+  Setup (Ptr<Node> aNode, Ptr<NetDevice> aDev, Ptr<Ipv4Interface> iface, std::vector<Ipv4Address> vAddr1, std::vector<Ipv4Address> vAddr2, std::vector<Address> vMac);
+
   bool NonPromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol,
                                      const Address &from);
   bool ReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol,
@@ -82,11 +84,11 @@ private:
   Ptr<Node> m_node;
   Ptr<NetDevice> m_device;
   Ptr<Ipv4Interface> m_iface;
-  Ipv4Address m_fakeAddr;
+  std::vector<Ipv4Address> m_fakeAddr;
 
   // victim info
-  Ipv4Address m_vAddr;
-  Address m_vMac;
+  std::vector<Ipv4Address>m_vAddr;
+  std::vector<Address> m_vMac;
 
   EventId         m_sendEvent;
   bool            m_running;

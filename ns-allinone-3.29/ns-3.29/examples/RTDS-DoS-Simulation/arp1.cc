@@ -245,7 +245,10 @@ main ()
 
   //construct attacker app
   Ptr<AttackApp> attacker = CreateObject<AttackApp> ();
-  attacker->Setup(csmaNodes.Get(attackerId), csmaDevices.Get(attackerId), iface, csmaInterfaces.GetAddress(serverId), csmaInterfaces.GetAddress(victimId), victimAddr);
+  std::vector<Ipv4Address> spoofedIPs{csmaInterfaces.GetAddress(serverId)};
+  std::vector<Ipv4Address>victimIPs{csmaInterfaces.GetAddress(victimId)};
+  std::vector<Address>victimMACs{victimAddr};
+  attacker->Setup(csmaNodes.Get(attackerId), csmaDevices.Get(attackerId), iface, spoofedIPs, victimIPs, victimMACs);
   csmaNodes.Get (attackerId)->AddApplication (attacker);
   attacker->SetStartTime (MilliSeconds (serverStart + delayT ));
   attacker->SetStopTime (MilliSeconds (stopTime));

@@ -1358,7 +1358,10 @@ main (int argc, char *argv[])
                     if (manInTheMiddle){
                    //contruct attacker app
                    Ptr<AttackApp> attacker = CreateObject<AttackApp> ();
-                   attacker->Setup(DERsn0Attacker.Get(attackerId), csmaDERsn0.Get(attackerId), iface, csmaInterfaces.GetAddress(csmaSwitch), csmaInterfaces.GetAddress(victimDer), victimAddr);
+                   std::vector<Ipv4Address> spoofedIPs{csmaInterfaces.GetAddress(csmaSwitch)};
+                   std::vector<Ipv4Address>victimIPs{csmaInterfaces.GetAddress(victimDer)};
+                   std::vector<Address>victimMACs{victimAddr};
+                   attacker->Setup(DERsn0Attacker.Get(attackerId), csmaDERsn0.Get(attackerId), iface, spoofedIPs, victimIPs, victimMACs);
                    DERsn0Attacker.Get (attackerId)->AddApplication (attacker);
                    attacker->SetStartTime (Seconds (1.0));
                    attacker->SetStopTime (Seconds (10.0));

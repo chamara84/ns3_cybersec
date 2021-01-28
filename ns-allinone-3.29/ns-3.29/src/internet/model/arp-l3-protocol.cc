@@ -127,7 +127,7 @@ ArpL3Protocol::NotifyNewAggregate ()
   Object::NotifyNewAggregate ();
 }
 
-void ArpL3Protocol::EnableDisableSpoofedARP(bool enable, Ipv4Address vaddr1, Ipv4Address vAddr2)
+void ArpL3Protocol::EnableDisableSpoofedARP(bool enable, std::vector<Ipv4Address>  vaddr1, std::vector<Ipv4Address> vAddr2)
 {
 	m_spoofARP = enable;
 	m_vaddr1 = vaddr1;
@@ -235,7 +235,11 @@ ArpL3Protocol::Receive (Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t pro
                         arp.GetSourceHardwareAddress ());
           break;
         } 
-      else if (arp.IsRequest () && m_spoofARP && ((arp.GetDestinationIpv4Address () == m_vaddr1 && arp.GetSourceIpv4Address ()==m_vaddr2)|| (arp.GetDestinationIpv4Address () == m_vaddr2 && arp.GetSourceIpv4Address ()==m_vaddr1))) //&& && ((arp.GetDestinationIpv4Address () == m_vaddr1 && arp.GetSourceIpv4Address ()==m_vaddr2)|| (arp.GetDestinationIpv4Address () == m_vaddr2 && arp.GetSourceIpv4Address ()==m_vaddr1))
+      else if (arp.IsRequest () && m_spoofARP && ((std::find(m_vaddr1.begin(), m_vaddr1.end(), arp.GetDestinationIpv4Address ())
+      != m_vaddr1.end() && std::find(m_vaddr2.begin(), m_vaddr2.end(), arp.GetSourceIpv4Address()) != m_vaddr2.end()
+	  )|| (std::find(m_vaddr2.begin(), m_vaddr2.end(), arp.GetDestinationIpv4Address()) != m_vaddr2.end()
+			  && std::find(m_vaddr1.begin(), m_vaddr1.end(), arp.GetSourceIpv4Address())
+      != m_vaddr1.end()))) //&& && ((arp.GetDestinationIpv4Address () == m_vaddr1 && arp.GetSourceIpv4Address ()==m_vaddr2)|| (arp.GetDestinationIpv4Address () == m_vaddr2 && arp.GetSourceIpv4Address ()==m_vaddr1))
       {
     	  found = true;
     	            NS_LOG_LOGIC ("node="<<m_node->GetId () <<", got request from " <<

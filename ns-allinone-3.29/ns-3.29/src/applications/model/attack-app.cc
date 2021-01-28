@@ -78,14 +78,14 @@ AttackApp::~AttackApp()
 }
 
 void
-AttackApp::Setup (Ptr<Node> aNode, Ptr<NetDevice> aDev, Ptr<Ipv4Interface> iface, Ipv4Address vAddr1, Ipv4Address vAddr2, Address vMac)
+AttackApp::Setup (Ptr<Node> aNode, Ptr<NetDevice> aDev, Ptr<Ipv4Interface> iface, std::vector<Ipv4Address> vAddr1, std::vector<Ipv4Address> vAddr2, std::vector<Address> vMac)
 {
   m_node = aNode;
   m_device = aDev;
   m_iface = iface;
-  m_fakeAddr = vAddr1;
-  m_vAddr = vAddr2;
-  m_vMac = vMac;
+  m_fakeAddr = vAddr1; //fake IP address of the attacker
+  m_vAddr = vAddr2; //IP address of the victim
+  m_vMac = vMac;    //MAC address of the victim
   Ptr<ArpL3Protocol> arpProtocol = m_node->GetObject<ArpL3Protocol>();
   arpProtocol->EnableDisableSpoofedARP(true,vAddr1,vAddr2);
   PacketMetadata::Enable();
@@ -136,7 +136,11 @@ AttackApp::StopApplication (void)
 void
 AttackApp::SendPacket (void)
 {
-  m_attacker.SendArpReply(m_arpCache, m_fakeAddr, m_vAddr, m_vMac);
+
+	for(int i=0;i<(int)m_fakeAddr.size();i++){
+  m_attacker.SendArpReply(m_arpCache, m_fakeAddr[i], m_vAddr[i], m_vMac[i]);
+
+	}
   std::cout << "stucked here" << std::endl;
   ScheduleTx();
 }

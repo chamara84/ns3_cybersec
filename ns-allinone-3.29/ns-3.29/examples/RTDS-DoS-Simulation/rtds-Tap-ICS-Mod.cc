@@ -393,7 +393,10 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
 
                                 Ptr<AttackApp> attacker = CreateObject<AttackApp> ();
-                                attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, ipn0n1n2n3.GetAddress(csmaSwitch), Ipv4Address ("172.24.9.90"), ns3::Mac48Address("00:30:a7:1d:75:bd"));
+                                std::vector<Ipv4Address> spoofedIPs{ipn0n1n2n3.GetAddress(csmaSwitch)};
+                                          std::vector<Ipv4Address>victimIPs{Ipv4Address ("172.24.9.90")};
+                                          std::vector<Address>victimMACs{ns3::Mac48Address("00:30:a7:1d:75:bd")};
+                                attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, spoofedIPs, victimIPs, victimMACs);
                                 n0n1n2n3.Get (attackerId)->AddApplication (attacker);
                                 attacker->SetStartTime (Seconds (1.0));
                                 attacker->SetStopTime (Seconds (3600.0));
@@ -423,7 +426,11 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
 
                                                                Ptr<AttackApp> attacker1 = CreateObject<AttackApp> (); //Ipv4Address ("192.168.100.10"), ns3::Mac48Address("00:50:c2:4f:9b:73")
-                                                               attacker1->Setup(inNx.Get(attackerId), dinNx.Get(attackerId), iface1, ipinNx.GetAddress(csmaSwitch), Ipv4Address ("192.168.100.10"), ns3::Mac48Address("00:50:c2:4f:9b:73"));
+                                                               std::vector<Ipv4Address> spoofedIPs1{ipinNx.GetAddress(csmaSwitch)};
+                                                               std::vector<Ipv4Address>victimIPs1{Ipv4Address ("192.168.100.10")};
+                                                               std::vector<Address>victimMACs1{ns3::Mac48Address("00:50:c2:4f:9b:73")};
+
+                                                               attacker1->Setup(inNx.Get(attackerId), dinNx.Get(attackerId), iface1, spoofedIPs1, victimIPs1, victimMACs1);
                                                                inNx.Get (attackerId)->AddApplication (attacker1);
                                                                attacker1->SetStartTime (Seconds (1.0));
                                                                attacker1->SetStopTime (Seconds (3600.0));

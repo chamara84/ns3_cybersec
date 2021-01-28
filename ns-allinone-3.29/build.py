@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 from __future__ import print_function
 import sys
 from optparse import OptionParser
@@ -55,7 +55,7 @@ def build_netanim(qmakepath):
         pass
 
 def build_ns3(config, build_examples, build_tests, args, build_options):
-    cmd = [sys.executable, "waf", "configure"] + args
+    cmd = [sys.executable,"waf", "configure"] + args
     cmd.append("--enable-examples")
     cmd.append("--enable-tests")
     cmd.append("--enable-sudo")

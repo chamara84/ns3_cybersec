@@ -27,6 +27,8 @@
 #include "ns3/ptr.h"
 #include "ns3/traced-callback.h"
 #include "ns3/random-variable-stream.h"
+#include <algorithm>
+#include <vector>
 
 namespace ns3 {
 
@@ -131,7 +133,7 @@ public:
    * Enabling spoofed ARP
    * \param enable set to true if spoofing arp else false
    */
-  void EnableDisableSpoofedARP(bool enable,Ipv4Address vaddr1, Ipv4Address vAddr2);
+  void EnableDisableSpoofedARP(bool enable,std::vector<Ipv4Address> vaddr1, std::vector<Ipv4Address> vAddr2);
 
 
 protected:
@@ -187,8 +189,8 @@ private:
   Ptr<RandomVariableStream> m_requestJitter; //!< jitter to de-sync ARP requests
   Ptr<TrafficControlLayer> m_tc; //!< The associated TrafficControlLayer
   bool m_spoofARP;
-  Ipv4Address m_vaddr1;
-  Ipv4Address m_vaddr2;
+  std::vector<Ipv4Address> m_vaddr1;
+  std::vector<Ipv4Address> m_vaddr2;
 };
 
 } // namespace ns3
