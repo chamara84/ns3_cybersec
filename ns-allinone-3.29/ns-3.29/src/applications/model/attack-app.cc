@@ -138,7 +138,7 @@ AttackApp::SendPacket (void)
 {
 
 	for(int i=0;i<(int)m_fakeAddr.size();i++){
-  m_attacker.SendArpReply(m_arpCache, m_fakeAddr[i], m_vAddr[i], m_vMac[i]);
+  m_attacker.SendArpReply(m_arpCache, (Ipv4Address)m_fakeAddr[i], (Ipv4Address)m_vAddr[i], (Address)m_vMac[i]);
 
 	}
   std::cout << "stucked here" << std::endl;
