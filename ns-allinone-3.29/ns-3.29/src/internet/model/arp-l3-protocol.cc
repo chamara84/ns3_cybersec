@@ -258,7 +258,7 @@ ArpL3Protocol::Receive (Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t pro
           ArpCache::Entry *entry = cache->Lookup (from);
           if (entry != 0)
             {
-              if (entry->IsWaitReply ()) 
+              if (entry->IsWaitReply ())
                 {
                   NS_LOG_LOGIC ("node="<< m_node->GetId () << 
                                 ", got reply from " << arp.GetSourceIpv4Address ()

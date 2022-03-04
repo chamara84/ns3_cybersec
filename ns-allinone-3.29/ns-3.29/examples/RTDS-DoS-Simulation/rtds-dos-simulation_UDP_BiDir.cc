@@ -815,8 +815,8 @@ main (int argc, char *argv[])
 	  // arguments
 	  //
 	  CommandLine cmd;
-	  std::string deviceName1 ("enp7s0");
-	   std::string deviceName2 ("enp8s0"); //edit the name corresponding to the device name
+	  std::string deviceName1 ("enp4s0");
+	   std::string deviceName2 ("enp3s0"); //edit the name corresponding to the device name
 	  std::string encapMode ("Dix");
 
 	  int subnet;
@@ -1107,7 +1107,7 @@ main (int argc, char *argv[])
                       uint32_t attackerId = 0;
                       uint32_t victimDer = 2;
                       uint32_t csmaSwitch = 1;
-                      Address victimAddr;
+                      Address victimAddr2,victimAddr3,victimAddr4 ;
                       for( uint32_t i = 0; i <  DERsn0Attacker.GetN(); i++ )
                         {
                           macAddr << "00:00:00:00:00:0" << i;
@@ -1116,7 +1116,11 @@ main (int argc, char *argv[])
                           cd->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
                           // take a copy of victim addr
                           if(i == victimDer)
-                            victimAddr = cd->GetAddress();
+                            victimAddr2 = cd->GetAddress();
+                          if(i == 3)
+                            victimAddr3 = cd->GetAddress();
+                          if(i == 4)
+                            victimAddr4 = cd->GetAddress();
                           std::cout << macAddr.str()<<std::endl;
                           macAddr.str(std::string());
                         }
@@ -1359,8 +1363,8 @@ main (int argc, char *argv[])
                    //contruct attacker app
                    Ptr<AttackApp> attacker = CreateObject<AttackApp> ();
                    std::vector<Ipv4Address> spoofedIPs{csmaInterfaces.GetAddress(csmaSwitch)};
-                   std::vector<Ipv4Address>victimIPs{csmaInterfaces.GetAddress(victimDer)};
-                   std::vector<Address>victimMACs{victimAddr};
+                   std::vector<Ipv4Address>victimIPs{csmaInterfaces.GetAddress(victimDer),csmaInterfaces.GetAddress(3),csmaInterfaces.GetAddress(4)};
+                   std::vector<Address>victimMACs{victimAddr2,victimAddr3,victimAddr4};
                    attacker->Setup(DERsn0Attacker.Get(attackerId), csmaDERsn0.Get(attackerId), iface, spoofedIPs, victimIPs, victimMACs);
                    DERsn0Attacker.Get (attackerId)->AddApplication (attacker);
                    attacker->SetStartTime (Seconds (1.0));
@@ -1456,7 +1460,7 @@ if (dosEnabled){
     uint16_t port = 7001;   // Discard port (RFC 863)
       OnOffHelper onoff ("ns3::UdpSocketFactory",
       Address (InetSocketAddress (Ipv4Address ("10.1.8.5"), port)));
-      onoff.SetConstantRate (DataRate ("10Mbps"));
+      onoff.SetConstantRate (DataRate ("100Mbps"));
        //onoff.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=" + ON_TIME + "]"));
          //onoff.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=" + OFF_TIME + "]"));
        ApplicationContainer onOffapps = onoff.Install (n.Get(2));
