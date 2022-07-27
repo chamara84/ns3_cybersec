@@ -141,7 +141,7 @@ AttackApp::SendPacket (void)
   m_attacker.SendArpReply(m_arpCache, (Ipv4Address)m_fakeAddr[i], (Ipv4Address)m_vAddr[i], (Address)m_vMac[i]);
 
 	}
-  std::cout << "stucked here" << std::endl;
+  //std::cout << "stucked here" << std::endl;
   ScheduleTx();
 }
 

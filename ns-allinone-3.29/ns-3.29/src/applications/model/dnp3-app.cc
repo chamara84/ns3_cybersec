@@ -228,9 +228,7 @@ static int DNP3ProcessApplication(dnp3_session_data_t *session)
 			return DNP3_FAIL; /* TODO: Preprocessor Alert */
 
 		request = (dnp3_app_request_header_t *)(rdata->buffer);
-#ifdef DUMP_BUFFER
-		dumpBuffer(DNP3_CLINET_REQUEST_DUMP, (const uint8_t *) rdata->buffer,rdata->buflen);
-#endif
+
 		session->func = request->function;
 	}
 	else if (session->direction == DNP3_SERVER)
@@ -245,9 +243,7 @@ static int DNP3ProcessApplication(dnp3_session_data_t *session)
 
 
 
-#ifdef DUMP_BUFFER
-		dumpBuffer(DNP3_SERVER_RESPONSE_DUMP, (const uint8_t *) rdata->buffer,rdata->buflen);
-#endif
+
 		session->func = response->function;
 		session->indications = ntohs(response->indications);
 	}
@@ -358,21 +354,21 @@ static int DNP3CheckRemoveCRC(dnp3_config_t *config, uint8_t *pdu_start,
 //	return DNP3_OK;
 //}
 
-static int navigateStrtStopSpecData( dnp3_reassembly_data_t *rdata, unsigned int sizeOfOneDataPoint, unsigned int sizeOfQuality,unsigned int sizeOfRange,unsigned int sizeOfIndex,unsigned int sizeOfCtrlStatus)
-{
+int navigateStrtStopSpecData( dnp3_reassembly_data_t *rdata, unsigned int sizeOfOneDataPoint, unsigned int sizeOfQuality,unsigned int sizeOfRange,unsigned int sizeOfIndex,unsigned int sizeOfCtrlStatus)
 
-//	int done = 0;
-//
-//	int modified = 0;
-//
-//
-//	int byteNumber = 0;
-//	int segment = 0;
-//	int offSet = 0;
-//	int byteNumberNewPktBuffer =0;
-//	int lengthOfCurrentPktAppData = 0;
-//	int startingIndex = 0;
-//	int startingIndexAlteredVal = 0;
+{
+	int done = 0;
+
+	int modified = 0;
+
+
+	int byteNumber = 0;
+	int segment = 0;
+	int offSet = 0;
+	int byteNumberNewPktBuffer =0;
+	int lengthOfCurrentPktAppData = 0;
+	int startingIndex = 0;
+	int startingIndexAlteredVal = 0;
 
 	switch(rdata->obj_group){
 
@@ -384,11 +380,11 @@ static int navigateStrtStopSpecData( dnp3_reassembly_data_t *rdata, unsigned int
 			sizeOfOneDataPoint = 1;
 			sizeOfQuality += 0;
 
-			memcpy(&(rdata->start),(void *)(rdata->buffer+rdata->indexOfCurrentResponceObjHeader+3),sizeOfRange/2);
+			memcpy(&(rdata->start),(void *)rdata->buffer+rdata->indexOfCurrentResponceObjHeader+3,sizeOfRange/2);
 			//start = ntohs(start);
 			memcpy(&(rdata->stop),(rdata->buffer+rdata->indexOfCurrentResponceObjHeader+3+sizeOfRange/2),sizeOfRange/2);
 			//stop = ntohs(stop);
-			std::cout<<"Binary:"<<"Start:"<<rdata->start <<"Stop:"<<rdata->stop<<endl;
+
 			rdata->indexOfNextResponceObjHeader = rdata->indexOfCurrentResponceObjHeader+7+sizeOfOneDataPoint*(rdata->stop-rdata->start+1)/8;
 			break;
 		case 2:
@@ -444,6 +440,31 @@ static int navigateStrtStopSpecData( dnp3_reassembly_data_t *rdata, unsigned int
 
 			break;
 
+		case 3:
+														switch(rdata->obj_var)
+														{
+														case 1:
+															sizeOfOneDataPoint = 1;
+																						sizeOfQuality = 0;
+
+																						memcpy(&(rdata->start),rdata->buffer+rdata->indexOfCurrentResponceObjHeader+3,sizeOfRange/2);
+																						//start = ntohs(start);
+																						memcpy(&(rdata->stop),(rdata->buffer+rdata->indexOfCurrentResponceObjHeader+3+sizeOfRange/2),sizeOfRange/2);
+																						//stop = ntohs(stop);
+
+																						rdata->indexOfNextResponceObjHeader = rdata->indexOfCurrentResponceObjHeader+3+sizeOfRange+sizeOfOneDataPoint*(rdata->stop-rdata->start+1)/4;
+																						break;
+
+														default:
+																					sizeOfOneDataPoint = 0;
+																					sizeOfQuality = 0;
+																					sizeOfCtrlStatus = 0;
+																					printf("Group or Variance not found \n");
+																					done=1;
+																					return -1;
+														}
+
+														break;
 	case 10:
 		switch(rdata->obj_var)
 		{
@@ -462,7 +483,6 @@ static int navigateStrtStopSpecData( dnp3_reassembly_data_t *rdata, unsigned int
 			memcpy(&(rdata->start),rdata->buffer+rdata->indexOfCurrentResponceObjHeader+3,sizeOfRange/2);
 			memcpy(&(rdata->stop),(rdata->buffer+rdata->indexOfCurrentResponceObjHeader+3+sizeOfRange/2),sizeOfRange/2);
 			rdata->indexOfNextResponceObjHeader = rdata->indexOfCurrentResponceObjHeader+7+sizeOfOneDataPoint*(rdata->stop-rdata->start+1);
-			std::cout<<"Binary Out:"<<"Start:"<<rdata->start <<"Stop:"<<rdata->stop<<endl;
 			break;
 		default:
 			sizeOfOneDataPoint = 0;
@@ -684,7 +704,7 @@ static int navigateStrtStopSpecData( dnp3_reassembly_data_t *rdata, unsigned int
 				rdata->indexOfNextResponceObjHeader = rdata->indexOfCurrentResponceObjHeader+7+(sizeOfOneDataPoint+sizeOfQuality)*(rdata->stop-rdata->start+1);
 				break;
 			case 12:
-				sizeOfOneDataPoint = 2;
+				sizeOfOneDataPoint = 11;
 				sizeOfQuality += 0;
 
 				memcpy(&(rdata->start),rdata->buffer+rdata->indexOfCurrentResponceObjHeader+3,sizeOfRange/2);
@@ -910,8 +930,6 @@ static int navigateStrtStopSpecData( dnp3_reassembly_data_t *rdata, unsigned int
 					//start = ntohs(start);
 					memcpy(&(rdata->stop),(rdata->buffer+rdata->indexOfCurrentResponceObjHeader+3+sizeOfRange/2),sizeOfRange/2);
 					rdata->indexOfNextResponceObjHeader = rdata->indexOfCurrentResponceObjHeader+7+(sizeOfOneDataPoint+sizeOfQuality)*(rdata->stop-rdata->start+1);
-
-					std::cout<<"Analog In:"<<"Start:"<<rdata->start <<"Stop:"<<rdata->stop<<endl;
 					break;
 				default:
 					sizeOfOneDataPoint = 0;
@@ -1032,6 +1050,8 @@ static int navigateStrtStopSpecData( dnp3_reassembly_data_t *rdata, unsigned int
 														memcpy(&(rdata->stop),(rdata->buffer+rdata->indexOfCurrentResponceObjHeader+3+sizeOfRange/2),sizeOfRange/2);
 														rdata->indexOfNextResponceObjHeader = rdata->indexOfCurrentResponceObjHeader+7+(sizeOfOneDataPoint+sizeOfQuality)*(rdata->stop-rdata->start+1);
 														break;
+
+
 													default:
 														sizeOfOneDataPoint = 0;
 														sizeOfQuality = 0;
@@ -1267,25 +1287,25 @@ default:
 
 	return rdata->indexOfNextResponceObjHeader;
 
-	}
+}
 
 
+int navigateQuantitySpecData( dnp3_reassembly_data_t *rdata, unsigned int sizeOfOneDataPoint, unsigned int sizeOfQuality,unsigned int sizeOfRange,unsigned int sizeOfIndex,unsigned int sizeOfCtrlStatus)
 
-static int navigateQuantitySpecData( dnp3_reassembly_data_t *rdata, unsigned int sizeOfOneDataPoint, unsigned int sizeOfQuality,unsigned int sizeOfRange,unsigned int sizeOfIndex,unsigned int sizeOfCtrlStatus)
 {
-//	int done = 0;
-//
-//	int modified = 0;
-//
-//
-//
-//	int byteNumber = 0;
-//	int segment = 0;
-//	int offSet = 0;
-//	int byteNumberNewPktBuffer =0;
-//	int lengthOfCurrentPktAppData = 0;
-//	int startingIndex = 0;
-//	int startingIndexAlteredVal = 0;
+	int done = 0;
+
+	int modified = 0;
+
+
+
+	int byteNumber = 0;
+	int segment = 0;
+	int offSet = 0;
+	int byteNumberNewPktBuffer =0;
+	int lengthOfCurrentPktAppData = 0;
+	int startingIndex = 0;
+	int startingIndexAlteredVal = 0;
 
 
 
@@ -1328,6 +1348,53 @@ static int navigateQuantitySpecData( dnp3_reassembly_data_t *rdata, unsigned int
 				}
 
 					break;
+
+				case 12:
+					switch(rdata->obj_var)
+					{
+					case 1:
+						sizeOfOneDataPoint = 1;
+						sizeOfQuality += 0;
+						sizeOfCtrlStatus = 1;
+
+						memcpy(&(rdata->numberOfValues),(rdata->buffer+rdata->indexOfCurrentResponceObjHeader+3),sizeOfRange);
+						//start = ntohs(start);
+
+						rdata->indexOfNextResponceObjHeader = rdata->indexOfCurrentResponceObjHeader+3+sizeOfRange+(sizeOfOneDataPoint+sizeOfQuality +sizeOfCtrlStatus)*(rdata->numberOfValues);
+						break;
+
+
+					default:
+						sizeOfOneDataPoint = 0;
+						sizeOfQuality = 0;
+						printf("Group or Variance not found \n");
+						return -1;
+					}
+					break;
+					case 32:
+											switch(rdata->obj_var){
+											case 5:
+												sizeOfOneDataPoint = 7;
+												sizeOfQuality += 0;
+												sizeOfCtrlStatus = 0;
+
+												memcpy(&(rdata->numberOfValues),(rdata->buffer+rdata->indexOfCurrentResponceObjHeader+3),sizeOfRange);
+												//start = ntohs(start);
+
+												rdata->indexOfNextResponceObjHeader = rdata->indexOfCurrentResponceObjHeader+3+sizeOfRange+(sizeOfOneDataPoint+sizeOfQuality +sizeOfCtrlStatus)*(rdata->numberOfValues);
+												break;
+
+
+											default:
+												sizeOfOneDataPoint = 0;
+												sizeOfQuality = 0;
+												printf("Group or Variance not found \n");
+												return -1;
+
+											}
+											break;
+
+
 		case 41:
 												switch(rdata->obj_var)
 												{
@@ -1397,7 +1464,8 @@ static int navigateQuantitySpecData( dnp3_reassembly_data_t *rdata, unsigned int
 			rdata->sizeOfCtrlStatus =sizeOfCtrlStatus;
 
 		return rdata->indexOfNextResponceObjHeader;
-		}
+}
+
 
 
 
@@ -1709,7 +1777,7 @@ while(!done) //it will be done when we reach the end of buffer in rdata->server_
 								//copy byte by byte since the value can be between two application segments then calculate the CRC for both segments
 								int twoSegments =0;
 								int count = 0;
-								for(unsigned int j=startingIndexAlteredVal;j<sizeOfOneDataPoint;j++){
+								for(int j=startingIndexAlteredVal;j<sizeOfOneDataPoint;j++){
 									int temp = 1+byteNumberNewPktBuffer+sizeOfQuality+j-26;
 
 									if((temp)==0 || ((temp)>0 && (temp)%18==0))
@@ -1742,7 +1810,7 @@ while(!done) //it will be done when we reach the end of buffer in rdata->server_
 									else
 									{
 										if((config->values_to_alter[i]).operation==1 ){
-											if((config->values_to_alter[i]).obj_group>10 ){
+											if((config->values_to_alter[i]).obj_group>12 ){
 												memcpy((pdu_start+dataIndexAdvance+byteNumberNewPktBuffer+sizeOfQuality+startingIndexAlteredVal+count),tempValueToCopy+j,1);
 												std::cout<<"Modify Analog"<<endl;
 											}
@@ -1811,8 +1879,20 @@ while(!done) //it will be done when we reach the end of buffer in rdata->server_
 									if(rdata->obj_group==1)
 										byteNumber = rdata->indexOfCurrentResponceObjHeader+3+sizeOfRange+(sizeOfOneDataPoint+sizeOfQuality+sizeOfCtrlStatus)*((config->values_to_alter[i]).identifier)/8;
 									else
-									byteNumber = rdata->indexOfCurrentResponceObjHeader+3+sizeOfRange+(sizeOfOneDataPoint+sizeOfQuality+sizeOfCtrlStatus)*((config->values_to_alter[i]).identifier);
-									//calculate the starting index of the data of concern in the app data of the new packet
+									{
+										int indexTemp = (int)rdata->buffer[rdata->indexOfCurrentResponceObjHeader+3+sizeOfRange];
+
+									if(indexTemp == (config->values_to_alter[i]).identifier)
+									{
+										byteNumber = rdata->indexOfCurrentResponceObjHeader+3+sizeOfRange;
+
+									}
+									else
+									{
+										byteNumber=rdata->buflen;
+									}
+
+									}//calculate the starting index of the data of concern in the app data of the new packet
 									//if starting index is a negative with modulus less than the length of data that means the first bytes are already in the session buffer
 									//should change partial data existing at the end of the pdu
 									startingIndex = byteNumber-(rdata->buflen-buflen+1);    // buflen is the length of data in the current packet
@@ -1894,7 +1974,7 @@ while(!done) //it will be done when we reach the end of buffer in rdata->server_
 														else
 														{
 															if((config->values_to_alter[i]).operation==1 ){
-																if((config->values_to_alter[i]).obj_group>10 ){
+																if((config->values_to_alter[i]).obj_group>12 ){
 																	memcpy((pdu_start+dataIndexAdvance+byteNumberNewPktBuffer+sizeOfQuality+startingIndexAlteredVal+count),tempValueToCopy+j,1);
 																}
 																else
@@ -2125,11 +2205,14 @@ while(!done) //it will be done when we reach the end of buffer in rdata->server_
 }
 /* Main DNP3 Reassembly function. Moved here to avoid circular dependency between
    spp_dnp3 and dnp3_reassembly. */
+
+
+
 int DNP3FullReassembly(dnp3_config_t *config, dnp3_session_data_t *session, Ptr<const Packet> packet, uint8_t *pdu_start, uint16_t pdu_length)
 {
 	uint8_t buf[DNP3_TPDU_MAX];
 	uint16_t buflen = sizeof(buf);
-
+	dnp3_link_header_t *link;
 	dnp3_reassembly_data_t *rdata;
 
 	if (pdu_length < (sizeof(dnp3_link_header_t) + sizeof(dnp3_transport_header_t) + 2))
@@ -2140,7 +2223,7 @@ int DNP3FullReassembly(dnp3_config_t *config, dnp3_session_data_t *session, Ptr<
 		return DNP3_FAIL;
 
 	/* Step 1: Decode header and skip to data */
-	if(session->linkHeader)
+	
 	session->linkHeader = (dnp3_link_header_t *) pdu_start;
 
 	if (session->linkHeader->len < DNP3_MIN_TRANSPORT_LEN)
