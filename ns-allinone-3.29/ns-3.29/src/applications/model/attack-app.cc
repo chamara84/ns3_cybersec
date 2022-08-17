@@ -212,7 +212,7 @@ int AttackApp::readConfigFile( configuration * config)
 	    			parameter++;
 	    			        break;
 	    			case 4:
-	    				if((config->dnp3.values_to_alter[indexNum].obj_group)==1 || (config->dnp3.values_to_alter[indexNum]).obj_group==10)
+	    				if((config->dnp3.values_to_alter[indexNum].obj_group)==1 || (config->dnp3.values_to_alter[indexNum]).obj_group==10 || (config->dnp3.values_to_alter[indexNum]).obj_group==12)
 	    				{
 	    					(config->dnp3.values_to_alter[indexNum]).integer_value =stol(s,nullptr,10);
 	    					std::cout<<"Grp:"<<(int)(config->dnp3.values_to_alter[indexNum]).obj_group << "var:"<<(int)(config->dnp3.values_to_alter[indexNum]).obj_var <<"Val:"<<(config->dnp3.values_to_alter[indexNum]).integer_value <<std::endl;
@@ -481,7 +481,7 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 	unsigned char * buffer =  new unsigned char[dataSize] ;
 		//if(packetCopy->GetSize ()>0){
 
-	printf("DNP3 \n"); // @suppress("Function cannot be resolved")
+	//printf("DNP3 \n"); // @suppress("Function cannot be resolved")
 	packetCopy->CopyData (buffer, dataSize);
 
 	if (tcpHdr1.GetDestinationPort()==20000)
@@ -501,7 +501,7 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 		if(mmapOfdnp3Data.find(key)!=mmapOfdnp3Data.end())
 		{
 			session = mmapOfdnp3Data.find(key)->second;
-			printf("found session for key: %ld \n",key);
+			//printf("found session for key: %ld \n",key);
 			if (tcpHdr1.GetDestinationPort()==20000)
 				{
 				session->direction = DNP3_CLIENT;
@@ -510,7 +510,7 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 			else if (tcpHdr1.GetSourcePort()==20000)
 			{
 			session->direction = DNP3_SERVER;
-			printf("In Server direction\n");
+		//	printf("In Server direction\n");
 			}
 
 			DNP3FullReassembly(&config.dnp3, session, packetCopy, (uint8_t *)buffer,dataSize);
@@ -539,11 +539,11 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 
 			tcpHdr.EnableChecksums();
 			packetNew->AddHeader(tcpHdr);
-			printf("Flags %x OrgLength: %d NewLength: %d Packet size: %d\n",tcpHdr.GetFlags()&TcpHeader::SYN,tcpHdr1.GetLength(),tcpHdr.GetLength(),packetCopy->GetSize ());
-			if(tcpHdr1.IsChecksumOk() && ipV4Hdr.IsChecksumOk())
-				printf("Checksum ok\n");
-			else
-				printf("Checksum error");
+		//	printf("Flags %x OrgLength: %d NewLength: %d Packet size: %d\n",tcpHdr.GetFlags()&TcpHeader::SYN,tcpHdr1.GetLength(),tcpHdr.GetLength(),packetCopy->GetSize ());
+//			if(tcpHdr1.IsChecksumOk() && ipV4Hdr.IsChecksumOk())
+//				//printf("Checksum ok\n");
+//			else
+				//printf("Checksum error");
 			 ipV4Hdr.SetPayloadSize(packetNew->GetSize());
 			 ipV4Hdr.EnableChecksum();
 		     packetNew->AddHeader(ipV4Hdr);

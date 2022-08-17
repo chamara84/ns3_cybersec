@@ -110,11 +110,11 @@ int main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 */
 
-	Time::SetResolution (Time::NS);
-		PacketMetadata::Enable();
-		Packet::EnablePrinting();
-		MobilityHelper mobility;
-			  mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+	//Time::SetResolution (Time::NS);
+		//PacketMetadata::Enable();
+	//	Packet::EnablePrinting();
+	//	MobilityHelper mobility;
+	//		  mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
 
   //
   // We are interacting with the outside, real, world.  This means we have to
@@ -255,7 +255,7 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
 //can use manual routing too (complete-untested)
 
- Ipv4StaticRoutingHelper ipv4RoutingHelper;
+ //Ipv4StaticRoutingHelper ipv4RoutingHelper;
 // routes outbound frsudo brctl addif br-right tap-rightom A and D are setup in the lxc containers
 
 
@@ -275,43 +275,43 @@ staticRoutingA->AddHostRouteTo (Ipv4Address ("192.168.10.1"), Ipv4Address ("192.
 */
 
 
- Ptr<Ipv4StaticRouting> staticRoutingn0 = ipv4RoutingHelper.GetStaticRouting (ipv4n0);
-
- // routing from n0 to n1,n2,n3,n4
- // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
-
-staticRoutingn0->SetDefaultRoute(Ipv4Address ("172.24.0.1"), 2,0);
-//staticRoutingn0->AddNetworkRouteTo(Ipv4Address ("192.168.100.0"),Ipv4Mask ("255.255.255.0"),Ipv4Address ("172.24.9.245"),1,3); //may be not needed since Ns3 knows the existence and routing for the network
-
-
-
-//Ptr<Ipv4StaticRouting> staticRoutinginN0 = ipv4RoutingHelper.GetStaticRouting (ipv4inN0);
-
- // routing from n1 to n0,n2,n3,n4
- // Create static routes
- Ptr<Ipv4StaticRouting> staticRoutingn1 = ipv4RoutingHelper.GetStaticRouting (ipv4n1);
-
- // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
-
- staticRoutingn1->AddNetworkRouteTo (Ipv4Address ("172.24.0.0"), Ipv4Mask ("255.255.0.0"), 1,0);
-
- // routing from n2 to n0,n1,n3,n4
- // Create static routes
- Ptr<Ipv4StaticRouting> staticRoutingn2 = ipv4RoutingHelper.GetStaticRouting (ipv4n2);
- //from B to C
- // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
-
-  staticRoutingn2->AddNetworkRouteTo(Ipv4Address ("172.24.0.0"), Ipv4Mask ("255.255.0.0"), 1,0);
-
- // routing from n3 to n0,n1,n2,n4
- // Create static routes
- Ptr<Ipv4StaticRouting> staticRoutingn3 = ipv4RoutingHelper.GetStaticRouting (ipv4n3);
-
-
- // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
-  staticRoutingn3->SetDefaultRoute(Ipv4Address ("172.24.0.1"), 2,0); // or next hop ip is: 192.168.12.1
-
-
+// Ptr<Ipv4StaticRouting> staticRoutingn0 = ipv4RoutingHelper.GetStaticRouting (ipv4n0);
+//
+// // routing from n0 to n1,n2,n3,n4
+// // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
+//
+//staticRoutingn0->SetDefaultRoute(Ipv4Address ("172.24.0.1"), 2,0);
+////staticRoutingn0->AddNetworkRouteTo(Ipv4Address ("192.168.100.0"),Ipv4Mask ("255.255.255.0"),Ipv4Address ("172.24.9.245"),1,3); //may be not needed since Ns3 knows the existence and routing for the network
+//
+//
+//
+////Ptr<Ipv4StaticRouting> staticRoutinginN0 = ipv4RoutingHelper.GetStaticRouting (ipv4inN0);
+//
+// // routing from n1 to n0,n2,n3,n4
+// // Create static routes
+// Ptr<Ipv4StaticRouting> staticRoutingn1 = ipv4RoutingHelper.GetStaticRouting (ipv4n1);
+//
+// // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
+//
+// staticRoutingn1->AddNetworkRouteTo (Ipv4Address ("172.24.0.0"), Ipv4Mask ("255.255.0.0"), 1,0);
+//
+// // routing from n2 to n0,n1,n3,n4
+// // Create static routes
+// Ptr<Ipv4StaticRouting> staticRoutingn2 = ipv4RoutingHelper.GetStaticRouting (ipv4n2);
+// //from B to C
+// // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
+//
+//  staticRoutingn2->AddNetworkRouteTo(Ipv4Address ("172.24.0.0"), Ipv4Mask ("255.255.0.0"), 1,0);
+//
+// // routing from n3 to n0,n1,n2,n4
+// // Create static routes
+// Ptr<Ipv4StaticRouting> staticRoutingn3 = ipv4RoutingHelper.GetStaticRouting (ipv4n3);
+//
+//
+// // The ifIndex for this outbound route is 2; 0 - loopback (always), 1 - CSMA, 2- P2P (based on order of device instantiations in the node)
+//  staticRoutingn3->SetDefaultRoute(Ipv4Address ("172.24.0.1"), 2,0); // or next hop ip is: 192.168.12.1
+//
+//
 
 //  Ptr<Ipv4StaticRouting> staticRoutingn4 = ipv4RoutingHelper.GetStaticRouting (ipv4n4);
 //
@@ -346,16 +346,16 @@ tapBridge.Install (n0, dn0n1n2n3.Get (0));
 tapBridge.SetAttribute ("DeviceName", StringValue ("tap01"));
 tapBridge.Install (n4, dn0n1n2n3.Get (4));
 
-Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
-          //Print Routin Table
-
-          Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
-//          std::cout<<"Routing Table inN4"<<endl;
-//          ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), inN4, routingStream);
-          std::cout<<"Routing Table n4"<<endl;
-          ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), n4, routingStream);
-//          std::cout<<"Routing Table n0"<<endl;
-//          ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), n0, routingStream);
+//Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
+//          //Print Routin Table
+//
+//          Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
+////          std::cout<<"Routing Table inN4"<<endl;
+////          ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), inN4, routingStream);
+//          std::cout<<"Routing Table n4"<<endl;
+//          ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), n4, routingStream);
+////          std::cout<<"Routing Table n0"<<endl;
+////          ipv4RoutingHelper.PrintRoutingTableAt(Seconds(1), n0, routingStream);
 
 
 
@@ -363,7 +363,7 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
           //setup application
 
        //   std::stringstream macAddr;
-                                uint32_t attackerId = 1;
+                                uint32_t attackerId = 3;
                                 uint32_t attackerId2 = 2;
 
                                // uint32_t csmaSwitch = 4;
@@ -394,9 +394,9 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
 
                                 Ptr<AttackApp> attacker = CreateObject<AttackApp> ();
-                                std::vector<Ipv4Address> spoofedIPs{Ipv4Address ("172.24.9.250")};
-                                std::vector<Ipv4Address>victimIPs{Ipv4Address ("172.24.2.28")};
-                                std::vector<Address>victimMACs{ns3::Mac48Address("10:65:30:f5:c9:a5")};
+                                std::vector<Ipv4Address> spoofedIPs{Ipv4Address ("172.24.9.251")};
+                                                                std::vector<Ipv4Address>victimIPs{Ipv4Address ("172.24.4.113")};
+                                                                std::vector<Address>victimMACs{ns3::Mac48Address("60:15:92:10:13:22")};
                                 //attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, Ipv4Address ("172.24.9.250"), Ipv4Address ("172.24.2.90"), ns3::Mac48Address("00:30:a7:1d:75:bd"));
                                attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, spoofedIPs, victimIPs, victimMACs);
                                 n0n1n2n3.Get (attackerId)->AddApplication (attacker);
@@ -405,7 +405,7 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
 
 
-                                std::pair<Ptr<Ipv4>, uint32_t> returnValue2 = ipn0n1n2n3.Get (attackerId2);
+                                std::pair<Ptr<Ipv4>, uint32_t> returnValue2 = ipn0n1n2n3.Get (attackerId);
 
                                                                 Ptr<Ipv4> ipv4Val2 = returnValue2.first;
                                                                 uint32_t index2= returnValue2.second;
@@ -414,12 +414,12 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
 
                                                                 Ptr<AttackApp> attacker2 = CreateObject<AttackApp> ();
-                                                                std::vector<Ipv4Address> spoofedIPs1{Ipv4Address ("172.24.2.28")};
-                                                                                                std::vector<Ipv4Address>victimIPs1{Ipv4Address ("172.24.9.250")};
-                                                                                                std::vector<Address>victimMACs1{ns3::Mac48Address("70:b3:d5:54:28:2f")};
+                                                                std::vector<Ipv4Address> spoofedIPs1{Ipv4Address ("172.24.4.113")};
+                                                                std::vector<Ipv4Address>victimIPs1{Ipv4Address ("172.24.9.251")};
+                                                                std::vector<Address>victimMACs1{ns3::Mac48Address("10:65:30:05:d8:ff")};
                                                              //   attacker2->Setup(n0n1n2n3.Get(attackerId2), dn0n1n2n3.Get(attackerId2), iface2, Ipv4Address ("172.24.9.90"), Ipv4Address ("172.24.9.250"), ns3::Mac48Address("00:50:c2:4f:9b:73"));
                                                                attacker2->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface,  spoofedIPs1, victimIPs1,victimMACs1);
-                                                                n0n1n2n3.Get (attackerId2)->AddApplication (attacker2);
+                                                                n0n1n2n3.Get (attackerId)->AddApplication (attacker2);
                                                                 attacker2->SetStartTime (Seconds (1.0));
                                                                 attacker2->SetStopTime (Seconds (3600.0));
 
@@ -455,40 +455,7 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
 //csmaNetwork.EnablePcapAll ("pmuconnectiontestNet", true);
 
-                                                               AnimationInterface anim("rtds-dos-sim.xml");
-                                                               Packet::EnablePrinting();
-                                                            // anim.EnablePacketMetadata (true);
-                                                                    anim.SetConstantPosition (n0n1n2n3.Get (0), 10 , 10);
 
-                                                                    anim.UpdateNodeDescription(n0n1n2n3.Get (0),"TAP_P3P1");
-                                                                 	anim.UpdateNodeDescription(n0n1n2n3.Get (1),"n1");
-                                                                 	anim.UpdateNodeDescription(n0n1n2n3.Get (2),"n2");
-                                                                 	anim.UpdateNodeDescription(n0n1n2n3.Get (3),"n3");
-                                                                 	anim.UpdateNodeDescription(n0n1n2n3.Get (4),"TAP_P1P1");
-
-                                                                 	anim.SetConstantPosition (n0n1n2n3.Get (1), 15 , 10);
-
-                                                                 	anim.SetConstantPosition (n0n1n2n3.Get (2), 10 , 15);
-
-                                                                 	anim.SetConstantPosition (n0n1n2n3.Get (3), 15 , 20);
-                                                                 	anim.SetConstantPosition (n0n1n2n3.Get (4), 15 , 15);
-
-
-//                                                                 anim.SetConstantPosition (inNx.Get (0), 5 , 0);
-//                                                                 anim.UpdateNodeDescription(inNx.Get (0),"inN0");
-//                                                                 	anim.SetConstantPosition (inNx.Get (1), 5 , 5);
-//                                                                 	  	anim.UpdateNodeDescription(inNx.Get (1),"inN1");
-//                                                                 	  anim.SetConstantPosition (inNx.Get (2), 5 , 10);
-//                                                                 	  	anim.UpdateNodeDescription(inNx.Get (2),"inN2");
-//                                                                 	  anim.SetConstantPosition (inNx.Get (3), 5 , 15);
-//                                                                 	  	anim.UpdateNodeDescription(inNx.Get (3),"inN3");
-//                                                                 	  	anim.SetConstantPosition (inNx.Get (4), 0 , 25);
-//                                                                 	  	anim.UpdateNodeDescription(inNx.Get (4),"inN4");
-
-
-
-                                                                 anim.SetStartTime (Seconds(1.0));
-                                                                 anim.SetStopTime (Seconds(3600));
 //csmaIngress.EnablePcapAll ("pmuconnectiontestIng", false);
 csmaNetwork.EnablePcapAll ("pmuconnectiontestNet", false);
 //p2p.EnablePcapAll("pmuconnectiontestP2P", false);

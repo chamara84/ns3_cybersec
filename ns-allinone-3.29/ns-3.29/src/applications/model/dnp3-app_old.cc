@@ -2931,7 +2931,7 @@ int DNP3FullReassembly(dnp3_config_t *config, dnp3_session_data_t *session, Ptr<
 	if (DNP3ReassembleTransport(rdata, buf, buflen) == DNP3_FAIL)
 		return DNP3_FAIL;
 
-
+	printf("Direction %s \n",session->direction==0?"ClientDirection":"ServerDirection");
 	/*
 	 * write a function to take in dnp3_config, packet_data and rdata
 	 */

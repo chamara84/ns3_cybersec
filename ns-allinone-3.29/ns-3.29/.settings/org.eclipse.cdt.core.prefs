@@ -24,3 +24,8 @@ environment/project/cdt.managedbuild.config.gnu.exe.release.285816863/LD_LIBRARY
 environment/project/cdt.managedbuild.config.gnu.exe.release.285816863/LD_LIBRARY_PATH/value="${workspace_loc\:ns-3-dev}/build/lib"
 environment/project/cdt.managedbuild.config.gnu.exe.release.285816863/append=true
 environment/project/cdt.managedbuild.config.gnu.exe.release.285816863/appendContributed=true
+environment/project/cdt.managedbuild.toolchain.gnu.base.1669783573/LD_LIBRARY_PATH/delimiter=\:
+environment/project/cdt.managedbuild.toolchain.gnu.base.1669783573/LD_LIBRARY_PATH/operation=append
+environment/project/cdt.managedbuild.toolchain.gnu.base.1669783573/LD_LIBRARY_PATH/value=/home/chamara/repo/ns3_cybersec/ns-allinone-3.29/ns-3.29/build/lib\:$LD_LIBRARY_PATH
+environment/project/cdt.managedbuild.toolchain.gnu.base.1669783573/append=true
+environment/project/cdt.managedbuild.toolchain.gnu.base.1669783573/appendContributed=true

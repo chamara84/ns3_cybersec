@@ -64,11 +64,11 @@ static int DNP3QueueSegment(dnp3_reassembly_data_t *rdata, uint8_t *buf, uint16_
 	/* At first I was afraid, but we checked for DNP3_MAX_TRANSPORT_LEN earlier. */
 	if (buflen + rdata->buflen > DNP3_BUFFER_SIZE)
 		return DNP3_FAIL;
-	printf("Length in App Buff: %d \n",rdata->buflen);
+//	printf("Length in App Buff: %d \n",rdata->buflen);
 	memcpy((rdata->buffer + rdata->buflen), buf, (size_t) buflen);
 	if(rdata->buflen>rdata->indexOfNextResponceObjHeader)
 	{
-		printf("Next Grp: %d Var: %d \n",rdata->buffer[rdata->indexOfNextResponceObjHeader], rdata->buffer[rdata->indexOfNextResponceObjHeader+1]);
+	//	printf("Next Grp: %d Var: %d \n",rdata->buffer[rdata->indexOfNextResponceObjHeader], rdata->buffer[rdata->indexOfNextResponceObjHeader+1]);
 	}
 	rdata->buflen += buflen;
 	return DNP3_OK;
@@ -1360,7 +1360,7 @@ int navigateQuantitySpecData( dnp3_reassembly_data_t *rdata, unsigned int sizeOf
 						memcpy(&(rdata->numberOfValues),(rdata->buffer+rdata->indexOfCurrentResponceObjHeader+3),sizeOfRange);
 						//start = ntohs(start);
 
-						rdata->indexOfNextResponceObjHeader = rdata->indexOfCurrentResponceObjHeader+3+sizeOfRange+(sizeOfOneDataPoint+sizeOfQuality +sizeOfCtrlStatus)*(rdata->numberOfValues);
+						rdata->indexOfNextResponceObjHeader = rdata->indexOfCurrentResponceObjHeader+3+sizeOfRange+(sizeOfOneDataPoint+sizeOfQuality +sizeOfCtrlStatus+8)*(rdata->numberOfValues);
 						break;
 
 
@@ -1633,7 +1633,7 @@ static int modifyData(dnp3_config_t *config, dnp3_reassembly_data_t *rdata,uint1
 	switch(indexSize)
 		{
 		case 0:
-			sizeOfQuality = 0;
+			sizeOfQuality = 1;
 			break;
 		case 1:
 			sizeOfQuality = 1;
@@ -2172,12 +2172,14 @@ while(!done) //it will be done when we reach the end of buffer in rdata->server_
 				//put cases for each group and sub-cases for variations
 				if(quantity==0 && absAddress==0)	{
 					navigateStrtStopSpecData( rdata, sizeOfOneDataPoint, sizeOfQuality,sizeOfRange,sizeOfIndex,sizeOfCtrlStatus);
+					printf("Next Grp: %d  Var: %d \n",rdata->obj_group,rdata->obj_var);
 
 				}
 
 				else if(quantity==1 && absAddress ==0)
 				{
 					navigateQuantitySpecData( rdata, sizeOfOneDataPoint, sizeOfQuality,sizeOfRange,sizeOfIndex,sizeOfCtrlStatus);
+					printf("Next Grp: %d  Var: %d \n",rdata->obj_group,rdata->obj_var);
 				}
 
 
@@ -2256,6 +2258,9 @@ int DNP3FullReassembly(dnp3_config_t *config, dnp3_session_data_t *session, Ptr<
 		return DNP3_FAIL;
 
 	}
+
+
+
 	/*
 	 * write a function to take in dnp3_config, packet_data and rdata
 	 */
@@ -2277,7 +2282,7 @@ int DNP3FullReassembly(dnp3_config_t *config, dnp3_session_data_t *session, Ptr<
 	{
 		int ret = DNP3ProcessApplication(session);
 
-		printf("Function %d direction %d\n",session->func,session->direction);
+		//printf("Function %d direction %d\n",session->func,session->direction);
 
 		/* To support multiple PDUs in UDP, we're going to call Detect()
            on each individual PDU. The AltDecode buffer was set earlier. */
