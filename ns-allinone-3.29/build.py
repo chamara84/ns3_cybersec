@@ -59,6 +59,7 @@ def build_ns3(config, build_examples, build_tests, args, build_options):
     cmd.append("--enable-examples")
     cmd.append("--enable-tests")
     cmd.append("--enable-sudo")
+    cmd.append("--disable-werror")
     if build_examples:
         cmd.append("--enable-examples")
 
