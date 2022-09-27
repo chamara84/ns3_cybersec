@@ -542,7 +542,52 @@ static int modifyData(modbus_config_t *config, modbus_session_data_t *session,ui
 
 
 			case MODBUS_FUNC_WRITE_SINGLE_COIL:
-			case MODBUS_FUNC_WRITE_SINGLE_REGISTER:
+							byteNumber = 1;
+
+
+
+							memcpy(&n,(pdu_start+MODBUS_MIN_LEN),2); //copy the index
+							 n = ntohs(n);
+							 if(n==(config->values_to_alter[index]).identifier)
+									{
+								 uint16_t data = 0;
+
+								 memcpy(&data,(pdu_start+MODBUS_MIN_LEN+2),2); //copy the data
+								 if((config->values_to_alter[index]).old_value == 0)
+								 {
+									 temp = 0;
+
+								 }
+								 else
+								 {
+									 temp = 0xFF00;
+								 }
+								 memcpy(pdu_start+MODBUS_MIN_LEN+2,&(temp),2);
+								 modified = 1;
+								 printf("Modify WriteCoils id=%d value=%d\n",(config->values_to_alter[index]).identifier,temp );
+									}
+
+
+							break;
+						case MODBUS_FUNC_WRITE_SINGLE_REGISTER:
+							memcpy(&n,(pdu_start+MODBUS_MIN_LEN),2); //copy the index
+											 n = ntohs(n);
+											 if(n==(config->values_to_alter[index]).identifier)
+													{
+												 uint16_t data = 0;
+
+												 memcpy(&data,(pdu_start+MODBUS_MIN_LEN+2),2); //copy the data
+
+													 temp = htons((config->values_to_alter[index]).old_value);
+
+
+												 memcpy(pdu_start+MODBUS_MIN_LEN+2,&(temp),2);
+												 modified = 1;
+												 printf("Modify WriteCoils id=%d value=%d\n",(config->values_to_alter[index]).identifier,temp );
+													}
+
+
+											break;
 			case MODBUS_FUNC_DIAGNOSTICS:
 			case MODBUS_FUNC_GET_COMM_EVENT_COUNTER:
 			case MODBUS_FUNC_WRITE_MULTIPLE_COILS:
@@ -578,6 +623,121 @@ static int modifyData(modbus_config_t *config, modbus_session_data_t *session,ui
 return modified;
 }
 
+static int modifyWriteData(modbus_config_t *config, modbus_session_data_t *session,uint8_t *pdu_start, uint16_t pdu_length)
+{
+	modbus_header_t *header;
+	uint16_t start,stop;
+	uint16_t temp;
+	uint8_t modified = 0;
+	uint16_t tempRegHold=0, tempRegHold2=0;
+	uint8_t mask = 0;
+	uint16_t n =0;
+	uint8_t p=0;
+	header = (modbus_header_t *) pdu_start;
+	if(header->transaction_id!=(session->request_data).transactionID)
+	{
+		printf("Transaction is missed\n");
+		return 0;
+	}
+
+	start = (session->request_data).address;
+	stop = (session->request_data).address+(session->request_data).quantity-1;
+
+	for(int index = 0 ; index<config->numAlteredVal;index++)
+	{
+		if((config->values_to_alter[index]).type == header->function_code && ((config->values_to_alter[index]).identifier)>=start && ((config->values_to_alter[index]).identifier)<=stop )
+		{
+			uint16_t byteNumber;
+			switch(header->function_code)
+			{
+
+
+
+			case MODBUS_FUNC_WRITE_SINGLE_COIL:
+				byteNumber = 1;
+
+
+
+				memcpy(&n,(pdu_start+MODBUS_MIN_LEN),2); //copy the index
+				 n = ntohs(n);
+				 if(n==(config->values_to_alter[index]).identifier)
+						{
+					 uint16_t data = 0;
+
+					 memcpy(&data,(pdu_start+MODBUS_MIN_LEN+2),2); //copy the data
+					 (config->values_to_alter[index]).old_value = ntohs(data);
+					 if((config->values_to_alter[index]).integer_value == 0)
+					 {
+						 temp = 0;
+
+					 }
+					 else
+					 {
+						 temp = 0xFF00;
+					 }
+					 memcpy(pdu_start+MODBUS_MIN_LEN+2,&(temp),2);
+					 modified = 1;
+					 printf("Modify WriteCoils id=%d value=%d\n",(config->values_to_alter[index]).identifier,temp );
+						}
+
+
+				break;
+			case MODBUS_FUNC_WRITE_SINGLE_REGISTER:
+				memcpy(&n,(pdu_start+MODBUS_MIN_LEN),2); //copy the index
+								 n = ntohs(n);
+								 if(n==(config->values_to_alter[index]).identifier)
+										{
+									 uint16_t data = 0;
+
+									 memcpy(&data,(pdu_start+MODBUS_MIN_LEN+2),2); //copy the data
+									 (config->values_to_alter[index]).old_value = ntohs(data);
+										 temp = htons((config->values_to_alter[index]).integer_value);
+
+
+									 memcpy(pdu_start+MODBUS_MIN_LEN+2,&(temp),2);
+									 modified = 1;
+									 printf("Modify WriteCoils id=%d value=%d\n",(config->values_to_alter[index]).identifier,temp );
+										}
+
+
+								break;
+
+			case MODBUS_FUNC_DIAGNOSTICS:
+			case MODBUS_FUNC_GET_COMM_EVENT_COUNTER:
+			case MODBUS_FUNC_WRITE_MULTIPLE_COILS:
+			case MODBUS_FUNC_WRITE_MULTIPLE_REGISTERS:
+
+
+			case MODBUS_FUNC_READ_EXCEPTION_STATUS:
+
+
+			case MODBUS_FUNC_MASK_WRITE_REGISTER:
+
+
+			case MODBUS_FUNC_READ_FIFO_QUEUE:
+
+
+			case MODBUS_FUNC_ENCAPSULATED_INTERFACE_TRANSPORT:
+
+
+				/* Cannot check this response, as it is device specific. */
+			case MODBUS_FUNC_REPORT_SLAVE_ID:
+
+				/* Cannot check these responses, as their sizes depend on the corresponding
+                              requests. Can re-visit if we bother with request/response tracking. */
+			case MODBUS_FUNC_READ_FILE_RECORD:
+			case MODBUS_FUNC_WRITE_FILE_RECORD:
+
+			default:
+
+				break;
+			}
+	}
+}
+return modified;
+}
+
+
 int ModbusDecode(modbus_session_data_t *session,modbus_config_t *config, uint8_t *pdu_start, uint16_t pdu_length)
 {
 
@@ -612,6 +772,7 @@ int ModbusDecode(modbus_session_data_t *session,modbus_config_t *config, uint8_t
     if (session->direction == MODBUS_SERVER)
     {
         ModbusCheckRequestLengths(session, pdu_start, pdu_length);
+        modifyWriteData(config, session,  pdu_start, pdu_length);
 
     }
     else
