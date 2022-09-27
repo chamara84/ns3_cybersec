@@ -16,6 +16,9 @@ def build(bld):
     obj = bld.create_ns3_program('rtds-Tap-ICS-Mod-One_Net', ['csma', 'internet', 'applications','wifi', 'olsr', 'netanim','flow-monitor','point-to-point', 'tap-bridge'])
     obj.source = 'rtds-Tap-ICS-Mod-One_Net.cc'
     
+    obj = bld.create_ns3_program('emu-udpecho-ex', ['csma', 'internet', 'applications','wifi', 'olsr', 'netanim','flow-monitor','point-to-point', 'tap-bridge'])
+    obj.source = 'emu-udpecho-ex.cc'
+    
     
     
  

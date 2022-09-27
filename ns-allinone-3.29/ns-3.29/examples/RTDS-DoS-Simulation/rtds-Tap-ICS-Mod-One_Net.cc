@@ -395,8 +395,8 @@ tapBridge.Install (n4, dn0n1n2n3.Get (4));
 
                                 Ptr<AttackApp> attacker = CreateObject<AttackApp> ();
                                 std::vector<Ipv4Address> spoofedIPs{Ipv4Address ("172.24.9.251")};
-                                                                std::vector<Ipv4Address>victimIPs{Ipv4Address ("172.24.4.113")};
-                                                                std::vector<Address>victimMACs{ns3::Mac48Address("60:15:92:10:13:22")};
+                                                                std::vector<Ipv4Address>victimIPs{Ipv4Address ("172.24.9.54")};
+                                                                std::vector<Address>victimMACs{ns3::Mac48Address("00:0a:35:00:10:08")};
                                 //attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, Ipv4Address ("172.24.9.250"), Ipv4Address ("172.24.2.90"), ns3::Mac48Address("00:30:a7:1d:75:bd"));
                                attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, spoofedIPs, victimIPs, victimMACs);
                                 n0n1n2n3.Get (attackerId)->AddApplication (attacker);
@@ -414,7 +414,7 @@ tapBridge.Install (n4, dn0n1n2n3.Get (4));
 
 
                                                                 Ptr<AttackApp> attacker2 = CreateObject<AttackApp> ();
-                                                                std::vector<Ipv4Address> spoofedIPs1{Ipv4Address ("172.24.4.113")};
+                                                                std::vector<Ipv4Address> spoofedIPs1{Ipv4Address ("172.24.9.54")};
                                                                 std::vector<Ipv4Address>victimIPs1{Ipv4Address ("172.24.9.251")};
                                                                 std::vector<Address>victimMACs1{ns3::Mac48Address("10:65:30:05:d8:ff")};
                                                              //   attacker2->Setup(n0n1n2n3.Get(attackerId2), dn0n1n2n3.Get(attackerId2), iface2, Ipv4Address ("172.24.9.90"), Ipv4Address ("172.24.9.250"), ns3::Mac48Address("00:50:c2:4f:9b:73"));

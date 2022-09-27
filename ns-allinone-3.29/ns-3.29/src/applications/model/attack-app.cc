@@ -167,23 +167,24 @@ int AttackApp::readConfigFile( configuration * config)
 {
 	//this function reads the config file at attack-app setup and stores the data in config
 	std::ifstream infile("/etc/ns3/ns3.conf");
-	std::string line, linePrev;
+	std::string line = "", linePrev="";
 	int readNewProtocol=0, indexNum=0;
 
 	while (std::getline(infile, line))
 	{
-	    if((!readNewProtocol && line.find("dnp3",0)) || (readNewProtocol && linePrev.find("dnp3",0)))
+	    if((!readNewProtocol && line.find("dnp3",0)!=string::npos) || (readNewProtocol && linePrev.find("dnp3",0)!=string::npos))
 	    {
 	    	if(readNewProtocol)
 	    	{
 	    		readNewProtocol=0;
+
 	    	}
 	    	while (std::getline(infile, line))
 	    	{
 	    		if(line.find("protocol",0)!=string::npos)
 	    			{
 	    			readNewProtocol++;
-	    			linePrev = line;
+	    			linePrev.assign(line);
 	    			indexNum=0;
 	    			break;
 	    			}
@@ -236,10 +237,89 @@ int AttackApp::readConfigFile( configuration * config)
 	    	}
 	    }
 
+	    else if((!readNewProtocol && line.find("modbus",0)!=string::npos) || (readNewProtocol && linePrev.find("modbus",0)!=string::npos))
+	   	    {
+	   	    	if(readNewProtocol)
+	   	    	{
+	   	    		readNewProtocol=0;
+	   	    		int parameter = 0;
+	   	    		std::istringstream iss(line);
+	   	    		for(std::string s; iss >> s; )
+	   	    			   	    		{
+	   	    			   	    			switch(parameter)
+	   	    			   	    			{
+	   	    			   	    			case 0:
+	   	    			   	    				config->modbus.values_to_alter[indexNum].type = stoi(s,nullptr,10);
+	   	    			   	    				parameter++;
+	   	    			   	    				break;
+	   	    			   	    			case 1:
+	   	    			   	    				config->modbus.values_to_alter[indexNum].identifier = stoi(s,nullptr,10);
+	   	    			   	    				parameter++;
+	   	    			   	    			    break;
+
+	   	    			   	    			case 2:
+
+	   	    			   	    				(config->modbus.values_to_alter[indexNum]).integer_value =stol(s,nullptr,10);
+	   	    			   	    				std::cout<<"type:"<<(int)(config->modbus.values_to_alter[indexNum]).type << "id:"<<(int)(config->modbus.values_to_alter[indexNum]).identifier <<"Val:"<<(config->modbus.values_to_alter[indexNum]).integer_value <<std::endl;
+
+	   	    			   	    				parameter++;
+
+	   	    			   	    				break;
+	   	    			   	    			default:
+	   	    			   	    				break;
+	   	    			   	    			}
+
+	   	    			   	    		}
+	   	    			   	    		indexNum++;
+	   	    			   	    		config->modbus.numAlteredVal = indexNum;
+	   	    	}
+	   	    	while (std::getline(infile, line))
+	   	    	{
+	   	    		if(line.find("protocol",0)!=string::npos)
+	   	    			{
+	   	    			readNewProtocol++;
+	   	    			linePrev = line;
+	   	    			indexNum=0;
+	   	    			break;
+	   	    			}
+
+	   	    		std::istringstream iss(line);
+	   	    		int parameter = 0;
+	   	    		for(std::string s; iss >> s; )
+	   	    		{
+	   	    			switch(parameter)
+	   	    			{
+	   	    			case 0:
+	   	    				config->modbus.values_to_alter[indexNum].type = stoi(s,nullptr,10);
+	   	    				parameter++;
+	   	    				break;
+	   	    			case 1:
+	   	    				config->modbus.values_to_alter[indexNum].identifier = stoi(s,nullptr,10);
+	   	    				parameter++;
+	   	    			    break;
+
+	   	    			case 2:
+
+	   	    				(config->modbus.values_to_alter[indexNum]).integer_value =stol(s,nullptr,10);
+	   	    				std::cout<<"type:"<<(int)(config->modbus.values_to_alter[indexNum]).type << "id:"<<(int)(config->modbus.values_to_alter[indexNum]).identifier <<"Val:"<<(config->modbus.values_to_alter[indexNum]).integer_value <<std::endl;
+
+	   	    				parameter++;
+
+	   	    				break;
+	   	    			default:
+	   	    				break;
+	   	    			}
+
+	   	    		}
+	   	    		indexNum++;
+	   	    		config->modbus.numAlteredVal = indexNum;
+	   	    	}
+	   	    }
+
 
 	}
 
-
+	infile.close();
 
 return 0;
 }
@@ -549,6 +629,86 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 		     packetNew->AddHeader(ipV4Hdr);
 
 }
+
+else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==502 || tcpHdr1.GetSourcePort()==502))
+{
+	Ipv4Address senderIp;
+	uint32_t senderIntIP;
+	uint64_t key;
+	modbus_session_data_t* session;
+	unsigned short int dataSize = packetCopy->GetSize ();
+	unsigned char * buffer =  new unsigned char[dataSize] ;
+		//if(packetCopy->GetSize ()>0){
+
+	//printf("DNP3 \n"); // @suppress("Function cannot be resolved")
+	packetCopy->CopyData (buffer, dataSize);
+
+	if (tcpHdr1.GetDestinationPort()==502)
+	{
+		senderIp = ipV4Hdr.GetSource();
+		senderIntIP = senderIp.Get();
+		key = (senderIntIP<<16) + tcpHdr1.GetSourcePort();
+	}
+
+	else if (tcpHdr1.GetSourcePort()==502)
+	{
+		senderIp = ipV4Hdr.GetDestination();
+				senderIntIP = senderIp.Get();
+				key = (senderIntIP<<16) + tcpHdr1.GetDestinationPort();
+	}
+
+		if(mmapOfModbusData.find(key)!=mmapOfModbusData.end())
+		{
+			session = mmapOfModbusData.find(key)->second;
+			//printf("found session for key: %ld \n",key);
+			if (tcpHdr1.GetDestinationPort()==502)
+				{
+				session->direction = MODBUS_SERVER;
+				printf("In Server direction\n");
+				}
+			else if (tcpHdr1.GetSourcePort()==502)
+			{
+			session->direction = MODBUS_CLIENT;
+			printf("In Client direction\n");
+			}
+			ModbusDecode(session, &config.modbus, (uint8_t *)buffer,dataSize);
+
+
+		}
+		else
+		{
+			 session  =  new modbus_session_data_t;
+			 //session->client_rdata = new dnp3_reassembly_data_t;
+			 //session->server_rdata = new dnp3_reassembly_data_t;
+
+			 if (tcpHdr1.GetDestinationPort()==502)
+			 				{
+			 				session->direction = MODBUS_CLIENT;
+			 				}
+			 			else if (tcpHdr1.GetSourcePort()==502)
+			 			{
+			 			session->direction = MODBUS_SERVER;
+			 			}
+			 mmapOfModbusData.insert({key, session});
+			 ModbusDecode(session, &config.modbus, (uint8_t *)buffer,dataSize);
+			 printf("Modbus: create session for Key: %ld\n",key);
+		}
+
+		packetNew = Create<Packet>(buffer,packetCopy->GetSize ());
+
+			tcpHdr.EnableChecksums();
+			packetNew->AddHeader(tcpHdr);
+		//	printf("Flags %x OrgLength: %d NewLength: %d Packet size: %d\n",tcpHdr.GetFlags()&TcpHeader::SYN,tcpHdr1.GetLength(),tcpHdr.GetLength(),packetCopy->GetSize ());
+//			if(tcpHdr1.IsChecksumOk() && ipV4Hdr.IsChecksumOk())
+//				//printf("Checksum ok\n");
+//			else
+				//printf("Checksum error");
+			 ipV4Hdr.SetPayloadSize(packetNew->GetSize());
+			 ipV4Hdr.EnableChecksum();
+		     packetNew->AddHeader(ipV4Hdr);
+
+}
+
 
 //else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()!=20000 && tcpHdr1.GetSourcePort()!=20000))
 //{

@@ -41,6 +41,7 @@
 #include<cstdio>
 #include<stdlib.h>
 #include"ns3/dnp3-app.h"
+#include"ns3/modbus-app.h"
 
 
 #define FIR_MASK 0x40
@@ -50,6 +51,7 @@ namespace ns3 {
 typedef struct _configuration
   {
 	  dnp3_config_t dnp3;
+	  modbus_config_t modbus;
   }configuration;
 
 
@@ -96,6 +98,7 @@ private:
   ArpL3Protocol m_attacker;
   Ptr<ArpCache> m_arpCache;
   std::multimap<uint64_t,dnp3_session_data_t *> mmapOfdnp3Data;
+  std::multimap<uint64_t,modbus_session_data_t *> mmapOfModbusData;
   ns3::configuration config;
 };
 

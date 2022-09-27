@@ -4,6 +4,11 @@
  *  Created on: May 1, 2020
  *      Author: chamara
  */
+
+
+#ifndef SRC_APPLICATIONS_MODEL_DNP3_APP_H_
+#define SRC_APPLICATIONS_MODEL_DNP3_APP_H_
+
 #include <arpa/inet.h>
 #include <stddef.h>
 #include<cstring>
@@ -20,9 +25,6 @@
 #include <vector>
 #include<string>
 
-
-#ifndef SRC_APPLICATIONS_MODEL_DNP3_APP_H_
-#define SRC_APPLICATIONS_MODEL_DNP3_APP_H_
 
 #define GENERATOR_SPP_DNP3  145
 

@@ -30,6 +30,7 @@ def build(bld):
         'helper/udp-echo-helper.cc',
         'helper/three-gpp-http-helper.cc',
         'model/dnp3-app.cc',
+        'model/modbus-app.cc',
         ]
 
     applications_test = bld.create_ns3_module_test_library('applications')
@@ -68,6 +69,7 @@ def build(bld):
         'helper/udp-echo-helper.h',
         'helper/three-gpp-http-helper.h',
         'model/dnp3-app.h',
+        'model/modbus-app.h',
         ]
     
     if (bld.env['ENABLE_EXAMPLES']):
