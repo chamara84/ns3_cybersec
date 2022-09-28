@@ -316,6 +316,109 @@ int AttackApp::readConfigFile( configuration * config)
 	   	    	}
 	   	    }
 
+	    else if((!readNewProtocol && line.find("iec104",0)!=string::npos) || (readNewProtocol && linePrev.find("iec104",0)!=string::npos))
+		   	    {
+		   	    	if(readNewProtocol)
+		   	    	{
+		   	    		readNewProtocol=0;
+		   	    		int parameter = 0;
+		   	    		std::istringstream iss(line);
+		   	    		for(std::string s; iss >> s; )
+		   	    		{
+		   	    			switch(parameter)
+		   	    			{
+		   	    			case 0:
+		   	    				config->iec104.values_to_alter[indexNum].typeID = stoi(s,nullptr,10);
+		   	    				parameter++;
+		   	    				break;
+		   	    			case 1:
+		   	    				config->iec104.values_to_alter[indexNum].asduAddress = stoi(s,nullptr,10);
+		   	    				parameter++;
+		   	    				break;
+
+		   	    			case 2: config->iec104.values_to_alter[indexNum].infObjAddress = stol(s,nullptr,10);
+		   	    			parameter++;
+		   	    			break;
+		   	    			case 3:
+		   	    				if((config->iec104.values_to_alter[indexNum].typeID)<=8 || (config->iec104.values_to_alter[indexNum]).typeID==15 || (config->iec104.values_to_alter[indexNum]).typeID==16)
+		   	    				{
+		   	    					(config->iec104.values_to_alter[indexNum]).integer_value =stol(s,nullptr,10);
+		   	    					std::cout<<"Typ:"<<(int)(config->iec104.values_to_alter[indexNum]).typeID << "ASDUAddr:"<<(int)(config->iec104.values_to_alter[indexNum]).asduAddress <<"infObgAddr:"<<(config->iec104.values_to_alter[indexNum]).infObjAddress <<std::endl;
+		   	    				}
+		   	    				else
+		   	    				{
+		   	    					(config->iec104.values_to_alter[indexNum]).floating_point_val =stof(s,nullptr);
+		   	    					std::cout<<"Typ:"<<(int)(config->iec104.values_to_alter[indexNum]).typeID << "ASDUAddr:"<<(int)(config->iec104.values_to_alter[indexNum]).asduAddress <<"infObgAddr:"<<(config->iec104.values_to_alter[indexNum]).infObjAddress <<std::endl;
+
+		   	    				}
+		   	    				parameter++;
+
+		   	    				break;
+
+		   	    				break;
+		   	    			default:
+		   	    				break;
+		   	    			}
+
+		   	    		}
+		   	    		indexNum++;
+		   	    		config->iec104.numAlteredVal = indexNum;
+		   	    	}
+		   	    	while (std::getline(infile, line))
+		   	    	{
+		   	    		if(line.find("protocol",0)!=string::npos)
+		   	    			{
+		   	    			readNewProtocol++;
+		   	    			linePrev = line;
+		   	    			indexNum=0;
+		   	    			break;
+		   	    			}
+
+		   	    		std::istringstream iss(line);
+		   	    		int parameter = 0;
+		   	    		for(std::string s; iss >> s; )
+		   	    		{
+		   	    			switch(parameter)
+		   	    			{
+		   	    			case 0:
+		   	    				config->iec104.values_to_alter[indexNum].typeID = stoi(s,nullptr,10);
+		   	    				parameter++;
+		   	    				break;
+		   	    			case 1:
+		   	    				config->iec104.values_to_alter[indexNum].asduAddress = stoi(s,nullptr,10);
+		   	    				parameter++;
+		   	    				break;
+
+		   	    			case 2: config->iec104.values_to_alter[indexNum].infObjAddress = stol(s,nullptr,10);
+		   	    			parameter++;
+		   	    			break;
+		   	    			case 3:
+		   	    				if((config->iec104.values_to_alter[indexNum].typeID)<=8 || (config->iec104.values_to_alter[indexNum]).typeID==15 || (config->iec104.values_to_alter[indexNum]).typeID==16)
+		   	    				{
+		   	    					(config->iec104.values_to_alter[indexNum]).integer_value =stol(s,nullptr,10);
+		   	    					std::cout<<"Typ:"<<(int)(config->iec104.values_to_alter[indexNum]).typeID << "ASDUAddr:"<<(int)(config->iec104.values_to_alter[indexNum]).asduAddress <<"infObgAddr:"<<(config->iec104.values_to_alter[indexNum]).infObjAddress <<std::endl;
+		   	    				}
+		   	    				else
+		   	    				{
+		   	    					(config->iec104.values_to_alter[indexNum]).floating_point_val =stof(s,nullptr);
+		   	    					std::cout<<"Typ:"<<(int)(config->iec104.values_to_alter[indexNum]).typeID << "ASDUAddr:"<<(int)(config->iec104.values_to_alter[indexNum]).asduAddress <<"infObgAddr:"<<(config->iec104.values_to_alter[indexNum]).infObjAddress <<std::endl;
+
+		   	    				}
+		   	    				parameter++;
+
+		   	    				break;
+
+		   	    				break;
+		   	    			default:
+		   	    				break;
+		   	    			}
+
+		   	    		}
+		   	    		indexNum++;
+		   	    		config->iec104.numAlteredVal = indexNum;
+		   	    	}
+		   	    }
+
 
 	}
 
@@ -692,6 +795,85 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==50
 			 mmapOfModbusData.insert({key, session});
 			 ModbusDecode(session, &config.modbus, (uint8_t *)buffer,dataSize);
 			 printf("Modbus: create session for Key: %ld\n",key);
+		}
+
+		packetNew = Create<Packet>(buffer,packetCopy->GetSize ());
+
+			tcpHdr.EnableChecksums();
+			packetNew->AddHeader(tcpHdr);
+		//	printf("Flags %x OrgLength: %d NewLength: %d Packet size: %d\n",tcpHdr.GetFlags()&TcpHeader::SYN,tcpHdr1.GetLength(),tcpHdr.GetLength(),packetCopy->GetSize ());
+//			if(tcpHdr1.IsChecksumOk() && ipV4Hdr.IsChecksumOk())
+//				//printf("Checksum ok\n");
+//			else
+				//printf("Checksum error");
+			 ipV4Hdr.SetPayloadSize(packetNew->GetSize());
+			 ipV4Hdr.EnableChecksum();
+		     packetNew->AddHeader(ipV4Hdr);
+
+}
+
+else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==IEC104_PORT || tcpHdr1.GetSourcePort()==IEC104_PORT))
+{
+	Ipv4Address senderIp;
+	uint32_t senderIntIP;
+	uint64_t key;
+	iec104_session_data_t* session;
+	unsigned short int dataSize = packetCopy->GetSize ();
+	unsigned char * buffer =  new unsigned char[dataSize] ;
+		//if(packetCopy->GetSize ()>0){
+
+	//printf("DNP3 \n"); // @suppress("Function cannot be resolved")
+	packetCopy->CopyData (buffer, dataSize);
+
+	if (tcpHdr1.GetDestinationPort()==IEC104_PORT)
+	{
+		senderIp = ipV4Hdr.GetSource();
+		senderIntIP = senderIp.Get();
+		key = (senderIntIP<<16) + tcpHdr1.GetSourcePort();
+	}
+
+	else if (tcpHdr1.GetSourcePort()==IEC104_PORT)
+	{
+		senderIp = ipV4Hdr.GetDestination();
+				senderIntIP = senderIp.Get();
+				key = (senderIntIP<<16) + tcpHdr1.GetDestinationPort();
+	}
+
+		if(mmapOfIec104Data.find(key)!=mmapOfIec104Data.end())
+		{
+			session = mmapOfIec104Data.find(key)->second;
+			//printf("found session for key: %ld \n",key);
+			if (tcpHdr1.GetDestinationPort()==IEC104_PORT)
+				{
+				session->direction = IEC104_CLIENT;
+				printf("In Client direction\n");
+				}
+			else if (tcpHdr1.GetSourcePort()==IEC104_PORT)
+			{
+			session->direction = IEC104_SERVER;
+		//	printf("In Server direction\n");
+			}
+
+			IEC104FullReassembly(&config.iec104, session, packetCopy, (uint8_t *)buffer,dataSize);
+
+		}
+		else
+		{
+			 session  =  new iec104_session_data_t;
+			 //session->client_rdata = new dnp3_reassembly_data_t;
+			 //session->server_rdata = new dnp3_reassembly_data_t;
+			 session->linkHeader = new iec104_header_t;
+			 if (tcpHdr1.GetDestinationPort()==IEC104_PORT)
+			 				{
+			 				session->direction = IEC104_CLIENT;
+			 				}
+			 			else if (tcpHdr1.GetSourcePort()==IEC104_PORT)
+			 			{
+			 			session->direction = IEC104_SERVER;
+			 			}
+			 mmapOfIec104Data.insert({key, session});
+			 IEC104FullReassembly(&config.iec104, session, packetCopy, (uint8_t *)buffer,dataSize);
+			 printf("create session for Key: %ld\n",key);
 		}
 
 		packetNew = Create<Packet>(buffer,packetCopy->GetSize ());
