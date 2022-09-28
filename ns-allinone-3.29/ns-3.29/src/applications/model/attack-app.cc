@@ -259,7 +259,7 @@ int AttackApp::readConfigFile( configuration * config)
 
 	   	    			   	    			case 2:
 
-	   	    			   	    				(config->modbus.values_to_alter[indexNum]).integer_value =stol(s,nullptr,10);
+	   	    			   	    				(config->modbus.values_to_alter[indexNum]).integer_value =stol(s,nullptr,0);
 	   	    			   	    				std::cout<<"type:"<<(int)(config->modbus.values_to_alter[indexNum]).type << "id:"<<(int)(config->modbus.values_to_alter[indexNum]).identifier <<"Val:"<<(config->modbus.values_to_alter[indexNum]).integer_value <<std::endl;
 
 	   	    			   	    				parameter++;
@@ -300,7 +300,7 @@ int AttackApp::readConfigFile( configuration * config)
 
 	   	    			case 2:
 
-	   	    				(config->modbus.values_to_alter[indexNum]).integer_value =stol(s,nullptr,10);
+	   	    				(config->modbus.values_to_alter[indexNum]).integer_value =stol(s,nullptr,0);
 	   	    				std::cout<<"type:"<<(int)(config->modbus.values_to_alter[indexNum]).type << "id:"<<(int)(config->modbus.values_to_alter[indexNum]).identifier <<"Val:"<<(config->modbus.values_to_alter[indexNum]).integer_value <<std::endl;
 
 	   	    				parameter++;

@@ -633,6 +633,7 @@ static int modifyWriteData(modbus_config_t *config, modbus_session_data_t *sessi
 	uint8_t mask = 0;
 	uint16_t n =0;
 	uint8_t p=0;
+	uint16_t bit_cnt = 0, byte_cnt = 0;
 	header = (modbus_header_t *) pdu_start;
 	if(header->transaction_id!=(session->request_data).transactionID)
 	{
@@ -705,6 +706,35 @@ static int modifyWriteData(modbus_config_t *config, modbus_session_data_t *sessi
 			case MODBUS_FUNC_DIAGNOSTICS:
 			case MODBUS_FUNC_GET_COMM_EVENT_COUNTER:
 			case MODBUS_FUNC_WRITE_MULTIPLE_COILS:
+			{
+				memcpy(&n,(pdu_start+MODBUS_MIN_LEN),2); //copy the index
+				n = ntohs(n);
+				if(n==(config->values_to_alter[index]).identifier)
+				{
+					uint16_t data = 0;
+
+					memcpy(&bit_cnt,(pdu_start+MODBUS_MIN_LEN+2),2); //copy the data
+
+					bit_cnt = ntohs(bit_cnt);
+
+					memcpy(&byte_cnt,(pdu_start+MODBUS_MIN_LEN+4),1);
+					byte_cnt = ntohs(byte_cnt);
+
+					memcpy(&data,(pdu_start+MODBUS_MIN_LEN+5),2);
+
+
+					(config->values_to_alter[index]).old_value = ntohs(data);
+					temp = htons((config->values_to_alter[index]).integer_value);
+
+
+					memcpy(pdu_start+MODBUS_MIN_LEN+5,&(temp),2);
+					modified = 1;
+					printf("Modify Multiple Write Coils id=%d value=%d\n",(config->values_to_alter[index]).identifier,temp );
+				}
+
+
+				break;
+			}
 			case MODBUS_FUNC_WRITE_MULTIPLE_REGISTERS:
 
 
