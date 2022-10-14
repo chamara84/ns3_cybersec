@@ -419,6 +419,139 @@ int AttackApp::readConfigFile( configuration * config)
 		   	    	}
 		   	    }
 
+	     else if((!readNewProtocol && line.find("pmu",0)!=string::npos) || (readNewProtocol && linePrev.find("pmu",0)!=string::npos))
+   	    {
+   	    	if(readNewProtocol)
+   	    	{
+   	    		readNewProtocol=0;
+   	    		int parameter = 0;
+   	    		std::istringstream iss(line);
+   	    		for(std::string s; iss >> s; )
+   	    		{
+   	    			switch(parameter)
+   	    			{
+   	    			case 0:
+   	    				config->pmu.values_to_alter[indexNum].pmuName = s;
+   	    				parameter++;
+   	    				break;
+   	    			case 1:
+   	    				config->pmu.values_to_alter[indexNum].type = stoi(s,nullptr,10);
+   	    				parameter++;
+   	    				break;
+
+   	    			case 2:
+   	    				std::replace(s.begin(),s.end() , '_', ' ');
+   	    				config->pmu.values_to_alter[indexNum].identifier = s;
+
+   	    				parameter++;
+   	    				break;
+   	    			case 3:
+   	    				if((config->pmu.values_to_alter[indexNum].identifier).find("DIGITAL",0)!=string::npos )
+   	    				{
+   	    					(config->pmu.values_to_alter[indexNum]).digValue =stol(s,nullptr,10);
+   	    					std::cout<<"Typ:"<<(config->pmu.values_to_alter[indexNum]).pmuName << "identifier:"<<(config->pmu.values_to_alter[indexNum]).identifier <<"value:"<<(config->pmu.values_to_alter[indexNum]).digValue <<std::endl;
+   	    				}
+   	    				else
+   	    				{
+   	    					(config->pmu.values_to_alter[indexNum]).real_value =stof(s,nullptr);
+   	    					std::cout<<"Typ:"<<(config->pmu.values_to_alter[indexNum]).pmuName << "identifier:"<<(config->pmu.values_to_alter[indexNum]).identifier <<"value:"<<(config->pmu.values_to_alter[indexNum]).real_value <<std::endl;
+
+   	    				}
+   	    				parameter++;
+
+   	    				break;
+
+   	    			case 4:
+   	    				if((config->pmu.values_to_alter[indexNum].identifier).find("DIGITAL",0)==string::npos )
+
+   	    				{
+   	    					(config->pmu.values_to_alter[indexNum]).imaginary_value =stof(s,nullptr);
+   	    					std::cout<<"Typ:"<<(config->pmu.values_to_alter[indexNum]).pmuName << "identifier:"<<(config->pmu.values_to_alter[indexNum]).identifier <<"value:"<<(config->pmu.values_to_alter[indexNum]).imaginary_value <<std::endl;
+
+   	    				}
+   	    				parameter++;
+
+   	    				break;
+
+
+   	    			default:
+   	    				break;
+   	    			}
+
+   	    		}
+   	    		indexNum++;
+   	    		config->pmu.numAlteredVal = indexNum;
+   	    	}
+   	    	while (std::getline(infile, line))
+   	    	{
+   	    		if(line.find("protocol",0)!=string::npos)
+   	    			{
+   	    			readNewProtocol++;
+   	    			linePrev = line;
+   	    			indexNum=0;
+   	    			break;
+   	    			}
+
+   	    		std::istringstream iss(line);
+   	    		int parameter = 0;
+   	    		for(std::string s; iss >> s; )
+   	    		   	    		{
+   	    		   	    			switch(parameter)
+   	    		   	    			{
+   	    		   	    			case 0:
+   	    		   	    				config->pmu.values_to_alter[indexNum].pmuName = s;
+   	    		   	    				parameter++;
+   	    		   	    				break;
+   	    		   	    			case 1:
+   	    		   	    				config->pmu.values_to_alter[indexNum].type = stoi(s,nullptr,10);
+   	    		   	    				parameter++;
+   	    		   	    				break;
+
+   	    		   	    			case 2:
+   	    		   	    				std::replace(s.begin(),s.end() , '_', ' ');
+   	    		   	    				config->pmu.values_to_alter[indexNum].identifier = s;
+   	    		   	    				parameter++;
+   	    		   	    				break;
+   	    		   	    			case 3:
+   	    		   	    				if((config->pmu.values_to_alter[indexNum].identifier).find("DIGITAL",0)!=string::npos )
+   	    		   	    				{
+   	    		   	    					(config->pmu.values_to_alter[indexNum]).digValue =stol(s,nullptr,10);
+   	    		   	    					std::cout<<"Typ:"<<(config->pmu.values_to_alter[indexNum]).pmuName << "identifier:"<<(config->pmu.values_to_alter[indexNum]).identifier <<"value:"<<(config->pmu.values_to_alter[indexNum]).digValue <<std::endl;
+   	    		   	    				}
+   	    		   	    				else
+   	    		   	    				{
+   	    		   	    					(config->pmu.values_to_alter[indexNum]).real_value =stof(s,nullptr);
+   	    		   	    					std::cout<<"Typ:"<<(config->pmu.values_to_alter[indexNum]).pmuName << "identifier:"<<(config->pmu.values_to_alter[indexNum]).identifier <<"value:"<<(config->pmu.values_to_alter[indexNum]).real_value <<std::endl;
+
+   	    		   	    				}
+   	    		   	    				parameter++;
+
+   	    		   	    				break;
+
+   	    		   	    			case 4:
+   	    		   	    				if((config->pmu.values_to_alter[indexNum].identifier).find("DIGITAL",0)==string::npos )
+
+   	    		   	    				{
+   	    		   	    					(config->pmu.values_to_alter[indexNum]).imaginary_value =stof(s,nullptr);
+   	    		   	    					std::cout<<"Typ:"<<(config->pmu.values_to_alter[indexNum]).pmuName << "identifier:"<<(config->pmu.values_to_alter[indexNum]).identifier <<"value:"<<(config->pmu.values_to_alter[indexNum]).imaginary_value <<std::endl;
+
+   	    		   	    				}
+   	    		   	    				parameter++;
+
+   	    		   	    				break;
+
+
+   	    		   	    			default:
+   	    		   	    				break;
+   	    		   	    			}
+
+   	    		   	    		}
+   	    		   	    		indexNum++;
+   	    		   	    		config->pmu.numAlteredVal = indexNum;
+   	    	}
+   	    }
+
+
 
 	}
 
@@ -891,6 +1024,84 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==IE
 
 }
 
+else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==PMU_PORT1 || tcpHdr1.GetSourcePort()==PMU_PORT1 || tcpHdr1.GetDestinationPort()==PMU_PORT2 || tcpHdr1.GetSourcePort()==PMU_PORT2))
+{
+	Ipv4Address senderIp;
+	uint32_t senderIntIP;
+	uint64_t key;
+	pmu_session_data_t* session;
+	unsigned short int dataSize = packetCopy->GetSize ();
+	unsigned char * buffer =  new unsigned char[dataSize] ;
+		//if(packetCopy->GetSize ()>0){
+
+	//printf("DNP3 \n"); // @suppress("Function cannot be resolved")
+	packetCopy->CopyData (buffer, dataSize);
+
+	if (tcpHdr1.GetDestinationPort()==PMU_PORT1 || tcpHdr1.GetDestinationPort()==PMU_PORT2)
+	{
+		senderIp = ipV4Hdr.GetSource();
+		senderIntIP = senderIp.Get();
+		key = (senderIntIP<<16) + tcpHdr1.GetSourcePort();
+	}
+
+	else if (tcpHdr1.GetSourcePort()==PMU_PORT1 || tcpHdr1.GetSourcePort()==PMU_PORT2)
+	{
+		senderIp = ipV4Hdr.GetDestination();
+				senderIntIP = senderIp.Get();
+				key = (senderIntIP<<16) + tcpHdr1.GetDestinationPort();
+	}
+
+		if(mmapOfPmuData.find(key)!=mmapOfPmuData.end())
+		{
+			session = mmapOfPmuData.find(key)->second;
+			//printf("found session for key: %ld \n",key);
+			if (tcpHdr1.GetDestinationPort()==PMU_PORT1 || tcpHdr1.GetDestinationPort()==PMU_PORT2)
+				{
+				session->direction = PMU_CLIENT;
+				printf("In Client direction\n");
+				}
+			else if (tcpHdr1.GetSourcePort()==PMU_PORT1 || tcpHdr1.GetSourcePort()==PMU_PORT2)
+			{
+			session->direction = PMU_SERVER;
+		//	printf("In Server direction\n");
+			}
+
+
+			PMUDecode(session, &config.pmu, (uint8_t *)buffer, dataSize);
+		}
+		else
+		{
+			 session  =  new pmu_session_data_t;
+			 //session->client_rdata = new dnp3_reassembly_data_t;
+			 //session->server_rdata = new dnp3_reassembly_data_t;
+
+			 if (tcpHdr1.GetDestinationPort()==PMU_PORT1 || tcpHdr1.GetDestinationPort()==PMU_PORT2)
+			 				{
+			 				session->direction = PMU_CLIENT;
+			 				}
+			 			else if (tcpHdr1.GetSourcePort()==PMU_PORT1 || tcpHdr1.GetSourcePort()==PMU_PORT2)
+			 			{
+			 			session->direction = PMU_SERVER;
+			 			}
+			 mmapOfPmuData.insert({key, session});
+			 PMUDecode(session, &config.pmu, (uint8_t *)buffer, dataSize);
+			 printf("create session for Key: %ld\n",key);
+		}
+
+		packetNew = Create<Packet>(buffer,packetCopy->GetSize ());
+
+			tcpHdr.EnableChecksums();
+			packetNew->AddHeader(tcpHdr);
+		//	printf("Flags %x OrgLength: %d NewLength: %d Packet size: %d\n",tcpHdr.GetFlags()&TcpHeader::SYN,tcpHdr1.GetLength(),tcpHdr.GetLength(),packetCopy->GetSize ());
+//			if(tcpHdr1.IsChecksumOk() && ipV4Hdr.IsChecksumOk())
+//				//printf("Checksum ok\n");
+//			else
+				//printf("Checksum error");
+			 ipV4Hdr.SetPayloadSize(packetNew->GetSize());
+			 ipV4Hdr.EnableChecksum();
+		     packetNew->AddHeader(ipV4Hdr);
+
+}
 
 //else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()!=20000 && tcpHdr1.GetSourcePort()!=20000))
 //{

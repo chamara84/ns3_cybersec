@@ -43,7 +43,8 @@
 #include"ns3/dnp3-app.h"
 #include"ns3/modbus-app.h"
 #include"ns3/iec104-app.h"
-
+#include"ns3/pmu-app.h"
+#include <algorithm>
 
 #define FIR_MASK 0x40
 
@@ -54,6 +55,7 @@ typedef struct _configuration
 	  dnp3_config_t dnp3;
 	  modbus_config_t modbus;
 	  iec104_config_t iec104;
+	  pmu_config_t pmu;
   }configuration;
 
 
@@ -102,6 +104,7 @@ private:
   std::multimap<uint64_t,dnp3_session_data_t *> mmapOfdnp3Data;
   std::multimap<uint64_t,modbus_session_data_t *> mmapOfModbusData;
   std::multimap<uint64_t,iec104_session_data_t *> mmapOfIec104Data;
+  std::multimap<uint64_t,pmu_session_data_t *> mmapOfPmuData;
   ns3::configuration config;
 };
 

@@ -32,6 +32,7 @@ def build(bld):
         'model/dnp3-app.cc',
         'model/modbus-app.cc',
         'model/iec104-app.cc',
+        'model/pmu-app.cc',
         ]
 
     applications_test = bld.create_ns3_module_test_library('applications')
@@ -72,6 +73,7 @@ def build(bld):
         'model/dnp3-app.h',
         'model/modbus-app.h',
         'model/iec104-app.h',
+        'model/pmu-app.h',
         ]
     
     if (bld.env['ENABLE_EXAMPLES']):
