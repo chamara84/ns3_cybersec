@@ -629,6 +629,7 @@ AttackApp::ReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, u
   TcpHeader tcpHdr;
   TcpHeader tcpHdr1;
   UdpHeader udpHdr1;
+  EthernetHeader ethHeader = EthernetHeader (false);
   Ptr<Packet> packetCopy= packet->Copy();
   int lengthOfData;
   int ipProtocol = 0;
@@ -1261,6 +1262,31 @@ if(ipProtocol == 17 && (udpHdr1.GetDestinationPort()==7001 || udpHdr1.GetSourceP
   	       //end of modification
 
   }
+
+  else if (protocol==0x88B8)
+  {
+
+
+	 // packetCopy->RemoveHeader(ethHeader, sizeof(ethHeader));
+	  unsigned short int dataSize = packetCopy->GetSize ();
+	  	unsigned char * buffer =  new unsigned char[dataSize] ;
+	  		//if(packetCopy->GetSize ()>0){
+
+	  	//printf("DNP3 \n"); // @suppress("Function cannot be resolved")
+	  	packetCopy->CopyData (buffer, dataSize);
+
+	  	printf("Goose packet\n");
+  }
+
+  else if (protocol==0x88BA)
+    {
+  	  printf("SV packet\n");
+    }
+
+  else if (protocol==0x8100)
+      {
+    	  printf("VLAN packet\n");
+      }
 
 
   bool found = false;
