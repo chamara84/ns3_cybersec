@@ -802,11 +802,11 @@ main (int argc, char *argv[])
 	  	  AggregatorIP[3]="172.24.9.247";
 
 	  	  string intIP[2];
-	  	  intIP[0]="172.24.2.146";
-	  	  intIP[1] = "172.24.2.25";
+	  	  intIP[0]="172.24.2.199";
+	  	  intIP[1] = "172.24.2.205";
 		   string intMAC[2];
-	  	  intMAC[0]="00:e0:4c:68:98:55";
-	  	  intMAC[1] ="00:e0:4c:68:98:56" ;
+	  	  intMAC[0]="00:e0:4c:67:77:d4";
+	  	  intMAC[1] ="00:e0:4c:67:77:d3" ;
 		  string gateway = "172.24.0.1";
 	  MobilityHelper mobility;
 	  mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
@@ -816,7 +816,7 @@ main (int argc, char *argv[])
 	  //
 	  CommandLine cmd;
 	  std::string deviceName1 ("enp4s0");
-	   std::string deviceName2 ("enp3s0"); //edit the name corresponding to the device name
+	   std::string deviceName2 ("enp5s0"); //edit the name corresponding to the device name
 	  std::string encapMode ("Dix");
 
 	  int subnet;
@@ -840,7 +840,7 @@ main (int argc, char *argv[])
 	  cmd.AddValue("Int2IP","IP address of NIC 2",intIP[1]);
 	  cmd.AddValue("Int1MAC","MAC address of NIC 1",intMAC[0]);
 	  cmd.AddValue("Int2MAC","MAC address of NIC 2",intMAC[1]);
-	  cmd.AddValue("Gateway","IP address of the gateway of interface p3p1",gateway);
+	  cmd.AddValue("Gateway","IP address of the gateway",gateway);
 	  
 	  //cmd.AddValue ("nNodes", "number of nodes to create (>= 2)", nNodes);
  cmd.AddValue("Subnet","Sub net: 1) /8 2)/16 or 3)/24",subnet );

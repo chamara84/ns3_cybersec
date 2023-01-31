@@ -54,12 +54,15 @@
 #include "ns3/mobility-module.h"
 #include "ns3/queue.h"
 #include "ns3/drop-tail-queue.h"
-#include "ns3/malicious-tag.h"
+
 #include "ns3/tcp-echo-server.h"
 #include "ns3/tcp-syn-flood.h"
 #include <cstring>
 #include <mutex>
 #include <condition_variable>
+#include <chrono>
+#include <thread>
+
 
 
 
@@ -132,6 +135,25 @@ private:
   string m_DERIP[4];
   string m_AggregatorIP[4];
   string m_interfaceIP[2];
+  Ptr<Socket>	Send_socketDER1;
+  Ptr<Socket>	Send_socketDER2;
+  Ptr<Socket>	Send_socketAGG1;
+  Ptr<Socket>	Send_socketAGG2;
+
+
+
+  Ptr<Socket>	Send_socketIngressDER1;
+    Ptr<Socket>	Send_socketIngressDER2;
+    Ptr<Socket>	Send_socketIngressDER3;
+        Ptr<Socket>	Send_socketIngressDER4;
+    Ptr<Socket>	Send_socketIngressAGG1;
+
+    Ptr<Socket>	Send_socket;
+
+  bool DER1Connected = false, DER2Connected= false, AGG1Connected= false,AGG2Connected= false;
+  bool DER1IngressConnected = false, DER2IngressConnected= false,DER3IngressConnected = false, DER4IngressConnected= false, AGG1IngressConnected= false, Send_socketConnected= false;
+
+
 };
 
 NS_LOG_COMPONENT_DEFINE ("MyApp");
@@ -171,6 +193,71 @@ MyApp::Setup (Ptr<Node> node,Ipv4Address raddress ,Ipv4Address address, uint16_t
     std::copy(DER,DER+4,m_DERIP);
     std::copy(IPAggregator,IPAggregator+4,m_AggregatorIP);
     std::copy(IPInterface,IPInterface+2,m_interfaceIP);
+    Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable> ();
+    rand->SetAttribute( "Min", DoubleValue( 1 ) );
+    rand->SetAttribute( "Max", DoubleValue( 65525 ) );
+    Ptr<SocketFactory> rxSocketFactory = this->node->GetObject<TcpSocketFactory> ();
+    Send_socket = rxSocketFactory->CreateSocket ();
+    Send_socket->Bind();
+
+
+
+    if(type==EGRESS_NODE)
+    {
+    Send_socketDER1 = rxSocketFactory->CreateSocket ();
+    while(Send_socketDER1->Bind(InetSocketAddress (m_raddress, 20000))!=0)
+    {
+    	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+
+
+    Send_socketDER2 = rxSocketFactory->CreateSocket ();
+
+    while(Send_socketDER2->Bind(InetSocketAddress (m_raddress, 20001))!=0)
+        {
+        	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+  //  Send_socketDER2->Connect (InetSocketAddress (Ipv4Address(DER[3].c_str()), m_peer_port));
+
+
+    Send_socketAGG1 = rxSocketFactory->CreateSocket ();
+
+    while(Send_socketAGG1->Bind(InetSocketAddress (m_raddress, 20002))!=0)
+            {
+            	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+   // Send_socketAGG1->Connect (InetSocketAddress (Ipv4Address(IPAggregator[1].c_str()), m_peer_port));
+
+    Send_socketAGG2 = rxSocketFactory->CreateSocket ();
+    while(Send_socketAGG2->Bind(InetSocketAddress (m_raddress, 20003))!=0)
+                {
+                	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                }
+
+  //  Send_socketAGG2->Connect (InetSocketAddress (Ipv4Address(IPAggregator[3].c_str()), m_peer_port));
+    }
+
+    else if(type==INGRESS_NODE)
+    {
+    	Send_socketIngressDER1 = rxSocketFactory->CreateSocket ();
+    	Send_socketIngressDER1->Bind(InetSocketAddress (m_raddress, 20004));
+
+    	Send_socketIngressDER2 = rxSocketFactory->CreateSocket ();
+    	Send_socketIngressDER2->Bind(InetSocketAddress (m_raddress, 20005));
+
+    	Send_socketIngressDER3 = rxSocketFactory->CreateSocket ();
+    	Send_socketIngressDER3->Bind(InetSocketAddress (m_raddress, 20006));
+
+    	Send_socketIngressDER4 = rxSocketFactory->CreateSocket ();
+    	Send_socketIngressDER4->Bind(InetSocketAddress (m_raddress, 20007));
+
+    	Send_socketIngressAGG1 = rxSocketFactory->CreateSocket ();
+    	Send_socketIngressAGG1->Bind(InetSocketAddress (m_raddress, 20008));
+    }
+
+
+
 
 
 }
@@ -361,12 +448,21 @@ MyApp::PrintTraffic (Ptr<Socket> socket)
 
 	       //std::printf("Float as int:  %x\n",bufferFloat[1]);
 	       //std::printf("Float as float: %f\n",floatingPointData);
-	       Ptr<SocketFactory> rxSocketFactory = this->node->GetObject<TcpSocketFactory> ();
-	       Ptr<Socket>	Send_socket = rxSocketFactory->CreateSocket ();
-	       Send_socket->Bind();
-	       Send_socket->Connect (InetSocketAddress (m_peer, m_peer_port));
+if(Send_socketConnected)
+
 	       Send_socket->Send(packet);
-	       Send_socket->Close();
+else
+{
+	while( Send_socket->Connect (InetSocketAddress (m_peer, m_peer_port))!=0)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
+	Send_socketConnected =  true;
+	Send_socket->Send(packet);
+
+
+}
+
 
 	       printf("DER Sent to\n");
 	       m_raddress.Print(std::cout);
@@ -549,32 +645,87 @@ MyApp::pktProcessingIngressNode (Ptr<Socket> socket)
 	       indexOfNode = bufferFloat[1];
 	       std::cout <<"At Ingress Type:"<<type<<std::endl;
 	       std::cout <<"Index of Node:"<<indexOfNode<<std::endl;
+
+	       Ptr<Packet> packetNew = Create<Packet>(buffer,packet->GetSize ());
 	       if(type==5 || type==8)
 	       {
 	    	   switch(indexOfNode)
 	    	   {
 	    	   case(1):
+		{
+	    		   //  socket->Connect (InetSocketAddress (Ipv4Address("10.1.6.2"), 7001));
+	    		   to = "10.1.6.2";
+	    		   if(DER1IngressConnected)
+	    			   Send_socketIngressDER1->Send(packetNew);
+	    		   else
+	    		   {
+	    			   while(Send_socketIngressDER1->Connect(InetSocketAddress (Ipv4Address(to.c_str()), m_peer_port))!=0)
+	    			   {
+	    				   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	    			   }
+	    			   DER1IngressConnected = true;
+	    			   Send_socketIngressDER1->Send(packetNew);
 
-	    		 //  socket->Connect (InetSocketAddress (Ipv4Address("10.1.6.2"), 7001));
-	    	   	   to = "10.1.6.2";
-	    	   	   std::cout <<"Sent to:10.1.6.2"<<std::endl;
-	    	   	   break;
+	    		   }
 
+	    		   std::cout <<"Sent to:10.1.6.2"<<std::endl;
+	    		   break;
+		}
 	    	   case(2):
-				   to = "10.1.6.6";
-	    		  // socket->Connect (InetSocketAddress (Ipv4Address("10.1.6.6"), 7001));
-	    	   	   break;
+		{
+	    		   to = "10.1.6.6";
+	    		   if(DER2IngressConnected)
+	    			   Send_socketIngressDER2->Send(packetNew);
+	    		   else
+	    		   {
+	    			   while(Send_socketIngressDER2->Connect(InetSocketAddress (Ipv4Address(to.c_str()), m_peer_port))!=0)
+	    			   {
+	    				   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	    			   }
+	    			   DER2IngressConnected = true;
+	    			   Send_socketIngressDER2->Send(packetNew);
 
+	    		   }
+	    		   // socket->Connect (InetSocketAddress (Ipv4Address("10.1.6.6"), 7001));
+	    		   break;
+		}
 	    	   case(3):
-					to = "10.1.6.10";
+		{
+	    		   to = "10.1.6.10";
+
+	    		   if(DER3IngressConnected)
+	    			   Send_socketIngressDER3->Send(packetNew);
+	    		   else
+	    		   {
+	    			   while(Send_socketIngressDER3->Connect(InetSocketAddress (Ipv4Address(to.c_str()), m_peer_port))!=0)
+	    			   {
+	    				   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	    			   }
+	    			   DER3IngressConnected = true;
+	    			   Send_socketIngressDER3->Send(packetNew);
+
+	    		   }
 	    		   //socket->Connect (InetSocketAddress (Ipv4Address("10.1.6.10"), 7001));
-	    	   	   break;
-
+	    		   break;
+		}
 	    	   case(4):
-						to = "10.1.6.14";
-	    		   //socket->Connect (InetSocketAddress (Ipv4Address("10.1.6.14"), 7001));
-	    	   	   break;
+		{
+	    		   to = "10.1.6.14";
+	    		   if(DER4IngressConnected)
+	    			   Send_socketIngressDER4->Send(packetNew);
+	    		   else
+	    		   {
+	    			   while(Send_socketIngressDER4->Connect(InetSocketAddress (Ipv4Address(to.c_str()), m_peer_port))!=0)
+	    			   {
+	    				   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	    			   }
+	    			   DER4IngressConnected = true;
+	    			   Send_socketIngressDER4->Send(packetNew);
 
+	    		   }
+	    		   //socket->Connect (InetSocketAddress (Ipv4Address("10.1.6.14"), 7001));
+	    		   break;
+		}
 	    	   default:
 	    		   std::printf("Invalid node index");
 	    		   break;
@@ -589,6 +740,7 @@ MyApp::pktProcessingIngressNode (Ptr<Socket> socket)
 	       	    	   {
 	       	    	   case(1):
 								to = "10.1.6.18";
+
 	       	    		   //socket->Connect (InetSocketAddress (Ipv4Address("10.1.6.18"), 7001));
 	       	    	       std::cout <<"Sent to:10.1.6.18"<<std::endl;
 	       	    	   	   break;
@@ -614,12 +766,25 @@ MyApp::pktProcessingIngressNode (Ptr<Socket> socket)
 
 
 	       	    	   }
+
+	       	    	if(AGG1IngressConnected)
+	       	    		       	    		    			   Send_socketIngressAGG1->Send(packetNew);
+	       	    		       	    		    		   else
+	       	    		       	    		    		   {
+	       	    		       	    		    			   while(Send_socketIngressAGG1->Connect(InetSocketAddress (Ipv4Address(to.c_str()), m_peer_port))!=0)
+	       	    		       	    		    			   {
+	       	    		       	    		    				   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	       	    		       	    		    			   }
+	       	    		       	    		    			AGG1IngressConnected = true;
+	       	    		       	    		    			   Send_socketIngressAGG1->Send(packetNew);
+
+	       	    		       	    		    		   }
 	       	       }
 
 	       else if(type== 1 )
 	      	       	       {
 
-	      	       	    		   socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.249"), 7001));
+	      	       	    		//   socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.249"), 7001));
 
 
 
@@ -628,20 +793,20 @@ MyApp::pktProcessingIngressNode (Ptr<Socket> socket)
 	       else if(type== 3 )
 	      	      	       	       {
 
-	      	      	       	    		   socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.250"), 7001));
+	      	      	       	    	//	   socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.250"), 7001));
 
 
 
 
 	      	      	       	       }
 
-	       Ptr<Packet> packetNew = Create<Packet>(buffer,packet->GetSize ());
-	       Ptr<SocketFactory> rxSocketFactory = this->node->GetObject<TcpSocketFactory> ();
-	       	      	       	       Ptr<Socket>	Send_socket = rxSocketFactory->CreateSocket ();
-	       	      	       	       Send_socket->Bind();
-	       	      	       	       Send_socket->Connect (InetSocketAddress (Ipv4Address(to.c_str()), m_peer_port));
-	       	      	       	       Send_socket->Send(packetNew);
-	       	      	       	       Send_socket->Close();
+
+//	       Ptr<SocketFactory> rxSocketFactory = this->node->GetObject<TcpSocketFactory> ();
+//	       	      	       	       Ptr<Socket>	Send_socket = rxSocketFactory->CreateSocket ();
+//	       	      	       	       Send_socket->Bind();
+//	       	      	       	       Send_socket->Connect (InetSocketAddress (Ipv4Address(to.c_str()), m_peer_port));
+//	       	      	       	       Send_socket->Send(packetNew);
+//	       	      	       	       Send_socket->Close();
 	       m_packetsSent++;
 	       //m_Event= Simulator::Schedule (Simulator::Now (), &MyApp::sendMessage, packetNew,m_socket);
 	       //txSocketn0->SetSendCallback (MakeBoundCallback (&SendMsg,packet));
@@ -694,17 +859,48 @@ MyApp::pktProcessingEgressNode (Ptr<Socket> socket)
 	    	   switch(indexOfNode)
 	    	   {
 	    	   case(1):
+	{
 						to=this->m_AggregatorIP[1];
 	    		   //socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.245"), 7001));
 	    	   std::cout <<"Egress Sent to:"<<this->m_AggregatorIP[1]<<std::endl;
-	    	   	   break;
+	    	   Ptr<Packet> packetNew = Create<Packet>(buffer,packet->GetSize ());
+	    	   if(AGG1Connected)
+	    		   Send_socketAGG1->Send(packetNew);
+	    	   else
+	    	   {
+	    		   while(Send_socketAGG1->Connect(InetSocketAddress (Ipv4Address(to.c_str()), m_peer_port))!=0)
+	    		   {
+	    			   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	    		   }
+	    			   AGG1Connected = true;
+	    			   Send_socketAGG1->Send(packetNew);
 
+	    		   }
+
+
+	    	   	   break;
+	}
 	    	   case(2):
+	{
 						to=this->m_AggregatorIP[3];
 	    		   //socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.247"), 7001));
 	    	   std::cout <<"Egress Sent to:"<<this->m_AggregatorIP[3]<<std::endl;
-	    	   	   break;
+	    	   Ptr<Packet> packetNew = Create<Packet>(buffer,packet->GetSize ());
 
+	    	   if(AGG2Connected)
+	    	   	    		   Send_socketAGG2->Send(packetNew);
+	    	   	    	   else
+	    	   	    	   {
+	    	   	    		   while(Send_socketAGG2->Connect(InetSocketAddress (Ipv4Address(to.c_str()), m_peer_port))!=0)
+	    	   	    		   {
+	    	   	    			   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	    	   	    		   }
+	    	   	    			   AGG2Connected = true;
+	    	   	    			   Send_socketAGG2->Send(packetNew);
+
+	    	   	    		   }
+	    	   	   break;
+	}
 
 	    	   default:
 	    		   std::printf("Invalid node index");
@@ -719,18 +915,56 @@ MyApp::pktProcessingEgressNode (Ptr<Socket> socket)
 	       	    	   switch(secondNodeIndex)
 	       	    	   {
 	       	    	   case(1):
+	{
 								to=this->m_DERIP[1];
 	       	    	std::cout <<"Egress Sent to:"<<this->m_DERIP[1]<<std::endl;
-	       	    		   //socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.241"), 7001));
-	       	    	   	   break;
+	       	    	Ptr<Packet> packetNew = Create<Packet>(buffer,packet->GetSize ());
 
+
+
+
+	       	    		       	       	      if(DER1Connected)
+	       	    		       	       	      {
+	       	    		       	       	 Send_socketDER1->Send(packetNew);
+	       	    		       	   std::cout <<"Egress Sent to:"<<to<<std::endl;
+	       	    		       	       	      }
+	       	    		       	       	      	    	   else
+	       	    		       	       	      	    	   {
+	       	    		       	       	      	    		   while(Send_socketDER1->Connect(InetSocketAddress (Ipv4Address(to.c_str()), m_peer_port))!=0)
+	       	    		       	       	      	    		   {
+	       	    		       	       	      	    			   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	       	    		       	       	      	    		   }
+	       	    		       	       	      	    			   DER1Connected = true;
+	       	    		       	       	      	    	Send_socketDER1->Send(packetNew);
+
+	       	    		       	       	      	    		   }
+	      	    	   	   break;
+	}
 	       	    	   case(2):
+	{
 								to=this->m_DERIP[3];
-	       	    	   std::cout <<"Egress Sent to:"<<this->m_DERIP[3]<<std::endl;
+
+	       	    	Ptr<Packet> packetNew = Create<Packet>(buffer,packet->GetSize ());
+
+	       	     if(DER2Connected)
+	       	    	       	    		       	       	      {
+	       	    	       	    		       	       	 Send_socketDER2->Send(packetNew);
+	       	    	       	    		       	   std::cout <<"Egress Sent to:"<<to<<std::endl;
+	       	    	       	    		       	       	      }
+	       	    	       	    		       	       	      	    	   else
+	       	    	       	    		       	       	      	    	   {
+	       	    	       	    		       	       	      	    		   while(Send_socketDER2->Connect(InetSocketAddress (Ipv4Address(to.c_str()),7001))!=0)
+	       	    	       	    		       	       	      	    		   {
+	       	    	       	    		       	       	      	    			   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	       	    	       	    		       	       	      	    		   }
+	       	    	       	    		       	       	      	    			   DER2Connected = true;
+	       	    	       	    		       	       	      	    	Send_socketDER2->Send(packetNew);
+
+	       	    	       	    		       	       	      	    		   }
 	       	    		   //socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.243"), 7001));
 	       	    	   	   break;
 
-
+	}
 
 	       	    	   default:
 	       	    		   std::printf("Invalid node index");
@@ -743,7 +977,7 @@ MyApp::pktProcessingEgressNode (Ptr<Socket> socket)
 	       else if(type== 1 )
 	      	       	       {
 
-	      	       	    		   socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.250"), 7001));
+	      	       	    		 //  socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.250"), 7001));
 
 
 
@@ -752,26 +986,18 @@ MyApp::pktProcessingEgressNode (Ptr<Socket> socket)
 	       else if(type== 3 )
 	      	      	       	       {
 
-	      	      	       	    		   socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.248"), 7001));
+	      	      	       	    //		   socket->Connect (InetSocketAddress (Ipv4Address("172.24.9.248"), 7001));
 
 
 
 
 	      	      	       	       }
-	       Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable> ();
-	       		       rand->SetAttribute( "Min", DoubleValue( 1 ) );
-	       		       rand->SetAttribute( "Max", DoubleValue( 65525 ) );
+
 
 
 	       if(!to.empty()){
-	       Ptr<Packet> packetNew = Create<Packet>(buffer,packet->GetSize ());
-	       Ptr<SocketFactory> rxSocketFactory = this->node->GetObject<TcpSocketFactory> ();
-	       	       	      	       	       Ptr<Socket>	Send_socket = rxSocketFactory->CreateSocket ();
-	       	       	      	       	       Send_socket->Bind(InetSocketAddress (m_raddress, rand->GetInteger ()));
-	       	       	      	       	       Send_socket->Connect (InetSocketAddress (Ipv4Address(to.c_str()), m_peer_port));
-	       	       	      	       	       Send_socket->Send(packetNew);
-	       	       	      	       std::cout <<"Egress Sent to:"<<to<<std::endl;
-	       	       	      	       	      Send_socket->Close();
+
+
 	       m_packetsSent++;
 	       }
 
@@ -950,37 +1176,37 @@ main (int argc, char *argv[])
 	  float interSynTime = 1000.0;
 	  double stopTime = 500;
 	  uint32_t nNodes = 2;
-	  int maxParallelSessions=100;
+	  int maxParallelSessions=10000;
 	  MobilityHelper mobility;
 	  mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
 	  string DER[4];
-	  DER[0]="172.20.28.53";
-	  	  	  DER[1]="172.20.28.54";
-	  	  	  DER[2]="172.20.28.55";
-	  	  	  DER[3]="172.20.28.56";
+	  DER[0]="172.24.9.240";
+	  	  	  DER[1]="172.24.9.241";
+	  	  	  DER[2]="172.24.9.242";
+	  	  	  DER[3]="172.2.9.254";
 	  	  	  string AggregatorIP[4];
-	  	  	  AggregatorIP[0]="172.20.28.57";
-	  	  	  AggregatorIP[1]="172.20.28.58";
-	  	  	  AggregatorIP[2]="172.20.28.59";
-	  	  	  AggregatorIP[3]="172.20.28.60";
+	  	  	  AggregatorIP[0]="172.24.9.244";
+	  	  	  AggregatorIP[1]="172.24.9.245";
+	  	  	  AggregatorIP[2]="172.24.9.246";
+	  	  	  AggregatorIP[3]="172.24.9.247";
 
 	  	  	  string intIP[2];
-	  	  	  intIP[0]="172.20.28.173";
-	  	  	  intIP[1] = "172.20.28.151";
+	  	  	  intIP[0]="172.24.2.205";
+	  	  	  intIP[1] = "172.24.2.199";
 	  		   string intMAC[2];
 	  	  	  intMAC[0]="00:e0:4c:67:77:d3";
 	  	  	  intMAC[1] ="00:e0:4c:67:77:d4" ;
-	  		  string gateway = "172.20.28.1";
+	  		  string gateway = "172.24.0.1";
 
 	  int subnet;
-	  subnet = 3;
+	  subnet = 2;
 	  //
 	  // Allow the user to override any of the defaults at run-time, via command-line
 	  // arguments
 	  //
 	  CommandLine cmd;
-	  std::string deviceName1 ("p1p1");
-	   std::string deviceName2 ("p3p1");
+	  std::string deviceName1 ("enp4s0");
+	   std::string deviceName2 ("enp5s0");
 	  
 	  std::string encapMode ("Dix");
 
@@ -989,7 +1215,7 @@ main (int argc, char *argv[])
 	  cmd.AddValue ("stopTime", "stop time (seconds)", stopTime);
 	  cmd.AddValue ("encapsulationMode", "encapsulation mode of emu device (\"Dix\" [default] or \"Llc\")", encapMode);
 	  cmd.AddValue ("DoSEnabled", "DoS enabled", dosEnabled);
-	  cmd.AddValue ("MiTmEnabled", "Man-in-the-middle enabled", manInTheMiddle);
+	  cmd.AddValue ("ArpSpoofEnabled", "Man-in-the-middle enabled", manInTheMiddle);
 	  cmd.AddValue ("InterSynTime", "Time between SYN pkts in Syn Flood", interSynTime);
 	  cmd.AddValue ("maxParallelSessions", "number of maximum parallel sessions", maxParallelSessions);
 	  cmd.AddValue("IPDER1C", "IP address of the DER1-client",DER[0]);
@@ -1002,7 +1228,10 @@ main (int argc, char *argv[])
 	  cmd.AddValue("IPAggreDER2S", "IP address of the Aggregator-DER2-server",AggregatorIP[3]);
 	  cmd.AddValue("Int1IP","IP address of NIC 1",intIP[0]);
 	  cmd.AddValue("Int2IP","IP address of NIC 2",intIP[1]);
+	  cmd.AddValue("Int1MAC","MAC address of NIC 1",intMAC[0]);
+	  	  cmd.AddValue("Int2MAC","MAC address of NIC 2",intMAC[1]);
 	  cmd.AddValue("Subnet","Sub net: 1) /8 2)/16 or 3)/24",subnet );
+	  cmd.AddValue("Gateway","IP address of the gateway",gateway);
 	  cmd.Parse (argc, argv);
 
 	  GlobalValue::Bind ("SimulatorImplementationType",
@@ -1474,15 +1703,17 @@ main (int argc, char *argv[])
               staticRouting_Aggregator->AddHostRouteTo (Ipv4Address ("10.1.7.5"), Ipv4Address ("10.1.8.1"), 2);
               staticRouting_Aggregator->AddHostRouteTo (Ipv4Address ("10.1.7.6"), Ipv4Address ("10.1.8.1"), 2);
               staticRouting_Aggregator->AddHostRouteTo (Ipv4Address (intIP[1].c_str()), Ipv4Address ("10.1.8.6"), 3);
-              staticRouting_Aggregator->SetDefaultRoute(Ipv4Address ("10.1.8.6"),3,0);
+
 
        Ptr<Ipv4> ipv4_egressNode = egressNode->GetObject<Ipv4>();
+
+
 
          Ptr<Ipv4StaticRouting> staticRouting_egressNode = ipv4RoutingHelper.GetStaticRouting (ipv4_egressNode);
           // The ifIndex for this outbound route is 1; the first p2p link added
 
-         staticRouting_egressNode->SetDefaultRoute(Ipv4Address ("172.24.0.1"),7,0);
-         staticRouting_egressNode->AddHostRouteTo (Ipv4Address ("10.1.6.18"),Ipv4Address ("10.1.8.5"),1 ,0);
+         staticRouting_egressNode->SetDefaultRoute(Ipv4Address (gateway.c_str()),7,0);
+
 
             Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
           //Print Routin Table
@@ -1599,6 +1830,8 @@ main (int argc, char *argv[])
 
 
        //Attacker Node to generate DoS traffic towards node0
+
+       dosEnabled =  false;
 if (dosEnabled){
 	NS_LOG_INFO ("Enable DoS");
     uint16_t port = 7001;   // Discard port (RFC 863)

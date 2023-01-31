@@ -1280,7 +1280,6 @@ if(ipProtocol == 17 && (udpHdr1.GetDestinationPort()==7001 || udpHdr1.GetSourceP
 
   else if (protocol==0x88BA)
     {
-  	  printf("SV packet\n");
     }
 
   else if (protocol==0x8100)
