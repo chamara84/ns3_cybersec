@@ -22,10 +22,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
-
-
-
 /*
  * Use two hostonly interfaces in the virtual box
  * Run the setupInterface script
@@ -83,14 +79,13 @@
 #include "ns3/tap-bridge-module.h"
 #include "ns3/tap-bridge-helper.h"
 
-
 using namespace ns3;
 using namespace std;
 
 NS_LOG_COMPONENT_DEFINE ("RTDS-Tap-Log");
 
-
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
 
 
@@ -116,10 +111,19 @@ int main (int argc, char *argv[])
   NodeContainer n0n1n2n3 = NodeContainer(n0,n1,n2,n3,n4);
 
   CsmaHelper csmaNetwork;
+  csmaNetwork.SetChannelAttribute ("DataRate", StringValue ("100Mbps"));
+  csmaNetwork.SetChannelAttribute ("Delay", TimeValue (NanoSeconds (6560))); // be very carefull about the delay that is applied to CSMA link, excessive delays will stack due to half duplex behaviour of the link
+  NetDeviceContainer dn0n1n2n3 = csmaNetwork.Install (n0n1n2n3); //Network access to the outside
 
-    csmaNetwork.SetChannelAttribute ("DataRate", StringValue ("100Mbps"));
-      csmaNetwork.SetChannelAttribute ("Delay", TimeValue (NanoSeconds (6560))); // be very carefull about the delay that is applied to CSMA link, excessive delays will stack due to half duplex behaviour of the link
+  // end of building the network
 
+  // installing IP stacks into the nodes
+  InternetStackHelper stack;
+  stack.Install (n0);
+  stack.Install (n1);
+  stack.Install (n2);
+  stack.Install (n3);
+  stack.Install (n4);
 
 
      NetDeviceContainer dn0n1n2n3 = csmaNetwork.Install (n0n1n2n3); //Network access to the outside
@@ -180,9 +184,11 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 // Connect the left side tap to the left side CSMA device in ghost node n0
 
   TapBridgeHelper tapBridge;
-tapBridge.SetAttribute ("Mode", StringValue ("UseBridge"));
-tapBridge.SetAttribute ("DeviceName", StringValue ("tap00"));
-tapBridge.Install (n0, dn0n1n2n3.Get (0));
+  tapBridge.SetAttribute ("Mode", StringValue ("UseBridge"));
+  tapBridge.SetAttribute ("DeviceName", StringValue ("tap00"));
+  tapBridge.Install (n0, dn0n1n2n3.Get (0));
+  tapBridge.SetAttribute ("DeviceName", StringValue ("tap01"));
+  tapBridge.Install (n4, dn0n1n2n3.Get (4));
 
 //
 // Connect the right side tap to the right side CSMA device in ghost node n4
@@ -193,6 +199,10 @@ tapBridge.SetAttribute ("DeviceName", StringValue ("tap01"));
 tapBridge.Install (n4, dn0n1n2n3.Get (4));
 
 
+  std::pair<Ptr<Ipv4>, uint32_t> returnValue = ipn0n1n2n3.Get (attackerId);
+  Ptr<Ipv4> ipv4Val = returnValue.first;
+  uint32_t index = returnValue.second;
+  Ptr<Ipv4Interface> iface = ipv4Val->GetObject<Ipv4L3Protocol> ()->GetInterface (index);
 
           //setup application
 
@@ -203,6 +213,7 @@ tapBridge.Install (n4, dn0n1n2n3.Get (4));
 
                                 Address victimAddr;
 
+  csmaNetwork.EnablePcapAll ("pmuconnectiontestNet", false);
 
 
                                 std::pair<Ptr<Ipv4>, uint32_t> returnValue = ipn0n1n2n3.Get (attackerId);
@@ -256,7 +267,3 @@ csmaNetwork.EnablePcapAll ("pmuconnectiontestNet", false);
   Simulator::Run ();
   Simulator::Destroy ();
 }
-
-
-
-
