@@ -493,10 +493,10 @@ TapBridge::CreateTap (void)
       //
       // Execute the socket creation process image.
 
-      NS_LOG_DEBUG (TAP_CREATOR);
+   //   NS_LOG_DEBUG (TAP_CREATOR);
       //
-      status = ::execlp (TAP_CREATOR, 
-                         TAP_CREATOR,                       // argv[0] (filename)
+      status = ::execlp ("/home/chamara/repo/ns3_cybersec/ns-allinone-3.29/ns-3.29/build/src/tap-bridge/ns3.29-tap-creator-debug",
+              "/home/chamara/repo/ns3_cybersec/ns-allinone-3.29/ns-3.29/build/src/tap-bridge/ns3.29-tap-creator-debug",                           // argv[0] (filename)
                          ossDeviceName.str ().c_str (),       // argv[1] (-d<device name>)
                          ossGateway.str ().c_str (),          // argv[2] (-g<gateway>)
                          ossIp.str ().c_str (),               // argv[3] (-i<IP address>)

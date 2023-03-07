@@ -213,7 +213,7 @@ int AttackApp::readConfigFile( configuration * config)
 	    			parameter++;
 	    			        break;
 	    			case 4:
-	    				if((config->dnp3.values_to_alter[indexNum].obj_group)==1 || (config->dnp3.values_to_alter[indexNum]).obj_group==10 || (config->dnp3.values_to_alter[indexNum]).obj_group==12)
+	    				if((config->dnp3.values_to_alter[indexNum].obj_group)==1 || (config->dnp3.values_to_alter[indexNum]).obj_group==10 || (config->dnp3.values_to_alter[indexNum]).obj_group==12 || ((config->dnp3.values_to_alter[indexNum]).obj_group>12 && (config->dnp3.values_to_alter[indexNum]).obj_group<40 && (config->dnp3.values_to_alter[indexNum]).obj_var<5))
 	    				{
 	    					(config->dnp3.values_to_alter[indexNum]).integer_value =stol(s,nullptr,10);
 	    					std::cout<<"Grp:"<<(int)(config->dnp3.values_to_alter[indexNum]).obj_group << "var:"<<(int)(config->dnp3.values_to_alter[indexNum]).obj_var <<"Val:"<<(config->dnp3.values_to_alter[indexNum]).integer_value <<std::endl;
@@ -822,12 +822,12 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 			if (tcpHdr1.GetDestinationPort()==20000)
 				{
 				session->direction = DNP3_CLIENT;
-				printf("In Client direction\n");
+				printf("From Client direction\n");
 				}
 			else if (tcpHdr1.GetSourcePort()==20000)
 			{
 			session->direction = DNP3_SERVER;
-		//	printf("In Server direction\n");
+			printf("From Server direction\n");
 			}
 
 			DNP3FullReassembly(&config.dnp3, session, packetCopy, (uint8_t *)buffer,dataSize);
@@ -1182,7 +1182,7 @@ if(ipProtocol == 17 && (udpHdr1.GetDestinationPort()==7001 || udpHdr1.GetSourceP
 	int i=0;
 	if(Simulator::Now ().GetSeconds ()>0.0)
 	{
-		while(it!=parseString.end() && DERIndex != 1)
+		while(it!=parseString.end() && DERIndex != 4)
 		{
 			//printf("dataType = %s\n", string[i]);
 			if(it->compare("float")==0)
@@ -1275,16 +1275,17 @@ if(ipProtocol == 17 && (udpHdr1.GetDestinationPort()==7001 || udpHdr1.GetSourceP
 	  	//printf("DNP3 \n"); // @suppress("Function cannot be resolved")
 	  	packetCopy->CopyData (buffer, dataSize);
 
-	  	printf("Goose packet\n");
+	  //	printf("Goose packet\n");
   }
 
   else if (protocol==0x88BA)
     {
+	//  printf("SV packet\n");
     }
 
   else if (protocol==0x8100)
       {
-    	  printf("VLAN packet\n");
+    //	  printf("VLAN packet\n");
       }
 
 

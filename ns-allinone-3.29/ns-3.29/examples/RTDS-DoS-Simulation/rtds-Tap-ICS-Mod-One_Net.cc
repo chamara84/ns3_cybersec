@@ -113,17 +113,10 @@ main (int argc, char *argv[])
   CsmaHelper csmaNetwork;
   csmaNetwork.SetChannelAttribute ("DataRate", StringValue ("100Mbps"));
   csmaNetwork.SetChannelAttribute ("Delay", TimeValue (NanoSeconds (6560))); // be very carefull about the delay that is applied to CSMA link, excessive delays will stack due to half duplex behaviour of the link
-  NetDeviceContainer dn0n1n2n3 = csmaNetwork.Install (n0n1n2n3); //Network access to the outside
+
 
   // end of building the network
 
-  // installing IP stacks into the nodes
-  InternetStackHelper stack;
-  stack.Install (n0);
-  stack.Install (n1);
-  stack.Install (n2);
-  stack.Install (n3);
-  stack.Install (n4);
 
 
      NetDeviceContainer dn0n1n2n3 = csmaNetwork.Install (n0n1n2n3); //Network access to the outside
@@ -151,7 +144,7 @@ Ipv4AddressHelper ipv4;
 
 
 
-ipv4.SetBase ("172.24.0.0", "255.255.0.0","0.0.9.241"); //this is the outer network
+ipv4.SetBase ("172.24.0.0", "255.255.0.0","0.0.51.160"); //this is the outer network
 Ipv4InterfaceContainer ipn0n1n2n3 = ipv4.Assign (dn0n1n2n3);
 
 
@@ -195,14 +188,10 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 //
 
 
-tapBridge.SetAttribute ("DeviceName", StringValue ("tap01"));
-tapBridge.Install (n4, dn0n1n2n3.Get (4));
 
 
-  std::pair<Ptr<Ipv4>, uint32_t> returnValue = ipn0n1n2n3.Get (attackerId);
-  Ptr<Ipv4> ipv4Val = returnValue.first;
-  uint32_t index = returnValue.second;
-  Ptr<Ipv4Interface> iface = ipv4Val->GetObject<Ipv4L3Protocol> ()->GetInterface (index);
+
+
 
           //setup application
 
@@ -225,9 +214,9 @@ tapBridge.Install (n4, dn0n1n2n3.Get (4));
 
 
                                 Ptr<AttackApp> attacker = CreateObject<AttackApp> ();
-                                std::vector<Ipv4Address> spoofedIPs{Ipv4Address ("172.24.9.251")};
-                                                                std::vector<Ipv4Address>victimIPs{Ipv4Address ("172.24.9.55")};
-                                                                std::vector<Address>victimMACs{ns3::Mac48Address("00:0A:35:00:10:09")};
+                                std::vector<Ipv4Address> spoofedIPs{Ipv4Address ("172.24.50.170")};
+                                                                std::vector<Ipv4Address>victimIPs{Ipv4Address ("172.24.50.91")};
+                                                                std::vector<Address>victimMACs{ns3::Mac48Address("00:50:C2:4F:9B:5D")};
 
                                attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, spoofedIPs, victimIPs, victimMACs);
                                 n0n1n2n3.Get (attackerId)->AddApplication (attacker);
@@ -245,9 +234,9 @@ tapBridge.Install (n4, dn0n1n2n3.Get (4));
 
 
                                                                 Ptr<AttackApp> attacker2 = CreateObject<AttackApp> ();
-                                                                std::vector<Ipv4Address> spoofedIPs1{Ipv4Address ("172.24.9.55")};
-                                                                std::vector<Ipv4Address>victimIPs1{Ipv4Address ("172.24.9.251")};
-                                                                std::vector<Address>victimMACs1{ns3::Mac48Address("10:65:30:05:d8:ff")};
+                                                                std::vector<Ipv4Address> spoofedIPs1{Ipv4Address ("172.24.50.91")};
+                                                                std::vector<Ipv4Address>victimIPs1{Ipv4Address ("172.24.50.170")};
+                                                                std::vector<Address>victimMACs1{ns3::Mac48Address("10:65:30:05:D8:FF")};
 
                                                                attacker2->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface,  spoofedIPs1, victimIPs1,victimMACs1);
                                                                 n0n1n2n3.Get (attackerId)->AddApplication (attacker2);

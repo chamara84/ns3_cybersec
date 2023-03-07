@@ -1363,12 +1363,12 @@ main (int argc, char *argv[])
                    //contruct attacker app
                    Ptr<AttackApp> attacker = CreateObject<AttackApp> ();
                    std::vector<Ipv4Address> spoofedIPs{csmaInterfaces.GetAddress(csmaSwitch)};
-                   std::vector<Ipv4Address>victimIPs{csmaInterfaces.GetAddress(victimDer),csmaInterfaces.GetAddress(3),csmaInterfaces.GetAddress(4)};
-                   std::vector<Address>victimMACs{victimAddr2,victimAddr3,victimAddr4};
+                   std::vector<Ipv4Address>victimIPs{csmaInterfaces.GetAddress(victimDer)};
+                   std::vector<Address>victimMACs{victimAddr2};
                    attacker->Setup(DERsn0Attacker.Get(attackerId), csmaDERsn0.Get(attackerId), iface, spoofedIPs, victimIPs, victimMACs);
                    DERsn0Attacker.Get (attackerId)->AddApplication (attacker);
                    attacker->SetStartTime (Seconds (1.0));
-                   attacker->SetStopTime (Seconds (10.0));
+                   attacker->SetStopTime (Seconds (100.0));
                     }
 
 

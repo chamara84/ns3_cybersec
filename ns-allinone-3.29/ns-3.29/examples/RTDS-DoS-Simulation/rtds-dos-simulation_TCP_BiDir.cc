@@ -197,11 +197,24 @@ MyApp::Setup (Ptr<Node> node,Ipv4Address raddress ,Ipv4Address address, uint16_t
     rand->SetAttribute( "Min", DoubleValue( 1 ) );
     rand->SetAttribute( "Max", DoubleValue( 65525 ) );
     Ptr<SocketFactory> rxSocketFactory = this->node->GetObject<TcpSocketFactory> ();
-    Send_socket = rxSocketFactory->CreateSocket ();
+
+    Send_socket = rxSocketFactory->CreateSocket();
+
+    Ptr<TcpOption> options = Send_socket->GetObject<TcpOption>();
+        	options->CreateOption(2);
+
+        	 Config::SetDefault("ns3::TcpSocket::SegmentSize", UintegerValue(1460));
+
+
+    Send_socket->SetAttribute("SegmentSize", UintegerValue (1460));
+    //	m_rsocket->SetAttribute("MaxWindowSize", UintegerValue (60000));
+    //
+    Send_socket->SetAttribute("WindowScaling", BooleanValue (false));
+
+    //	m_rsocket->SetAttribute("RcvBufSize", ns3::UintegerValue(60000));
+    //	m_rsocket->SetAttribute("SndBufSize", ns3::UintegerValue(60000));
+    //	m_rsocket->SetAttribute("TcpNoDelay", ns3::BooleanValue (true));
     Send_socket->Bind();
-
-
-
     if(type==EGRESS_NODE)
     {
     Send_socketDER1 = rxSocketFactory->CreateSocket ();
@@ -241,6 +254,8 @@ MyApp::Setup (Ptr<Node> node,Ipv4Address raddress ,Ipv4Address address, uint16_t
     else if(type==INGRESS_NODE)
     {
     	Send_socketIngressDER1 = rxSocketFactory->CreateSocket ();
+    	Ptr<TcpOption> options = Send_socketIngressDER1->GetObject<TcpOption>();
+    	options->CreateOption(2);
     	Send_socketIngressDER1->Bind(InetSocketAddress (m_raddress, 20004));
 
     	Send_socketIngressDER2 = rxSocketFactory->CreateSocket ();
@@ -346,7 +361,10 @@ void MyApp::StartApplication (void)
 
 
 	// Create the TCP sockets
+
 	Ptr<SocketFactory> rxSocketFactory = this->m_node->GetObject<TcpSocketFactory> ();
+
+
 	m_rsocket = rxSocketFactory->CreateSocket ();
 	tcpL4 = this->m_node->GetObject<TcpL4Protocol>();
 	Ptr<Ipv4> ipV4Info = this->m_node->GetObject<Ipv4>();
@@ -354,11 +372,18 @@ void MyApp::StartApplication (void)
 	std::cout<<"NetDev:"<<interfaceIndex;
 
 
-	      //rxSocketn0->SetAttribute("SegmentSize", UintegerValue (1460));
-	     // rxSocketn0->SetAttribute("MaxWindowSize", UintegerValue (60000));
-	     //rxSocketn0->SetAttribute("WindowScaling", BooleanValue (true));
-	     //rxSocketn0->SetAttribute("RcvBufSize", ns3::UintegerValue(60000));
+//	Config::SetDefault
+//		("ns3::TcpSocket::MaxWindowSize", UintegerValue (60000));
+//	Config::SetDefault
+//			("ns3::TcpSocket::WindowScaling", BooleanValue (true));
+	//m_rsocket->SetAttribute("SegmentSize", UintegerValue (1460));
+	//m_rsocket->SetAttribute("MaxWindowSize", UintegerValue (60000));
+	m_rsocket->SetAttribute("WindowScaling", BooleanValue (true));
+	//m_rsocket->SetAttribute("RcvBufSize", ns3::UintegerValue(60000));
+	//m_rsocket->SetAttribute("SndBufSize", ns3::UintegerValue(60000));
+	//m_rsocket->SetAttribute("TcpNoDelay", ns3::BooleanValue (true));
 	m_rsocket->Bind (InetSocketAddress (m_raddress, m_port));
+
 	//m_rsocket->BindToNetDevice(this->node->GetDevice(interfaceIndex));
 	m_rsocket->Listen();
 	m_rsocket->SetAcceptCallback (MakeCallback(&MyApp::HandleAcceptRequest,this),MakeCallback (&MyApp::HandleAccept,this));
@@ -1167,6 +1192,14 @@ main (int argc, char *argv[])
 	Time::SetResolution (Time::NS);
 	PacketMetadata::Enable();
 	Packet::EnablePrinting();
+	//std::string tcpTypeId = "ns3::TcpLinuxReno";
+	//Config::SetDefault ("ns3::TcpSocket::SegmentSize", UintegerValue (1460));
+//	TypeId tcpTid;
+//	        NS_ABORT_MSG_UNLESS(TypeId::LookupByNameFailSafe(tcpTypeId, &tcpTid),
+//	                            "TypeId " << tcpTypeId << " not found");
+//	        Config::SetDefault("ns3::TcpL4Protocol::SocketType",
+//	                           TypeIdValue(TypeId::LookupByName(tcpTypeId)));
+
 //	FlowMonitorHelper flowmon;
 //	  Ptr<FlowMonitor> monitor;
 //	  monitor = flowmon.InstallAll();
@@ -1279,6 +1312,7 @@ main (int argc, char *argv[])
 
 
       InternetStackHelper stack;
+
       stack.Install (n);
       stack.Install (DERs);
       stack.Install (Aggregator);
@@ -1759,7 +1793,7 @@ main (int argc, char *argv[])
        //ingress interface
 
        Ptr<MyApp> app = CreateObject<MyApp> ();
-       app->Setup (ingressNode,Ipv4Address (intIP[0].c_str()),Ipv4Address ("10.1.8.5"), 7001,7001,INGRESS_NODE,maxParallelSessions,DER,AggregatorIP,intIP);
+       app->Setup (ingressNode,Ipv4Address (intIP[0].c_str()),Ipv4Address ("10.1.8.5"), 10000,10000,INGRESS_NODE,maxParallelSessions,DER,AggregatorIP,intIP);
        ingressNode->AddApplication (app);
        app->SetStartTime (Seconds (1.));
        app->SetStopTime (Seconds (stopTime));

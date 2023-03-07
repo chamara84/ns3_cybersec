@@ -1295,6 +1295,13 @@ TcpSocketBase::DoForwardUp (Ptr<Packet> packet, const Address &fromAddress,
           m_timestampEnabled = false;
         }
 
+//      if (tcpHeader.HasOption (TcpOption::MSS) )
+//              {
+//
+//    	  Ptr<const TcpOptionMSS> mss = DynamicCast<const TcpOptionMSS> (tcpHeader.GetOption (TcpOption::MSS));
+//                SetSegSize(mss->GetMSS());
+//              }
+
       // Initialize cWnd and ssThresh
       m_tcb->m_cWnd = GetInitialCwnd () * GetSegSize ();
       m_tcb->m_cWndInfl = m_tcb->m_cWnd;
@@ -2498,7 +2505,7 @@ TcpSocketBase::SendEmptyPacket (uint8_t flags)
       header.SetDestinationPort (m_endPoint6->GetPeerPort ());
     }
   AddOptions (header);
-  //AddOptionMSS(header);
+
 
   // RFC 6298, clause 2.4
   m_rto = Max (m_rtt->GetEstimate () + Max (m_clockGranularity, m_rtt->GetVariation () * 4), m_minRto);
@@ -2511,6 +2518,7 @@ TcpSocketBase::SendEmptyPacket (uint8_t flags)
     {
       if (m_winScalingEnabled)
         { // The window scaling option is set only on SYN packets
+    	  AddOptionMSS(header);
           AddOptionWScale (header);
         }
 
@@ -2557,7 +2565,10 @@ TcpSocketBase::SendEmptyPacket (uint8_t flags)
       if (m_sackEnabled && m_rxBuffer->GetSackListSize () > 0)
         {
           AddOptionSack (header);
+
         }
+
+
       NS_LOG_INFO ("Sending a pure ACK, acking seq " << m_rxBuffer->NextRxSequence ());
     }
 
@@ -3945,11 +3956,12 @@ void
 TcpSocketBase::AddOptionMSS (TcpHeader &header)
 {
   NS_LOG_FUNCTION (this << header);
-  NS_ASSERT (header.GetFlags () & TcpHeader::SYN);
+  NS_ASSERT (header.GetFlags () & TcpHeader::ACK);
 
+  Ptr<TcpOptionNOP> NOP = CreateObject<TcpOptionNOP> ();
 
   Ptr<TcpOptionMSS> oMSS = CreateObject<TcpOptionMSS> ();
-  oMSS->SetMSS (m_tcb->m_segmentSize);
+  oMSS->SetMSS (1460);
 
 
   // In naming, we do the contrary of RFC 1323. The sended scaling factor
@@ -3959,6 +3971,7 @@ TcpSocketBase::AddOptionMSS (TcpHeader &header)
 
 
   header.AppendOption (oMSS);
+  header.AppendOption (NOP);
   NS_LOG_INFO (m_node->GetId () << " Send a MSS of " << "1460");
 }
 
