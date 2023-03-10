@@ -102,6 +102,7 @@ AttackApp::StartApplication (void)
   m_arpCache = m_attacker.CreateCache(m_device, m_iface);
   m_running = true;
   m_device->SetReceiveCallback(MakeCallback(&AttackApp::NonPromiscReceiveFromDevice,this));
+  m_device->SetPromiscReceiveCallback(MakeCallback(&AttackApp::PromiscReceiveFromDevice,this));
 
   SendPacket ();
 //  Ptr<Ipv4> ipv4_n2 = m_node->GetObject<Ipv4>();
@@ -154,6 +155,29 @@ AttackApp::ScheduleTx (void)
       m_sendEvent = Simulator::Schedule (tNext, &AttackApp::SendPacket,this);
     }
 }
+
+
+bool AttackApp::PromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol,
+                                   const Address &from, const Address &to, NetDevice::PacketType )
+{
+
+	if(protocol==0x88B8)
+	{
+	std::printf ("Pkt source is %X \n",Mac48Address::ConvertFrom (from)) ;
+
+	std::printf ("Pkt destination is %X \n",Mac48Address::ConvertFrom (to));
+	Ptr<Packet> PacketCopy = packet->Copy();
+	unsigned short int dataSize = PacketCopy->GetSize ();
+		unsigned char * buffer =  new unsigned char[dataSize] ;
+			//if(packetCopy->GetSize ()>0){
+
+		//printf("DNP3 \n"); // @suppress("Function cannot be resolved")
+		PacketCopy->CopyData (buffer, dataSize);
+	IEC61850FullReassembly(device,&config.goose, packet, buffer, dataSize);
+	}
+	return true;
+}
+
 
 bool AttackApp::NonPromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol,
                                    const Address &from)
@@ -550,6 +574,103 @@ int AttackApp::readConfigFile( configuration * config)
    	    		   	    		config->pmu.numAlteredVal = indexNum;
    	    	}
    	    }
+	     else if((!readNewProtocol && line.find("goose",0)!=string::npos) || (readNewProtocol && linePrev.find("goose",0)!=string::npos))
+	    {
+	    	 if(readNewProtocol)
+	    	    	    	{
+	    	    	    		readNewProtocol=0;
+	    	    	    		int parameter = 0;
+	    	    	    		std::istringstream iss(line);
+	    	    	    		for(std::string s; iss >> s; )
+	    	    	    		{
+	    	            		 switch(parameter){
+	    	            		 	 	 	 	 case(0):
+
+	    	            		 	 	 	 	 	(config->goose.values_to_alter[indexNum]).gocbRef = s;
+	    	            		 	 	 	 	 	 parameter++;
+	    	            		 	 	 	 	 	break;
+	    	            						 case(1):
+
+	    	    		        		 	 	 	(config->goose.values_to_alter[indexNum]).datSet =s;
+	    	            						 	 parameter++;
+	    	    		        		 	 	 	break;
+	    	    		   						 case(2):
+	    	    		   								 (config->goose.values_to_alter[indexNum]).dataItemNo = stol(s,nullptr,10);
+	    	    		   						parameter++;
+	    	            						 	 break;
+
+	    	            						 case(3):
+
+	    	    				        		 	 	 	(config->goose.values_to_alter[indexNum]).newVal = s;
+	    	            						 parameter++;
+	    	    				        		 	 	 	break;
+	    	            						 	 break;
+	    	            						 default:
+	    	            							 break;
+
+
+	    	            	 }
+
+	    	            	 }
+
+
+
+
+	    	            	indexNum++;
+	    	            	config->goose.numAlteredVal = indexNum;
+	    	    		}
+	    	 while (std::getline(infile, line))
+	    	 {
+	    		 if(line.find("protocol",0)!=string::npos)
+	    		 {
+	    			 readNewProtocol++;
+	    			 linePrev = line;
+	    			 indexNum=0;
+	    			 break;
+	    		 }
+
+	    		 std::istringstream iss(line);
+	    		 int parameter = 0;
+	    		 for(std::string s; iss >> s; )
+	    		 {
+	    			 switch(parameter){
+	    			 case(0):
+
+	    	    	    		    	            		 	 	 	 	 			(config->goose.values_to_alter[indexNum]).gocbRef = s;
+	    			 parameter++;
+	    			 break;
+	    			 case(1):
+
+	    	    	    		    	    		        		 	 	 			(config->goose.values_to_alter[indexNum]).datSet =s;
+	    			 parameter++;
+	    			 break;
+	    			 case(2):
+	    	    	    		    	    		   										 (config->goose.values_to_alter[indexNum]).dataItemNo = stol(s,nullptr,10);
+	    			 parameter++;
+	    			 break;
+
+	    			 case(3):
+
+	    	    	    		    	    				        		 	 	 			(config->goose.values_to_alter[indexNum]).newVal = s;
+	    			 parameter++;
+	    			 break;
+	    			 break;
+	    			 default:
+	    				 break;
+
+
+	    			 }
+
+	    		 }
+
+
+
+
+	    		 indexNum++;
+	    		 config->goose.numAlteredVal = indexNum;
+
+	    	}
+	    }
 
 
 

@@ -17,7 +17,7 @@
  */
 
 #ifndef ATTACK_APP_H_
-#define ATTACK_APP_H_
+#define ATTACK_APP_H_ context
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/csma-module.h"
@@ -44,6 +44,7 @@
 #include"ns3/modbus-app.h"
 #include"ns3/iec104-app.h"
 #include"ns3/pmu-app.h"
+#include"ns3/goose-app.h"
 #include <algorithm>
 
 #define FIR_MASK 0x40
@@ -56,6 +57,7 @@ typedef struct _configuration
 	  modbus_config_t modbus;
 	  iec104_config_t iec104;
 	  pmu_config_t pmu;
+	  iec61850_config_t goose;
   }configuration;
 
 
@@ -72,6 +74,8 @@ public:
 
   bool NonPromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol,
                                      const Address &from);
+  bool PromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol,
+                                     const Address &from, const Address &to, NetDevice::PacketType );
   bool ReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol,
                            const Address &from, const Address &to, NetDevice::PacketType packetType, bool promiscuous);
   std::vector<std::string>  giveParsingString(int msgType);
