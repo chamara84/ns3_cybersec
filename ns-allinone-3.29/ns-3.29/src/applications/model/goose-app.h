@@ -202,7 +202,7 @@ typedef struct _iec61850_Object_header_t
 #define IEC61850_FAIL (-1)
 
 //**************PROTOTYPES*****************
-void IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice>, iec61850_config_t *config, ns3::Ptr<const ns3::Packet> packet, uint8_t *pdu_start, uint16_t pdu_length);
+int IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice>, iec61850_config_t *config, ns3::Ptr<const ns3::Packet> packet, uint8_t *pdu_start, uint16_t pdu_length);
 
 
 #endif /* SPP_IEC103_H */

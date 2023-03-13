@@ -172,10 +172,10 @@ static void ParseIEC61850Args(IEC61850Config *config, char *args)
 
 
 
-static int modifyData(uint8_t * pdu_start, uint16_t pdu_length,std::vector<iec61850_Object_header_t*> dataSet, iec61850_asdu_header_t* pdu)
+static int modifyData(uint8_t * pdu_start, uint16_t pdu_length,std::vector<iec61850_Object_header_t*> dataSet, iec61850_asdu_header_t* pdu,iec61850_config_t *config)
 {
 int modified = 0;
-IEC61850Config* aconfig=NULL;
+IEC61850Config* aconfig=config;
 iec61850_Object_header_t* dataEnty=NULL;
 
 
@@ -445,7 +445,7 @@ BerDecoder_decodeBoolean(uint8_t* buffer, int bufPos) {
 
 
 
-void IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice> device,iec61850_config_t *config, ns3::Ptr<const ns3::Packet> packet, uint8_t *pdu_start, uint16_t pdu_length)
+int IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice> device,iec61850_config_t *config, ns3::Ptr<const ns3::Packet> packet, uint8_t *pdu_start, uint16_t pdu_length)
 {
 
 
@@ -474,11 +474,11 @@ void IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice> device,iec61850_config_t *c
 
 
 	if (pdu_length < (sizeof(iec61850_header_t) ))
-		return ;
+		return -1;
 
 	if ( pdu_length > IEC60870_5_61850_MAX_ASDU_LENGTH + IEC60870_5_61850_APCI_LENGTH )
 
-		return ;
+		return -1;
 	//uint8_t *lengthData = malloc(1);
 	//memset(lengthData,100,1);
 	gooseHeader.appID = pdu_start[offset++]*0x100;
@@ -501,7 +501,7 @@ void IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice> device,iec61850_config_t *c
 		 offset = BerDecoder_decodeLength(pdu_start, &gooseLength, offset, gooseHeader.len);
 		         if (offset < 0) {
 
-		             return ;
+		             return -1;
 		         }
 
 		         int gooseEnd = offset + gooseLength;
@@ -513,7 +513,7 @@ void IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice> device,iec61850_config_t *c
 		             offset = BerDecoder_decodeLength(pdu_start, &elementLength, offset, gooseHeader.len);
 		             if (offset < 0) {
 
-		                 return;
+		                 return -1;
 		             }
 
 
@@ -545,7 +545,7 @@ void IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice> device,iec61850_config_t *c
 
 		            	 for(int index = 0 ; index<config->numAlteredVal;index++)
 		            	 {
-		            		 if(pdu->gocbRef.compare(config->values_to_alter[index].gocbRef) && pdu->datSet.compare(config->values_to_alter[index].datSet))
+		            		 if(pdu->gocbRef.compare(config->values_to_alter[index].gocbRef)==0 && pdu->datSet.compare(config->values_to_alter[index].datSet)==0)
 		            		 {
 
 		            			 modify = 1;
@@ -564,7 +564,7 @@ void IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice> device,iec61850_config_t *c
 
 		            		 if(pdu)
 		            			 delete pdu;
-		            		 return;
+		            		 return -1;
 		            	 }
 
 		             }
@@ -615,7 +615,7 @@ void IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice> device,iec61850_config_t *c
 
 
 		            		 if(tempFrameID && tempFrameID->stNum==frameID->stNum && tempFrameID->sqNum==frameID->sqNum)
-		            			 return;
+		            			 return -1;
 
 		            		 if(!dosAttack){
 		            		 if(!tempFrameID)          		 // we need to send a fake new status
@@ -822,12 +822,12 @@ void IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice> device,iec61850_config_t *c
 
 		            	 		            	//	 g_hash_table_insert (gooseRefTable,temp1,frameID); why put old packet information in the hash
 		            	 		            	printf("Not Sent KEY: |%s|.SQNum %d StNum %d \n", pdu->gocbRef.c_str(),frameID->sqNum,frameID->stNum);
-		            	 		            	 return;
+		            	 		            	 return -1;
 		            	 		            	 }
 		            	 else
 		            	 {
 		            		 printf("No Match KEY: |%s|.SQNum %d:%d StNum %d:%d \n", pdu->gocbRef.c_str(),frameID->sqNum,tempFrameID->sqNum,frameID->stNum,tempFrameID->stNum);
-		            		 return;
+		            		 return -1;
 		            	 }
 		             }
 		                 break;
@@ -907,7 +907,7 @@ void IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice> device,iec61850_config_t *c
 
  if(modify==1)
  {
-		if(modifyData(pdu_start, pdu_length,dataSet,pdu))
+		if(modifyData(pdu_start, pdu_length,dataSet,pdu,config))
 		{
 			//packet->packet_flags|=PKT_MODIFIED;
 
@@ -965,7 +965,9 @@ void IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice> device,iec61850_config_t *c
  if(pdu)
  delete pdu;
  dataSet.clear();
-	return;
+
+
+	return modify;
 }
 
 

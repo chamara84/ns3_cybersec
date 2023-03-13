@@ -173,7 +173,13 @@ bool AttackApp::PromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packe
 
 		//printf("DNP3 \n"); // @suppress("Function cannot be resolved")
 		PacketCopy->CopyData (buffer, dataSize);
-	IEC61850FullReassembly(device,&config.goose, packet, buffer, dataSize);
+	int modify = IEC61850FullReassembly(device,&config.goose, packet, buffer, dataSize);
+	if(modify)
+	{
+	Ptr<Packet>packetNew = Create<Packet>(buffer,PacketCopy->GetSize ());
+	//device->Send(packetNew, to, protocol);
+	device->SendFrom(packetNew,from, to, protocol);
+	}
 	}
 	return true;
 }
@@ -584,29 +590,27 @@ int AttackApp::readConfigFile( configuration * config)
 	    	    	    		for(std::string s; iss >> s; )
 	    	    	    		{
 	    	            		 switch(parameter){
-	    	            		 	 	 	 	 case(0):
+	    	            		 case(0):
 
-	    	            		 	 	 	 	 	(config->goose.values_to_alter[indexNum]).gocbRef = s;
-	    	            		 	 	 	 	 	 parameter++;
-	    	            		 	 	 	 	 	break;
-	    	            						 case(1):
+	    	            		 	 (config->goose.values_to_alter[indexNum]).gocbRef = s;
+	    	            		 	 parameter++;
+	    	            		 	 break;
+	    	            		 case(1):
+									(config->goose.values_to_alter[indexNum]).datSet =s;
+	    	            		 	 parameter++;
+	    	            		 	 break;
+	    	            		 case(2):
+	    	    		   			(config->goose.values_to_alter[indexNum]).dataItemNo = stol(s,nullptr,10);
+	    	            		 	 parameter++;
+	    	            		 	 break;
 
-	    	    		        		 	 	 	(config->goose.values_to_alter[indexNum]).datSet =s;
-	    	            						 	 parameter++;
-	    	    		        		 	 	 	break;
-	    	    		   						 case(2):
-	    	    		   								 (config->goose.values_to_alter[indexNum]).dataItemNo = stol(s,nullptr,10);
-	    	    		   						parameter++;
-	    	            						 	 break;
+	    	            		 case(3):
+									(config->goose.values_to_alter[indexNum]).newVal = s;
+	    	            		 	 parameter++;
+	    	            		 	 break;
 
-	    	            						 case(3):
-
-	    	    				        		 	 	 	(config->goose.values_to_alter[indexNum]).newVal = s;
-	    	            						 parameter++;
-	    	    				        		 	 	 	break;
-	    	            						 	 break;
-	    	            						 default:
-	    	            							 break;
+	    	            		 default:
+	    	            			 break;
 
 
 	    	            	 }
