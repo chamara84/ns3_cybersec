@@ -74,9 +74,6 @@ PreprocStats arpPerfStats;
 
 
 /*  P R O T O T Y P E S  ********************************************/
-static void IEC61850Init(struct _SnortConfig *, char *args);
-
-static void ParseIEC61850Args(IEC61850Config *, char *);
 
 
 
@@ -86,93 +83,7 @@ static void ParseIEC61850Args(IEC61850Config *, char *);
 
 
 
-
-
-
-
-
-
-/**
- * Parse arguments passed to the goose keyword.
- *
- * @param args preprocessor argument string
- *
- * @return void function
- */
-static void ParseIEC61850Args(IEC61850Config *config, char *args)
-{
-    if ((config == NULL) || (args == NULL))
-        return;
-
-    char *saveptr;
-        char *token;
-        int index = 0;
-    token = strtok_r(args, " ,", &saveptr);
-        while (token != NULL)
-        {
-
-        	if (strcmp(token, "interface") == 0)  // add the interface name to the config
-        	{
-        		token = strtok_r(NULL, " ,", &saveptr);
-        		config->interface = std::string(token);
-        	}
-        	else if (strcmp(token, "change") == 0)
-    		{
-            	int count =0;
-
-            	//add the the objects to be modified
-            	while(count<4 ) {
-            	token = strtok_r(NULL, " ,", &saveptr);
-
-            	 if (token == NULL)
-            	             {
-            		 printf("Missing argument for "
-            	                     "IEC61850 preprocessor 'change' option.\n");
-
-            	             }
-            	 else{
-            		 switch(count){
-            		 	 	 	 	 case(0):
-
-            		 	 	 	 	 	(config->values_to_alter[index]).gocbRef = std::string(token+1);
-            		 	 	 	 	 	(config->values_to_alter[index]).gocbRef.substr(0,(config->values_to_alter[index]).gocbRef.size()-1 );
-            		 	 	 	 	 	break;
-            						 case(1):
-
-    		        		 	 	 	(config->values_to_alter[index]).datSet = std::string(token+1);
-    		        		 	 	  	(config->values_to_alter[index]).datSet.substr(0,(config->values_to_alter[index]).datSet.size()-1 );
-    		        		 	 	 	break;
-    		   						 case(2):
-    		   								 (config->values_to_alter[index]).dataItemNo = strtol(token,NULL,10);
-            						 	 break;
-
-            						 case(3):
-
-    				        		 	 	 	(config->values_to_alter[index]).newVal = std::string(token);
-    				        		 	 	 	break;
-            						 	 break;
-            						 default:
-            							 break;
-
-
-            	 }
-            		 count++;
-            	 }
-            	}
-
-            	index++;
-            	config->numAlteredVal = index;
-    		}
-
-    token = strtok_r(NULL, " ,", &saveptr);
-}
-}
-
-
-
-
-
-static int modifyData(uint8_t * pdu_start, uint16_t pdu_length,std::vector<iec61850_Object_header_t*> dataSet, iec61850_asdu_header_t* pdu,iec61850_config_t *config)
+int modifyData(uint8_t * pdu_start, uint16_t pdu_length,std::vector<iec61850_Object_header_t*> dataSet, iec61850_asdu_header_t* pdu,iec61850_config_t *config)
 {
 int modified = 0;
 IEC61850Config* aconfig=config;

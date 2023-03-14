@@ -45,6 +45,7 @@
 #include"ns3/iec104-app.h"
 #include"ns3/pmu-app.h"
 #include"ns3/goose-app.h"
+#include"ns3/sv-app.h"
 #include <algorithm>
 
 #define FIR_MASK 0x40
@@ -58,6 +59,7 @@ typedef struct _configuration
 	  iec104_config_t iec104;
 	  pmu_config_t pmu;
 	  iec61850_config_t goose;
+	  sv_config_t sv;
   }configuration;
 
 

@@ -163,9 +163,9 @@ bool AttackApp::PromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packe
 
 	if(protocol==0x88B8)
 	{
-	std::printf ("Pkt source is %X \n",Mac48Address::ConvertFrom (from)) ;
+	std::printf ("GSE Pkt source is %X \n",Mac48Address::ConvertFrom (from)) ;
 
-	std::printf ("Pkt destination is %X \n",Mac48Address::ConvertFrom (to));
+	std::printf ("GSE Pkt destination is %X \n",Mac48Address::ConvertFrom (to));
 	Ptr<Packet> PacketCopy = packet->Copy();
 	unsigned short int dataSize = PacketCopy->GetSize ();
 		unsigned char * buffer =  new unsigned char[dataSize] ;
@@ -174,6 +174,27 @@ bool AttackApp::PromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packe
 		//printf("DNP3 \n"); // @suppress("Function cannot be resolved")
 		PacketCopy->CopyData (buffer, dataSize);
 	int modify = IEC61850FullReassembly(device,&config.goose, packet, buffer, dataSize);
+	if(modify)
+	{
+	Ptr<Packet>packetNew = Create<Packet>(buffer,PacketCopy->GetSize ());
+	//device->Send(packetNew, to, protocol);
+	device->SendFrom(packetNew,from, to, protocol);
+	}
+	}
+
+	else if(protocol==0x88BA)
+	{
+	std::printf ("SV Pkt source is %X \n",Mac48Address::ConvertFrom (from)) ;
+
+	std::printf ("SV Pkt destination is %X \n",Mac48Address::ConvertFrom (to));
+	Ptr<Packet> PacketCopy = packet->Copy();
+	unsigned short int dataSize = PacketCopy->GetSize ();
+		unsigned char * buffer =  new unsigned char[dataSize] ;
+			//if(packetCopy->GetSize ()>0){
+
+		//printf("DNP3 \n"); // @suppress("Function cannot be resolved")
+		PacketCopy->CopyData (buffer, dataSize);
+	int modify = SVFullReassembly(device,&config.sv, packet, buffer, dataSize);
 	if(modify)
 	{
 	Ptr<Packet>packetNew = Create<Packet>(buffer,PacketCopy->GetSize ());
@@ -675,6 +696,100 @@ int AttackApp::readConfigFile( configuration * config)
 
 	    	}
 	    }
+
+	     else if((!readNewProtocol && line.find("sample_value",0)!=string::npos) || (readNewProtocol && linePrev.find("sample_value",0)!=string::npos))
+	    	    {
+	    	    	 if(readNewProtocol)
+	    	    	    	    	{
+	    	    	    	    		readNewProtocol=0;
+	    	    	    	    		int parameter = 0;
+	    	    	    	    		std::istringstream iss(line);
+	    	    	    	    		for(std::string s; iss >> s; )
+	    	    	    	    		{
+	    	    	    	    			switch(parameter){
+	    	    	    	    			            		 	 	 	 	 case(0):
+	    	    	    	    			    								    (config->sv.values_to_alter[indexNum]).svID =s;
+	    	    	    	    			            		 	 	 	 	 	 parameter++;
+	    	    	    	    			            		 	 	 	 	 	 break;
+	    	    	    	    			            						 case(1):
+	    	    	    	    			    									(config->sv.values_to_alter[indexNum]).datSet =s;
+	    	    	    	    			            						     parameter++;
+	    	    	    	    			    									break;
+	    	    	    	    			    		   						 case(2):
+	    	    	    	    			    		   								 (config->sv.values_to_alter[indexNum]).asduNo = stol(s,nullptr,10);
+	    	    	    	    			    		   						parameter++;
+	    	    	    	    			            						 	 break;
+
+
+	    	    	    	    			            						 case(3):
+	    	    	    	    			    										(config->sv.values_to_alter[indexNum]).newVal = s;
+	    	    	    	    			            						 parameter++;
+	    	    	    	    			    											    	    	    	    			    				        		 	 	 	break;
+	    	    	    	    			            						 	 break;
+	    	    	    	    			            						 default:
+	    	    	    	    			            							 break;
+
+
+	    	    	    	    			            	 }
+
+	    	    	            	 }
+
+
+
+
+	    	    	            	indexNum++;
+	    	    	            	config->sv.numAlteredVal = indexNum;
+	    	    	    		}
+	    	    	 while (std::getline(infile, line))
+	    	    	 {
+	    	    		 if(line.find("protocol",0)!=string::npos)
+	    	    		 {
+	    	    			 readNewProtocol++;
+	    	    			 linePrev = line;
+	    	    			 indexNum=0;
+	    	    			 break;
+	    	    		 }
+
+	    	    		 std::istringstream iss(line);
+	    	    		 int parameter = 0;
+	    	    		 for(std::string s; iss >> s; )
+	    	    		 {
+	    	    			 switch(parameter){
+	    	    			 	    	    	    	    			            		 	 	 	 	 case(0):
+	    	    			 	    	    	    	    			    								    (config->sv.values_to_alter[indexNum]).svID =s;
+	    	    			 	    	    	    	    			            		 	 	 	 	 	 parameter++;
+	    	    			 	    	    	    	    			            		 	 	 	 	 	 break;
+	    	    			 	    	    	    	    			            						 case(1):
+	    	    			 	    	    	    	    			    									(config->sv.values_to_alter[indexNum]).datSet =s;
+	    	    			 	    	    	    	    			            						     parameter++;
+	    	    			 	    	    	    	    			    									break;
+	    	    			 	    	    	    	    			    		   						 case(2):
+	    	    			 	    	    	    	    			    		   								 (config->sv.values_to_alter[indexNum]).asduNo = stol(s,nullptr,10);
+	    	    			 	    	    	    	    			    		   						parameter++;
+	    	    			 	    	    	    	    			            						 	 break;
+
+
+	    	    			 	    	    	    	    			            						 case(3):
+	    	    			 	    	    	    	    			    										(config->sv.values_to_alter[indexNum]).newVal = s;
+	    	    			 	    	    	    	    			            						 parameter++;
+	    	    			 	    	    	    	    			    											    	    	    	    			    				        		 	 	 	break;
+	    	    			 	    	    	    	    			            						 	 break;
+	    	    			 	    	    	    	    			            						 default:
+	    	    			 	    	    	    	    			            							 break;
+
+
+	    	    			 	    	    	    	    			            	 }
+
+	    	    		 }
+
+
+
+
+	    	    		 indexNum++;
+	    	    		 config->sv.numAlteredVal = indexNum;
+
+	    	    	}
+	    	    }
 
 
 
