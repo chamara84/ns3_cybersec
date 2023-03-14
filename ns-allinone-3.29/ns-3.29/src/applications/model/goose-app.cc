@@ -622,6 +622,9 @@ int IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice> device,iec61850_config_t *co
 		            				            		 memcpy(stNumPt,&val,4);
 		            				            		 memcpy(pdu_start+offset, stNumPt,elementLength);
 		            				            	 }
+		            				            	 std::map<std::string,frame_identifier_t*>::iterator it = gooseRefTable.find(pdu->gocbRef);
+		            				            	   if (it != gooseRefTable.end())
+		            				            		   gooseRefTable.erase (it);
 
 
 		            	 		            		 gooseRefTable.insert( std::pair<std::string,frame_identifier_t*>(pdu->gocbRef,frameID));
@@ -722,9 +725,14 @@ int IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice> device,iec61850_config_t *co
 		            		 	 	 	 			            		 		                 memcpy(pdu_start + offsetTime+4,&curTimeInc,4);
 		            		 	 	 	 			            		 		            memcpy(&(frameID->tv),&(tempFrameID->tv),sizeof(tempFrameID->tv));
 
-		            		 	 	 	 			            		 		       gooseRefTable.insert(std::pair<std::string,frame_identifier_t*>(pdu->gocbRef,frameID));
+		            		 	 	 	 			            		 		            std::map<std::string,frame_identifier_t*>::iterator it = gooseRefTable.find(pdu->gocbRef);
+		            		 	 	 	 			            		 		            if (it != gooseRefTable.end())
+		            		 	 	 	 			            		 		            	gooseRefTable.erase (it);
 
-		            	 		            		printf("No Change KEY: |%s| SQNum %d StNum %d \n", pdu->gocbRef.c_str(),frameID->sqNum,frameID->stNum);
+
+		            		 	 	 	 			            		 		            gooseRefTable.insert( std::pair<std::string,frame_identifier_t*>(pdu->gocbRef,frameID));
+
+		            		 	 	 	 			            		 		            printf("No Change KEY: |%s| SQNum %d StNum %d \n", pdu->gocbRef.c_str(),frameID->sqNum,frameID->stNum);
 		            	 		            	 }
 		            	 else if(tempFrameID &&  tempFrameID->stNum==frameID->stNum && tempFrameID->sqNum==frameID->sqNum)
 		            	 		            	 {

@@ -1,0 +1,28 @@
+#!/bin/bash
+# Setup Interfaces
+sudo ip link add name br0 type bridge
+sudo ip link add name br1 type bridge
+sudo ip tuntap add mode tap tap00
+sudo ip tuntap add mode tap tap01
+
+sudo ip link set dev tap00 address 00:00:00:00:01:20
+sudo ip a add 0.0.0.0 dev tap00
+sudo ip link set tap00  promisc on
+sudo ip link set tap00 up
+
+sudo ip link set dev tap01 address 00:00:00:00:01:21
+sudo ip a add 0.0.0.0 dev tap01
+sudo ip link set tap01  promisc on
+sudo ip link set tap01 up
+
+ip link set dev tap00 master br0
+ip link set dev eth0 master enp7s0
+ 
+ tap00
+sudo brctl addif br0 enp7s0
+sudo ifconfig br0 up   
+sudo brctl addif br1 tap01
+sudo brctl addif br1 enp8s0
+sudo ifconfig br1 up
+sudo ifconfig enp4s0 promisc
+sudo ifconfig enp5s0 promisc

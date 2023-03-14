@@ -1,20 +1,44 @@
 #!/bin/bash
 # Setup Interfaces
-sudo brctl addbr br0
-sudo brctl addbr br1
+sudo ip link add name br0 type bridge
+sudo ip link add name br1 type bridge
+
 sudo ip tuntap add mode tap tap00
 sudo ip tuntap add mode tap tap01
 
-sudo ifconfig tap00 hw ether 00:00:00:00:01:20
-sudo ifconfig tap00 0.0.0.0 promisc up
-sudo ifconfig tap01 hw ether 00:00:00:00:01:21
-sudo ifconfig tap01 0.0.0.0 promisc up
+sudo ip link set dev tap00 address 00:00:00:00:01:20
+sudo ip address add 0.0.0.0 dev tap00
+sudo ip link set dev tap00 promisc on
+sudo ip link set dev tap00 up
 
-sudo brctl addif br0 tap00
-sudo brctl addif br0 enp4s0
-sudo ifconfig br0 up
-sudo brctl addif br1 tap01
-sudo brctl addif br1 enp5s0
-sudo ifconfig br1 up
-sudo ifconfig enp4s0 promisc
-sudo ifconfig enp5s0 promisc
+sudo ip link set dev tap01 address 00:00:00:00:01:21
+sudo ip address add 0.0.0.0 dev tap01
+
+sudo ip link set dev enp7s0 down
+sudo ip address add 0.0.0.0 dev enp7s0
+sudo ip link set dev enp7s0 up
+
+sudo ip link set dev enp8s0 down
+sudo ip address add 0.0.0.0 dev enp8s0
+sudo ip link set dev enp8s0 up
+
+sudo ip link set dev enp11s0 down
+sudo ip address add 0.0.0.0 dev enp11s0
+sudo ip link set dev enp11s0 up
+
+
+sudo ip link set dev tap01 promisc on
+sudo ip link set dev tap01 up
+
+sudo ip link set dev tap00 master br0
+sudo ip link set dev enp7s0 master br0
+
+
+sudo ip link set dev tap01 master br1
+sudo ip link set dev enp8s0 master br1
+
+sudo ip link set dev br0 up
+sudo ip link set dev  br1 up
+sudo ip link set dev  enp7s0 promisc on
+sudo ip link set dev  enp8s0 promisc on
+
