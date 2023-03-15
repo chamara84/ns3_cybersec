@@ -161,24 +161,64 @@ bool AttackApp::PromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packe
                                    const Address &from, const Address &to, NetDevice::PacketType )
 {
 
+	uint8_t vlanTag[4];
+	bool hasValnTag = false;
+	Ptr<Packet> PacketCopy;
+	unsigned short int dataSize;
+	unsigned char * buffer;
+	if(protocol==0x8100) //VLAN
+	{
+		PacketCopy = packet->Copy();
+		 dataSize = PacketCopy->GetSize ();
+		 buffer =  new unsigned char[dataSize] ;
+		PacketCopy->CopyData (buffer, dataSize);
+
+		memcpy(vlanTag,buffer,4);
+		memcpy(&protocol, buffer+2,2);
+		protocol = ntohs(protocol);
+		hasValnTag= true;
+		buffer+=4;
+		dataSize-=4;
+	}
+	else
+	{
+		PacketCopy = packet->Copy();
+			dataSize = PacketCopy->GetSize ();
+				buffer =  new unsigned char[dataSize] ;
+					//if(packetCopy->GetSize ()>0){
+
+				//printf("DNP3 \n"); // @suppress("Function cannot be resolved")
+				PacketCopy->CopyData (buffer, dataSize);
+	}
+
+
 	if(protocol==0x88B8)
 	{
 	std::printf ("GSE Pkt source is %X \n",Mac48Address::ConvertFrom (from)) ;
 
 	std::printf ("GSE Pkt destination is %X \n",Mac48Address::ConvertFrom (to));
-	Ptr<Packet> PacketCopy = packet->Copy();
-	unsigned short int dataSize = PacketCopy->GetSize ();
-		unsigned char * buffer =  new unsigned char[dataSize] ;
-			//if(packetCopy->GetSize ()>0){
 
-		//printf("DNP3 \n"); // @suppress("Function cannot be resolved")
-		PacketCopy->CopyData (buffer, dataSize);
 	int modify = IEC61850FullReassembly(device,&config.goose, packet, buffer, dataSize);
 	if(modify)
 	{
-	Ptr<Packet>packetNew = Create<Packet>(buffer,PacketCopy->GetSize ());
+
+		if(!hasValnTag)
+		{
+	Ptr<Packet>packetNew = Create<Packet>(buffer,dataSize );
 	//device->Send(packetNew, to, protocol);
 	device->SendFrom(packetNew,from, to, protocol);
+		}
+
+		else
+		{
+			unsigned char * bufferNew = new unsigned char[dataSize+4] ;
+			memcpy(bufferNew,vlanTag,4);
+			memcpy(bufferNew+4,buffer,dataSize);
+			Ptr<Packet>packetNew = Create<Packet>(bufferNew,dataSize+4 );
+				//device->Send(packetNew, to, protocol);
+				device->SendFrom(packetNew,from, to, 0x8100);
+
+		}
 	}
 	}
 
@@ -187,19 +227,27 @@ bool AttackApp::PromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packe
 	std::printf ("SV Pkt source is %X \n",Mac48Address::ConvertFrom (from)) ;
 
 	std::printf ("SV Pkt destination is %X \n",Mac48Address::ConvertFrom (to));
-	Ptr<Packet> PacketCopy = packet->Copy();
-	unsigned short int dataSize = PacketCopy->GetSize ();
-		unsigned char * buffer =  new unsigned char[dataSize] ;
-			//if(packetCopy->GetSize ()>0){
 
-		//printf("DNP3 \n"); // @suppress("Function cannot be resolved")
-		PacketCopy->CopyData (buffer, dataSize);
 	int modify = SVFullReassembly(device,&config.sv, packet, buffer, dataSize);
 	if(modify)
 	{
-	Ptr<Packet>packetNew = Create<Packet>(buffer,PacketCopy->GetSize ());
-	//device->Send(packetNew, to, protocol);
-	device->SendFrom(packetNew,from, to, protocol);
+		if(!hasValnTag)
+				{
+			Ptr<Packet>packetNew = Create<Packet>(buffer,dataSize );
+			//device->Send(packetNew, to, protocol);
+			device->SendFrom(packetNew,from, to, protocol);
+				}
+
+				else
+				{
+					unsigned char * bufferNew = new unsigned char[dataSize+4] ;
+					memcpy(bufferNew,vlanTag,4);
+					memcpy(bufferNew+4,buffer,dataSize);
+					Ptr<Packet>packetNew = Create<Packet>(bufferNew,dataSize+4 );
+						//device->Send(packetNew, to, protocol);
+						device->SendFrom(packetNew,from, to, 0x8100);
+
+				}
 	}
 	}
 	return true;
