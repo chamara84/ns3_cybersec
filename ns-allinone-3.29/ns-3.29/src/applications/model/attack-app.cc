@@ -748,46 +748,52 @@ int AttackApp::readConfigFile( configuration * config)
 	     else if((!readNewProtocol && line.find("sample_value",0)!=string::npos) || (readNewProtocol && linePrev.find("sample_value",0)!=string::npos))
 	    	    {
 	    	    	 if(readNewProtocol)
-	    	    	    	    	{
-	    	    	    	    		readNewProtocol=0;
-	    	    	    	    		int parameter = 0;
-	    	    	    	    		std::istringstream iss(line);
-	    	    	    	    		for(std::string s; iss >> s; )
-	    	    	    	    		{
-	    	    	    	    			switch(parameter){
-	    	    	    	    			            		 	 	 	 	 case(0):
-	    	    	    	    			    								    (config->sv.values_to_alter[indexNum]).svID =s;
-	    	    	    	    			            		 	 	 	 	 	 parameter++;
-	    	    	    	    			            		 	 	 	 	 	 break;
-	    	    	    	    			            						 case(1):
-	    	    	    	    			    									(config->sv.values_to_alter[indexNum]).datSet =s;
-	    	    	    	    			            						     parameter++;
-	    	    	    	    			    									break;
-	    	    	    	    			    		   						 case(2):
-	    	    	    	    			    		   								 (config->sv.values_to_alter[indexNum]).asduNo = stol(s,nullptr,10);
-	    	    	    	    			    		   						parameter++;
-	    	    	    	    			            						 	 break;
+	    	    	 {
+	    	    		 readNewProtocol=0;
+	    	    		 int parameter = 0;
+	    	    		 std::istringstream iss(line);
+	    	    		 for(std::string s; iss >> s; )
+	    	    		 {
+	    	    			 switch(parameter){
+	    	    			 case(0):
+	    	    	    	 (config->sv.values_to_alter[indexNum]).svID =s;
+	    	    			 parameter++;
+	    	    			 break;
+	    	    			 case(1):
+	    	    			(config->sv.values_to_alter[indexNum]).datSet =s;
+	    	    			 parameter++;
+	    	    			 break;
+	    	    			 case(2):
+	    	    	    	 (config->sv.values_to_alter[indexNum]).asduNo = stol(s,nullptr,10);
+	    	    			 parameter++;
+	    	    			 break;
 
 
-	    	    	    	    			            						 case(3):
-	    	    	    	    			    										(config->sv.values_to_alter[indexNum]).newVal = s;
-	    	    	    	    			            						 parameter++;
-	    	    	    	    			    											    	    	    	    			    				        		 	 	 	break;
-	    	    	    	    			            						 	 break;
-	    	    	    	    			            						 default:
-	    	    	    	    			            							 break;
+	    	    			 case(3):
+	    	    	    	 (config->sv.values_to_alter[indexNum]).newVal = s;
+	    	    			 parameter++;
+
+	    	    			 break;
+
+	    	    			 case(4):
+	    	    	    	 (config->sv.values_to_alter[indexNum]).newValQ =strtol(s.c_str(),nullptr,16);
+	    	    			 parameter++;
+	    	    			 break;
+
+	    	    			 default:
+	    	    				 break;
 
 
-	    	    	    	    			            	 }
+	    	    			 }
 
-	    	    	            	 }
-
-
+	    	    		 }
 
 
-	    	    	            	indexNum++;
-	    	    	            	config->sv.numAlteredVal = indexNum;
-	    	    	    		}
+
+
+	    	    		 indexNum++;
+	    	    		 config->sv.numAlteredVal = indexNum;
+	    	    	 }
 	    	    	 while (std::getline(infile, line))
 	    	    	 {
 	    	    		 if(line.find("protocol",0)!=string::npos)
@@ -803,30 +809,34 @@ int AttackApp::readConfigFile( configuration * config)
 	    	    		 for(std::string s; iss >> s; )
 	    	    		 {
 	    	    			 switch(parameter){
-	    	    			 	    	    	    	    			            		 	 	 	 	 case(0):
-	    	    			 	    	    	    	    			    								    (config->sv.values_to_alter[indexNum]).svID =s;
-	    	    			 	    	    	    	    			            		 	 	 	 	 	 parameter++;
-	    	    			 	    	    	    	    			            		 	 	 	 	 	 break;
-	    	    			 	    	    	    	    			            						 case(1):
-	    	    			 	    	    	    	    			    									(config->sv.values_to_alter[indexNum]).datSet =s;
-	    	    			 	    	    	    	    			            						     parameter++;
-	    	    			 	    	    	    	    			    									break;
-	    	    			 	    	    	    	    			    		   						 case(2):
-	    	    			 	    	    	    	    			    		   								 (config->sv.values_to_alter[indexNum]).asduNo = stol(s,nullptr,10);
-	    	    			 	    	    	    	    			    		   						parameter++;
-	    	    			 	    	    	    	    			            						 	 break;
+	    	    			 case(0):
+	    	    			 (config->sv.values_to_alter[indexNum]).svID =s;
+	    	    			 parameter++;
+	    	    			 break;
+	    	    			 case(1):
+	    	    			 (config->sv.values_to_alter[indexNum]).datSet =s;
+	    	    			 parameter++;
+	    	    			 break;
+	    	    			 case(2):
+	    	    			 (config->sv.values_to_alter[indexNum]).asduNo = stol(s,nullptr,10);
+	    	    			 parameter++;
+	    	    			 break;
 
 
-	    	    			 	    	    	    	    			            						 case(3):
-	    	    			 	    	    	    	    			    										(config->sv.values_to_alter[indexNum]).newVal = s;
-	    	    			 	    	    	    	    			            						 parameter++;
-	    	    			 	    	    	    	    			    											    	    	    	    			    				        		 	 	 	break;
-	    	    			 	    	    	    	    			            						 	 break;
-	    	    			 	    	    	    	    			            						 default:
-	    	    			 	    	    	    	    			            							 break;
+	    	    			 case(3):
+	    	    			 (config->sv.values_to_alter[indexNum]).newVal = s;
+	    	    			 parameter++;
+	    	    			 break;
+
+	    	    			 case(4):
+	    	    			 (config->sv.values_to_alter[indexNum]).newValQ = strtol(s.c_str(),nullptr,16);
+	    	    			 parameter++;
+	    	    			 break;
+	    	    			 default:
+	    	    				 break;
 
 
-	    	    			 	    	    	    	    			            	 }
+	    	    			 }
 
 	    	    		 }
 
@@ -1008,7 +1018,7 @@ if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==7001 ||
 	  	       if(Simulator::Now ().GetSeconds ()>1.0)
 	  	       {
 	  	    	 printf("dataType = %s\n", (*it).c_str());
-	  	       while(it!=parseString.end() && DERIndex != 2)
+	  	       while(it!=parseString.end() && DERIndex == 1)
 	  	       {
 	  	    	 printf("dataType = %s\n", (*it).c_str());
 	  	    	   if((*it).compare("float")==0 )
@@ -1020,36 +1030,36 @@ if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==7001 ||
 	  	    		   bufferFloat[i] = ntohl(bufferFloat[i]);
 	  	    		   memcpy(&floatingPointData, &bufferFloat[i], 4);
 	  	    		 printf("dataValue = %f-%d\n", floatingPointData,i);
-	  	    		   if(integerData==7){
+	  	    		   if(integerData==8){
 
 	  	    			   if(i==3){
-	  	    				   floatingPointData = 3.0; //PGen
+	  	    				   floatingPointData = 0.0; //PGen
 	  	    			   }
 	  	    			   else if(i==4)
-	  	    				   floatingPointData = 3.0; //QGen
+	  	    				   floatingPointData = 0.0; //QGen
 
 	  	    			   else if(i==5){
-	  	    				   floatingPointData = 4.5; //Pload
+	  	    				   floatingPointData = 0.0; //Pload
 	  	    			   }
-	  	    			   else
-	  	    				   floatingPointData = 4.0; //Qload
+	  	    			   else if(i==6)
+	  	    				   floatingPointData = 0.0; //Qload
 	  	    		   }
 
-	  	    		   else
-	  	    		   {
-	  	    			   if(i==3){
-	  	    				   floatingPointData = 0.0;
-	  	    			   }
-	  	    			   else if(i==4)
-	  	    				   floatingPointData = 0.0;
-
-	  	    			   else if(i==5){
-	  	    				   floatingPointData = 0.0;
-	  	    			   }
-	  	    			   else
-	  	    				   floatingPointData = 0.0;
-
-	  	    		   }
+//	  	    		   else (integerData==7)
+//	  	    		   {
+//	  	    			   if(i==3){
+//	  	    				   floatingPointData = 0.0;
+//	  	    			   }
+//	  	    			   else if(i==4)
+//	  	    				   floatingPointData = 0.0;
+//
+//	  	    			   else if(i==5){
+//	  	    				   floatingPointData = 0.0;
+//	  	    			   }
+//	  	    			   else
+//	  	    				   floatingPointData = 0.0;
+//
+//	  	    		   }
 	  	    		   memcpy(&bufferFloat[i], &floatingPointData, 4);
 	  	    		 printf("dataValueAfter = %f\n", floatingPointData);
 	  	    		   bufferFloat[i] = htonl(bufferFloat[i]);
@@ -1470,7 +1480,7 @@ if(ipProtocol == 17 && (udpHdr1.GetDestinationPort()==7001 || udpHdr1.GetSourceP
 	int i=0;
 	if(Simulator::Now ().GetSeconds ()>0.0)
 	{
-		while(it!=parseString.end() && DERIndex != 4)
+		while(it!=parseString.end() && DERIndex == 1)
 		{
 			//printf("dataType = %s\n", string[i]);
 			if(it->compare("float")==0)

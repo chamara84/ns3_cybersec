@@ -282,10 +282,10 @@ void MyApp::HandleAccept (Ptr<Socket> s, const Address& from)
 
 	NS_LOG_FUNCTION (this << s << from << tcpL4->GetSizeSocket());
 	if((tcpL4->GetSizeSocket())>m_parallelSessions){
-		NS_LOG_INFO(" Greater than "<< m_parallelSessions <<" Closing");
+		std::cout<<" Greater than "<< m_parallelSessions <<" Closing"<<std::endl;
 		Ptr<TcpSocketBase> baseS = s->GetObject<TcpSocketBase>();
 		baseS->DeallocateEndPoint();
-
+		s->Close();
 		return;
 	}
 
@@ -1192,97 +1192,86 @@ main (int argc, char *argv[])
 	Time::SetResolution (Time::NS);
 	PacketMetadata::Enable();
 	Packet::EnablePrinting();
-	//std::string tcpTypeId = "ns3::TcpLinuxReno";
-	//Config::SetDefault ("ns3::TcpSocket::SegmentSize", UintegerValue (1460));
-//	TypeId tcpTid;
-//	        NS_ABORT_MSG_UNLESS(TypeId::LookupByNameFailSafe(tcpTypeId, &tcpTid),
-//	                            "TypeId " << tcpTypeId << " not found");
-//	        Config::SetDefault("ns3::TcpL4Protocol::SocketType",
-//	                           TypeIdValue(TypeId::LookupByName(tcpTypeId)));
 
-//	FlowMonitorHelper flowmon;
-//	  Ptr<FlowMonitor> monitor;
-//	  monitor = flowmon.InstallAll();
+	bool dosEnabled = false;
+	bool manInTheMiddle = false;
+	float interSynTime = 1000.0;
+	double stopTime = 500;
+	uint32_t nNodes = 2;
+	int maxParallelSessions=10000;
+	MobilityHelper mobility;
+	mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+	string DER[4];
+	DER[0]="172.24.9.240";
+	DER[1]="172.24.9.241";
+	DER[2]="172.24.9.242";
+	DER[3]="172.2.9.254";
+	string AggregatorIP[4];
+	AggregatorIP[0]="172.24.9.244";
+	AggregatorIP[1]="172.24.9.245";
+	AggregatorIP[2]="172.24.9.246";
+	AggregatorIP[3]="172.24.9.247";
 
-	  bool dosEnabled = false;
-	  bool manInTheMiddle = false;
-	  float interSynTime = 1000.0;
-	  double stopTime = 500;
-	  uint32_t nNodes = 2;
-	  int maxParallelSessions=10000;
-	  MobilityHelper mobility;
-	  mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
-	  string DER[4];
-	  DER[0]="172.24.9.240";
-	  	  	  DER[1]="172.24.9.241";
-	  	  	  DER[2]="172.24.9.242";
-	  	  	  DER[3]="172.2.9.254";
-	  	  	  string AggregatorIP[4];
-	  	  	  AggregatorIP[0]="172.24.9.244";
-	  	  	  AggregatorIP[1]="172.24.9.245";
-	  	  	  AggregatorIP[2]="172.24.9.246";
-	  	  	  AggregatorIP[3]="172.24.9.247";
+	string intIP[2];
+	intIP[0]="172.24.2.205";
+	intIP[1] = "172.24.2.199";
+	string intMAC[2];
+	intMAC[0]="00:e0:4c:67:77:d3";
+	intMAC[1] ="00:e0:4c:67:77:d4" ;
+	string gateway = "172.24.0.1";
 
-	  	  	  string intIP[2];
-	  	  	  intIP[0]="172.24.2.205";
-	  	  	  intIP[1] = "172.24.2.199";
-	  		   string intMAC[2];
-	  	  	  intMAC[0]="00:e0:4c:67:77:d3";
-	  	  	  intMAC[1] ="00:e0:4c:67:77:d4" ;
-	  		  string gateway = "172.24.0.1";
+	int subnet;
+	subnet = 2;
+	//
+	// Allow the user to override any of the defaults at run-time, via command-line
+	// arguments
+	//
+	CommandLine cmd;
+	std::string deviceName1 ("enp4s0");
+	std::string deviceName2 ("enp5s0");
 
-	  int subnet;
-	  subnet = 2;
-	  //
-	  // Allow the user to override any of the defaults at run-time, via command-line
-	  // arguments
-	  //
-	  CommandLine cmd;
-	  std::string deviceName1 ("enp4s0");
-	   std::string deviceName2 ("enp5s0");
-	  
-	  std::string encapMode ("Dix");
+	std::string encapMode ("Dix");
 
-	  cmd.AddValue ("deviceName1", "device name1", deviceName1);
-	  cmd.AddValue ("deviceName2", "device name2", deviceName2);
-	  cmd.AddValue ("stopTime", "stop time (seconds)", stopTime);
-	  cmd.AddValue ("encapsulationMode", "encapsulation mode of emu device (\"Dix\" [default] or \"Llc\")", encapMode);
-	  cmd.AddValue ("DoSEnabled", "DoS enabled", dosEnabled);
-	  cmd.AddValue ("ArpSpoofEnabled", "Man-in-the-middle enabled", manInTheMiddle);
-	  cmd.AddValue ("InterSynTime", "Time between SYN pkts in Syn Flood", interSynTime);
-	  cmd.AddValue ("maxParallelSessions", "number of maximum parallel sessions", maxParallelSessions);
-	  cmd.AddValue("IPDER1C", "IP address of the DER1-client",DER[0]);
-	  cmd.AddValue("IPDER1S", "IP address of the DER1-server",DER[1]);
-	  cmd.AddValue("IPDER2C", "IP address of the DER2-client",DER[2]);
-	  cmd.AddValue("IPDER2S", "IP address of the DER2-server",DER[3]);
-	  cmd.AddValue("IPAggreDER1C", "IP address of the Aggregator-DER1-client",AggregatorIP[0]);
-	  cmd.AddValue("IPAggreDER1S", "IP address of the Aggregator-DER1-server",AggregatorIP[1]);
-	  cmd.AddValue("IPAggreDER2C", "IP address of the Aggregator-DER2-client",AggregatorIP[2]);
-	  cmd.AddValue("IPAggreDER2S", "IP address of the Aggregator-DER2-server",AggregatorIP[3]);
-	  cmd.AddValue("Int1IP","IP address of NIC 1",intIP[0]);
-	  cmd.AddValue("Int2IP","IP address of NIC 2",intIP[1]);
-	  cmd.AddValue("Int1MAC","MAC address of NIC 1",intMAC[0]);
-	  	  cmd.AddValue("Int2MAC","MAC address of NIC 2",intMAC[1]);
-	  cmd.AddValue("Subnet","Sub net: 1) /8 2)/16 or 3)/24",subnet );
-	  cmd.AddValue("Gateway","IP address of the gateway",gateway);
-	  cmd.Parse (argc, argv);
+	cmd.AddValue ("deviceName1", "device name1", deviceName1);
+	cmd.AddValue ("deviceName2", "device name2", deviceName2);
+	cmd.AddValue ("stopTime", "stop time (seconds)", stopTime);
+	cmd.AddValue ("encapsulationMode", "encapsulation mode of emu device (\"Dix\" [default] or \"Llc\")", encapMode);
+	cmd.AddValue ("DoSEnabled", "DoS enabled", dosEnabled);
+	cmd.AddValue ("ArpSpoofEnabled", "Man-in-the-middle enabled", manInTheMiddle);
+	cmd.AddValue ("InterSynTime", "Time between SYN pkts in Syn Flood", interSynTime);
+	cmd.AddValue ("maxParallelSessions", "number of maximum parallel sessions", maxParallelSessions);
+	cmd.AddValue("IPDER1C", "IP address of the DER1-client",DER[0]);
+	cmd.AddValue("IPDER1S", "IP address of the DER1-server",DER[1]);
+	cmd.AddValue("IPDER2C", "IP address of the DER2-client",DER[2]);
+	cmd.AddValue("IPDER2S", "IP address of the DER2-server",DER[3]);
+	cmd.AddValue("IPAggreDER1C", "IP address of the Aggregator-DER1-client",AggregatorIP[0]);
+	cmd.AddValue("IPAggreDER1S", "IP address of the Aggregator-DER1-server",AggregatorIP[1]);
+	cmd.AddValue("IPAggreDER2C", "IP address of the Aggregator-DER2-client",AggregatorIP[2]);
+	cmd.AddValue("IPAggreDER2S", "IP address of the Aggregator-DER2-server",AggregatorIP[3]);
+	cmd.AddValue("Int1IP","IP address of NIC 1",intIP[0]);
+	cmd.AddValue("Int2IP","IP address of NIC 2",intIP[1]);
+	cmd.AddValue("Int1MAC","MAC address of NIC 1",intMAC[0]);
+	cmd.AddValue("Int2MAC","MAC address of NIC 2",intMAC[1]);
+	cmd.AddValue("Subnet","Sub net: 1) /8 2)/16 or 3)/24",subnet );
+	cmd.AddValue("Gateway","IP address of the gateway",gateway);
+	cmd.Parse (argc, argv);
 
-	  GlobalValue::Bind ("SimulatorImplementationType",
-	                     StringValue ("ns3::RealtimeSimulatorImpl"));
+	GlobalValue::Bind ("SimulatorImplementationType",
+			StringValue ("ns3::RealtimeSimulatorImpl"));
 
-	  GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true));
-	  NodeContainer Attackers;
-	  Attackers.Create(1);
+	GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true));
+	NodeContainer Attackers;
+	Attackers.Create(1);
 
 
-	  nNodes = 4;
+	nNodes = 4;
 
 	  //
 	  // Explicitly create the nodes required by the topology (shown above).
 	  //
-	  NS_LOG_INFO ("Create nodes.");
-	  NodeContainer n;
-	  n.Create (nNodes);
+	NS_LOG_INFO ("Create nodes.");
+	NodeContainer n;
+	n.Create (nNodes);
 
 
 
@@ -1292,8 +1281,7 @@ main (int argc, char *argv[])
 	  Ptr<Node> Aggregator = CreateObject<Node> ();
 	  Ptr<Node> ingressNode = CreateObject<Node> ();
 	  Ptr<Node> egressNode = CreateObject<Node> ();
-	  //Ptr<Node> RTU = CreateObject<Node> ();
-	  //Ptr<Node> DSO = CreateObject<Node> ();
+
 
 	  mobility.Install(n);
 	  mobility.Install(Aggregator);
@@ -1370,37 +1358,38 @@ main (int argc, char *argv[])
     NS_LOG_INFO ("Create links.");
 
     // We create the channels first without any IP addressing information
-      NS_LOG_INFO ("Create channels.");
-      PointToPointHelper p2p;
-      p2p.SetDeviceAttribute ("DataRate", StringValue ("10000Mbps"));
-      p2p.SetChannelAttribute ("Delay",  TimeValue (NanoSeconds (656)));
-      PointerValue ptr;
+    NS_LOG_INFO ("Create channels.");
+    PointToPointHelper p2p;
+    p2p.SetDeviceAttribute ("DataRate", StringValue ("10000Mbps"));
+    p2p.SetChannelAttribute ("Delay",  TimeValue (NanoSeconds (656)));
+    PointerValue ptr;
 
-      NetDeviceContainer d0d1 = p2p.Install (n0n1);
+    NetDeviceContainer d0d1 = p2p.Install (n0n1);
 
 
-      d0d1.Get(0)->GetAttribute ("TxQueue", ptr);
-            Ptr<Queue<Packet> > txQueuen0 = ptr.Get<Queue<Packet> > ();
-            txQueuen0->SetMaxSize( QueueSize (QueueSizeUnit::PACKETS, 10));
-            d0d1.Get(1)->GetAttribute ("TxQueue", ptr);
-                  Ptr<Queue<Packet> > txQueuen1 = ptr.Get<Queue<Packet> > ();
-                  txQueuen1->SetMaxSize( QueueSize (QueueSizeUnit::PACKETS, 10));
-            TrafficControlHelper tch;
-                      tch.SetRootQueueDisc ("ns3::FifoQueueDisc",
-                                            "MaxSize",  QueueSizeValue (QueueSize ("10p")));
+    d0d1.Get(0)->GetAttribute ("TxQueue", ptr);
+    Ptr<Queue<Packet> > txQueuen0 = ptr.Get<Queue<Packet> > ();
+    txQueuen0->SetMaxSize( QueueSize (QueueSizeUnit::PACKETS, 10));
+    d0d1.Get(1)->GetAttribute ("TxQueue", ptr);
+    Ptr<Queue<Packet> > txQueuen1 = ptr.Get<Queue<Packet> > ();
+    txQueuen1->SetMaxSize( QueueSize (QueueSizeUnit::PACKETS, 10));
+    TrafficControlHelper tch;
+    tch.SetRootQueueDisc ("ns3::FifoQueueDisc",
+    		"MaxSize",  QueueSizeValue (QueueSize ("10p")));
 
       //      tch.SetRootQueueDisc ("ns3::TbfQueueDisc",
       //                                       "Burst", UintegerValue (10000),
       //                                       "Mtu", UintegerValue (1500),
       //                                       "Rate", DataRateValue (DataRate (DataRate ("100Mbps"))),
       //                                       "PeakRate", DataRateValue (DataRate (DataRate ("1000Mbps"))));
-                     QueueDiscContainer qdiscs = tch.Install (d0d1);
+     QueueDiscContainer qdiscs = tch.Install (d0d1);
 
 
       NetDeviceContainer d0d2 = p2p.Install (n0n2);
 
       //p2p.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
       //p2p.SetChannelAttribute ("Delay", StringValue ("10ms"));
+
       NetDeviceContainer d1d3 = p2p.Install (n1n3);
       d1d3.Get(0)->GetAttribute ("TxQueue", ptr);
       Ptr<Queue<Packet> > txQueuen12 = ptr.Get<Queue<Packet> > ();
@@ -1413,14 +1402,15 @@ main (int argc, char *argv[])
 
       //p2p.SetChannelAttribute ("DataRate", StringValue ("50Mbps"));
       //p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
-      NetDeviceContainer d2d3 = p2p.Install (n2n3);
-      d2d3.Get(0)->GetAttribute ("TxQueue", ptr);
-                              Ptr<Queue<Packet> > txQueuend2d31 = ptr.Get<Queue<Packet> > ();
-                              txQueuend2d31 ->SetMaxSize( QueueSize (QueueSizeUnit::PACKETS, 10));
-                              d2d3.Get(1)->GetAttribute ("TxQueue", ptr);
-                                                Ptr<Queue<Packet> > txQueuend2d32 = ptr.Get<Queue<Packet> > ();
-                                                txQueuend2d32->SetMaxSize( QueueSize (QueueSizeUnit::PACKETS, 10));
-            tch.Install (d2d3);
+
+	 NetDeviceContainer d2d3 = p2p.Install (n2n3);
+	 d2d3.Get(0)->GetAttribute ("TxQueue", ptr);
+	 Ptr<Queue<Packet> > txQueuend2d31 = ptr.Get<Queue<Packet> > ();
+	 txQueuend2d31 ->SetMaxSize( QueueSize (QueueSizeUnit::PACKETS, 10));
+	 d2d3.Get(1)->GetAttribute ("TxQueue", ptr);
+	 Ptr<Queue<Packet> > txQueuend2d32 = ptr.Get<Queue<Packet> > ();
+	 txQueuend2d32->SetMaxSize( QueueSize (QueueSizeUnit::PACKETS, 10));
+	 tch.Install (d2d3);
 
 
       // Later, we add IP addresses.
@@ -1446,41 +1436,41 @@ main (int argc, char *argv[])
 
    //setting up ingress node to communicate with the GTNET
        EmuFdNetDeviceHelper emu;
-           emu.SetDeviceName (deviceName1);
-           emu.SetAttribute ("EncapsulationMode", StringValue (encapMode));
+       emu.SetDeviceName (deviceName1);
+       emu.SetAttribute ("EncapsulationMode", StringValue (encapMode));
 
-           std::stringstream ss(intIP[0]);
-           std::vector<string> tokenizedIP;
-           	std::string s;
-           	while (std::getline(ss, s, '.')) {
-           		tokenizedIP.push_back(s);
-           	}
-           	string netID;
-           	string netMask;
-           	string hostID;
-           	vector<string>::iterator it = tokenizedIP.begin();
+       std::stringstream ss(intIP[0]);
+       std::vector<string> tokenizedIP;
+       std::string s;
+       while (std::getline(ss, s, '.')) {
+    	   tokenizedIP.push_back(s);
+       }
+       string netID;
+       string netMask;
+       string hostID;
+       vector<string>::iterator it = tokenizedIP.begin();
 
-           	if(subnet==1)
-           	{
-           		netID = *it+".0.0.0";
-           		netMask="255.0.0.0";
-           		hostID = "0."+*(it+1)+"."+*(it+2)+"."+*(it+3);
-           	}
-           	else if(subnet==2)
-           	{
-           		netID = *it+"."+*(it+1)+".0.0";
-           		netMask="255.255.0.0";
-           		hostID = "0.0."+*(it+2)+"."+*(it+3);
-           	}
-           	else if(subnet==3)
-           	{
-           		netID = *it+"."+*(it+1)+"."+*(it+2)+".0";
-           		netMask="255.255.255.0";
-           		hostID = "0.0.0."+*(it+3);
-           	}
+       if(subnet==1)
+       {
+    	   netID = *it+".0.0.0";
+    	   netMask="255.0.0.0";
+    	   hostID = "0."+*(it+1)+"."+*(it+2)+"."+*(it+3);
+       }
+       else if(subnet==2)
+       {
+    	   netID = *it+"."+*(it+1)+".0.0";
+    	   netMask="255.255.0.0";
+    	   hostID = "0.0."+*(it+2)+"."+*(it+3);
+       }
+       else if(subnet==3)
+       {
+    	   netID = *it+"."+*(it+1)+"."+*(it+2)+".0";
+    	   netMask="255.255.255.0";
+    	   hostID = "0.0.0."+*(it+3);
+       }
 
-           address.SetBase (netID.c_str(), netMask.c_str(), hostID.c_str());
-      d0 = emu.Install (ingressNode);
+       address.SetBase (netID.c_str(), netMask.c_str(), hostID.c_str());
+       d0 = emu.Install (ingressNode);
        Ptr<FdNetDevice> dev = d0.Get (0)->GetObject<FdNetDevice> ();
        dev->SetAddress (Mac48Address (intMAC[0].c_str()));
        NS_LOG_INFO ("Assign IP Address of EMU interface.");
@@ -1513,52 +1503,34 @@ main (int argc, char *argv[])
        ipv4.Assign (NetDevIngressAggregator);
 
        CsmaHelper csma;
-              csma.SetChannelAttribute ("DataRate", StringValue ("1000Mbps"));
-              csma.SetChannelAttribute ("Delay", TimeValue (NanoSeconds (6560)));
+       csma.SetChannelAttribute ("DataRate", StringValue ("1000Mbps"));
+       csma.SetChannelAttribute ("Delay", TimeValue (NanoSeconds (6560)));
 
-              csma.SetDeviceAttribute ("EncapsulationMode", StringValue ("Dix"));
+       csma.SetDeviceAttribute ("EncapsulationMode", StringValue ("Dix"));
 
-              NetDeviceContainer csmaDERsn0 = csma.Install (DERsn0Attacker); //installing the CSMA netdevice on n0 and DERs
-              ipv4.SetBase ("10.1.7.0", "255.255.255.248"); //n0-Int1->DERs-int2 10.1.7.2->{10.1.7.3-10.1.7.6)+10.1.7.1(Attacker)
+       NetDeviceContainer csmaDERsn0 = csma.Install (DERsn0Attacker); //installing the CSMA netdevice on n0 and DERs
+       ipv4.SetBase ("10.1.7.0", "255.255.255.248"); //n0-Int1->DERs-int2 10.1.7.2->{10.1.7.3-10.1.7.6)+10.1.7.1(Attacker)
 
-              Ipv4InterfaceContainer csmaInterfaces;
-                      csmaInterfaces = ipv4.Assign (csmaDERsn0);
-                      std::stringstream macAddr;
-                      uint32_t attackerId = 0;
-                      uint32_t victimDer = 2;
-                      uint32_t csmaSwitch = 1;
-                      Address victimAddr;
-                      for( uint32_t i = 0; i <  DERsn0Attacker.GetN(); i++ )
-                        {
-                          macAddr << "00:00:00:00:00:0" << i;
-                          Ptr<NetDevice> nd = csmaDERsn0.Get (i);
-                          Ptr<CsmaNetDevice> cd = nd->GetObject<CsmaNetDevice> ();
-                          cd->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
-                          // take a copy of victim addr
-                          if(i == victimDer)
-                            victimAddr = cd->GetAddress();
-                          std::cout << macAddr.str()<<std::endl;
-                          macAddr.str(std::string());
-                        }
-////       //Connect DERs to n) using p2p
-////
-//       NetDeviceContainer NetDevDER1n0 = p2pDERIngress.Install (DER1n0);
-//       ipv4.SetBase ("10.1.7.0", "255.255.255.252"); //n0-Int3->DER1_Int2  10.1.7.1->10.1.7.2
-//       ipv4.Assign (NetDevDER1n0);
-//
-//       NetDeviceContainer NetDevDER2n0 = p2pDERIngress.Install (DER2n0);
-//       ipv4.SetBase ("10.1.7.4", "255.255.255.252"); //n0-Int4->DER2_Int2  10.1.7.5->10.1.7.6
-//       ipv4.Assign (NetDevDER2n0);
-//
-//       NetDeviceContainer NetDevDER3n0 = p2pDERIngress.Install (DER3n0);
-//       ipv4.SetBase ("10.1.7.8", "255.255.255.252"); //n0-Int5->DER3_Int2  10.1.7.9->10.1.7.10
-//       ipv4.Assign (NetDevDER3n0);
-//
-//       NetDeviceContainer NetDevDER4n0 = p2pDERIngress.Install (DER4n0);
-//       ipv4.SetBase ("10.1.7.12", "255.255.255.252"); //n0-Int6->DER4_Int2  10.1.7.13->10.1.7.14
-//       ipv4.Assign (NetDevDER4n0);
+       Ipv4InterfaceContainer csmaInterfaces;
+       csmaInterfaces = ipv4.Assign (csmaDERsn0);
+       std::stringstream macAddr;
+       uint32_t attackerId = 0;
+       uint32_t victimDer = 2;
+       uint32_t csmaSwitch = 1;
+       Address victimAddr;
+       for( uint32_t i = 0; i <  DERsn0Attacker.GetN(); i++ )
+       {
+    	   macAddr << "00:00:00:00:00:0" << i;
+    	   Ptr<NetDevice> nd = csmaDERsn0.Get (i);
+    	   Ptr<CsmaNetDevice> cd = nd->GetObject<CsmaNetDevice> ();
+    	   cd->SetAddress(ns3::Mac48Address(macAddr.str().c_str()));
+    	   // take a copy of victim addr
+    	   if(i == victimDer)
+    		   victimAddr = cd->GetAddress();
+    	   std::cout << macAddr.str()<<std::endl;
+    	   macAddr.str(std::string());
+       }
 
-//
 
 
 
@@ -1600,65 +1572,60 @@ main (int argc, char *argv[])
              
 
 
-             std::string encapMode2 ("Dix");
-             EmuFdNetDeviceHelper emu2;
-             emu2.SetDeviceName (deviceName2);
-             emu2.SetAttribute ("EncapsulationMode", StringValue (encapMode2));
-             std::stringstream ss1(intIP[1]);
-             std::vector<string> tokenizedIP1;
-             std::string s1;
-                        tokenizedIP1.clear();
+		std::string encapMode2 ("Dix");
+		EmuFdNetDeviceHelper emu2;
+		emu2.SetDeviceName (deviceName2);
+		emu2.SetAttribute ("EncapsulationMode", StringValue (encapMode2));
+		std::stringstream ss1(intIP[1]);
+		std::vector<string> tokenizedIP1;
+		std::string s1;
+		tokenizedIP1.clear();
 
-                        	while (std::getline(ss1, s1, '.')) {
-                        		tokenizedIP1.push_back(s1);
-                        	}
-                        	string netID1;
-                        			           	string netMask1;
-                        			           	string hostID1;
-                        			           	vector<string>::iterator it1 = tokenizedIP1.begin();
-
-
-                        			           	if(subnet==1)
-                        			           			           	{
-                        			           			           		netID1 = *it1+".0.0.0";
-                        			           			           		netMask1="255.0.0.0";
-                        			           			           		hostID1 = "0."+*(it1+1)+"."+*(it1+2)+"."+*(it1+3);
-                        			           			           	}
-                        			           			           	else if(subnet==2)
-                        			           			           	{
-                        			           			           		netID1 = *it1+"."+*(it1+1)+".0.0";
-                        			           			           		netMask1="255.255.0.0";
-                        			           			           		hostID1 = "0.0."+*(it1+2)+"."+*(it1+3);
-                        			           			           	}
-                        			           			           	else if(subnet==3)
-                        			           			           	{
-                        			           			           		netID1 = *it1+"."+*(it1+1)+"."+*(it1+2)+".0";
-                        			           			           		netMask1="255.255.255.0";
-                        			           			           		hostID1 = "0.0.0."+*(it1+3);
-                        			           			           	}
-
-                        	std::cout<<"NetID "<<netID1<<"Netmask "<<netMask1 << "HostID "<<hostID1;
-                        	address.SetBase (netID1.c_str(), netMask1.c_str(), hostID1.c_str());
-             d1 = emu2.Install (egressNode);
+		while (std::getline(ss1, s1, '.')) {
+			tokenizedIP1.push_back(s1);
+		}
+		string netID1;
+		string netMask1;
+		string hostID1;
+		vector<string>::iterator it1 = tokenizedIP1.begin();
 
 
-             Ptr<FdNetDevice> dev1 = d1.Get (0)->GetObject<FdNetDevice> ();
-             dev1->SetAddress (Mac48Address (intMAC[1].c_str()));
-             NS_LOG_INFO ("Assign IP Address of EMU interface2.");
-             i1 = address.Assign (d1); //IP address for node n3 with emulation
-             dev1->Initialize();
+		if(subnet==1)
+		{
+			netID1 = *it1+".0.0.0";
+			netMask1="255.0.0.0";
+			hostID1 = "0."+*(it1+1)+"."+*(it1+2)+"."+*(it1+3);
+		}
+		else if(subnet==2)
+		{
+			netID1 = *it1+"."+*(it1+1)+".0.0";
+			netMask1="255.255.0.0";
+			hostID1 = "0.0."+*(it1+2)+"."+*(it1+3);
+		}
+		else if(subnet==3)
+		{
+			netID1 = *it1+"."+*(it1+1)+"."+*(it1+2)+".0";
+			netMask1="255.255.255.0";
+			hostID1 = "0.0.0."+*(it1+3);
+		}
+
+		std::cout<<"NetID "<<netID1<<"Netmask "<<netMask1 << "HostID "<<hostID1;
+		address.SetBase (netID1.c_str(), netMask1.c_str(), hostID1.c_str());
+		d1 = emu2.Install (egressNode);
+
+
+		Ptr<FdNetDevice> dev1 = d1.Get (0)->GetObject<FdNetDevice> ();
+		dev1->SetAddress (Mac48Address (intMAC[1].c_str()));
+		NS_LOG_INFO ("Assign IP Address of EMU interface2.");
+		i1 = address.Assign (d1); //IP address for node n3 with emulation
+		dev1->Initialize();
 
 
 
   //********************Setup routing**********************************************
-             NS_LOG_INFO ("Setup routing");
+       NS_LOG_INFO ("Setup routing");
        Ipv4StaticRoutingHelper ipv4RoutingHelper;
-//       Ptr<SocketFactory> rxSocketFactory = n.Get (0)->GetObject<UdpSocketFactory> ();
-//       Ptr<Socket> rxSocketn0 = rxSocketFactory->CreateSocket ();
-//       rxSocketn0->Bind (InetSocketAddress (Ipv4Address ("10.0.2.2"), 4888));
 
-
-       //rxSocketn0->SetRecvCallback (MakeBoundCallback (&PrintTraffic ,&n));
 
        //set routing
        Ptr<Ipv4> ipv4AttackerNode =Attackers.Get(0)->GetObject<Ipv4>();
@@ -1674,27 +1641,7 @@ main (int argc, char *argv[])
        //intermediate node that relays traffic from node 0 to node 3
        Ptr<Ipv4> ipv4n0 = n.Get(0)->GetObject<Ipv4>();
        Ptr<Ipv4StaticRouting> staticRouting_n0= ipv4RoutingHelper.GetStaticRouting (ipv4n0);
-       // The ifIndex for this outbound route is 1; the first p2p link added
 
-//       staticRouting_n0->SetDefaultRoute(Ipv4Address("10.1.1.2"),1,0);
-//
-//       Ptr<Ipv4> ipv4n1 = n.Get(1)->GetObject<Ipv4>();
-//             Ptr<Ipv4StaticRouting> staticRouting_n1= ipv4RoutingHelper.GetStaticRouting (ipv4n1);
-//             // The ifIndex for this outbound route is 1; the first p2p link added
-//
-//             staticRouting_n1->SetDefaultRoute(Ipv4Address("10.1.2.2"),2,0);
-//
-//             Ptr<Ipv4> ipv4n2 = n.Get(2)->GetObject<Ipv4>();
-//             Ptr<Ipv4StaticRouting> staticRouting_n2= ipv4RoutingHelper.GetStaticRouting (ipv4n2);
-//             // The ifIndex for this outbound route is 1; the first p2p link added
-//             staticRouting_n2->SetDefaultRoute(Ipv4Address("10.1.3.2"),1,0);
-//                                     //staticRouting_n3->SetDefaultRoute(Ipv4Address("10.1.8.2"),2,0);
-//
-//             Ptr<Ipv4> ipv4n3 = n.Get(3)->GetObject<Ipv4>();
-//                         Ptr<Ipv4StaticRouting> staticRouting_n3= ipv4RoutingHelper.GetStaticRouting (ipv4n3);
-//                         // The ifIndex for this outbound route is 1; the first p2p link added
-//                         staticRouting_n3->SetDefaultRoute(Ipv4Address("10.1.8.2"),3,0);
-//                         //staticRouting_n3->SetDefaultRoute(Ipv4Address("10.1.8.2"),2,0);
        //DER route for 10.1.8.5
        Ptr<Ipv4> ipv4DER1 = DERs.Get(0)->GetObject<Ipv4>();
        Ptr<Ipv4StaticRouting> staticRouting_DER1= ipv4RoutingHelper.GetStaticRouting (ipv4DER1);
@@ -1731,12 +1678,12 @@ main (int argc, char *argv[])
        staticRoutingAttackerNode->AddHostRouteTo(Ipv4Address (intIP[1].c_str()), Ipv4Address ("10.1.8.26"), 2);
 
        Ptr<Ipv4> ipv4Aggregator = Aggregator->GetObject<Ipv4>();
-              Ptr<Ipv4StaticRouting> staticRouting_Aggregator= ipv4RoutingHelper.GetStaticRouting (ipv4Aggregator);
-              staticRouting_Aggregator->AddHostRouteTo (Ipv4Address ("10.1.7.3"), Ipv4Address ("10.1.8.1"), 2);
-              staticRouting_Aggregator->AddHostRouteTo (Ipv4Address ("10.1.7.4"), Ipv4Address ("10.1.8.1"), 2);
-              staticRouting_Aggregator->AddHostRouteTo (Ipv4Address ("10.1.7.5"), Ipv4Address ("10.1.8.1"), 2);
-              staticRouting_Aggregator->AddHostRouteTo (Ipv4Address ("10.1.7.6"), Ipv4Address ("10.1.8.1"), 2);
-              staticRouting_Aggregator->AddHostRouteTo (Ipv4Address (intIP[1].c_str()), Ipv4Address ("10.1.8.6"), 3);
+       Ptr<Ipv4StaticRouting> staticRouting_Aggregator= ipv4RoutingHelper.GetStaticRouting (ipv4Aggregator);
+       staticRouting_Aggregator->AddHostRouteTo (Ipv4Address ("10.1.7.3"), Ipv4Address ("10.1.8.1"), 2);
+       staticRouting_Aggregator->AddHostRouteTo (Ipv4Address ("10.1.7.4"), Ipv4Address ("10.1.8.1"), 2);
+       staticRouting_Aggregator->AddHostRouteTo (Ipv4Address ("10.1.7.5"), Ipv4Address ("10.1.8.1"), 2);
+       staticRouting_Aggregator->AddHostRouteTo (Ipv4Address ("10.1.7.6"), Ipv4Address ("10.1.8.1"), 2);
+       staticRouting_Aggregator->AddHostRouteTo (Ipv4Address (intIP[1].c_str()), Ipv4Address ("10.1.8.6"), 3);
 
 
        Ptr<Ipv4> ipv4_egressNode = egressNode->GetObject<Ipv4>();
@@ -1764,27 +1711,27 @@ main (int argc, char *argv[])
 
 
           // get IPV4 interface for the attacker
-                   std::pair<Ptr<Ipv4>, uint32_t> returnValue = csmaInterfaces.Get (attackerId);
-                   Ptr<Ipv4> ipv4Val = returnValue.first;
-                   uint32_t index = returnValue.second;
-                   Ptr<Ipv4Interface> iface =  ipv4Val->GetObject<Ipv4L3Protocol> ()->GetInterface (index);
+          std::pair<Ptr<Ipv4>, uint32_t> returnValue = csmaInterfaces.Get (attackerId);
+          Ptr<Ipv4> ipv4Val = returnValue.first;
+          uint32_t index = returnValue.second;
+          Ptr<Ipv4Interface> iface =  ipv4Val->GetObject<Ipv4L3Protocol> ()->GetInterface (index);
 
-                   std::pair<Ptr<Ipv4>, uint32_t> returnValue2 = csmaInterfaces.Get (victimDer);
-                    Ptr<Ipv4> ipv4Val2 = returnValue.first;
-                    uint32_t index2 = returnValue.second;
-                    Ptr<Ipv4Interface> iface2 =  ipv4Val2->GetObject<Ipv4L3Protocol> ()->GetInterface (index2);
+          std::pair<Ptr<Ipv4>, uint32_t> returnValue2 = csmaInterfaces.Get (victimDer);
+          Ptr<Ipv4> ipv4Val2 = returnValue.first;
+          uint32_t index2 = returnValue.second;
+          Ptr<Ipv4Interface> iface2 =  ipv4Val2->GetObject<Ipv4L3Protocol> ()->GetInterface (index2);
 
-                    if (manInTheMiddle){
-                   //contruct attacker app
-                   Ptr<AttackApp> attacker = CreateObject<AttackApp> ();
-                   std::vector<Ipv4Address> spoofedIPs{csmaInterfaces.GetAddress(csmaSwitch)};
-                                                             std::vector<Ipv4Address>victimIPs{csmaInterfaces.GetAddress(victimDer)};
-                                                             std::vector<Address>victimMACs{victimAddr};
-                   attacker->Setup(DERsn0Attacker.Get(attackerId), csmaDERsn0.Get(attackerId), iface, spoofedIPs, victimIPs, victimMACs);
-                   DERsn0Attacker.Get (attackerId)->AddApplication (attacker);
-                   attacker->SetStartTime (Seconds (1.0));
-                   attacker->SetStopTime (Seconds (10.0));
-                    }
+          if (manInTheMiddle){
+        	  //contruct attacker app
+			  Ptr<AttackApp> attacker = CreateObject<AttackApp> ();
+			  std::vector<Ipv4Address> spoofedIPs{csmaInterfaces.GetAddress(csmaSwitch)};
+			  std::vector<Ipv4Address>victimIPs{csmaInterfaces.GetAddress(victimDer)};
+			  std::vector<Address>victimMACs{victimAddr};
+			  attacker->Setup(DERsn0Attacker.Get(attackerId), csmaDERsn0.Get(attackerId), iface, spoofedIPs, victimIPs, victimMACs);
+			  DERsn0Attacker.Get (attackerId)->AddApplication (attacker);
+			  attacker->SetStartTime (Seconds (20.0));
+			  attacker->SetStopTime (Seconds (100.0));
+          }
 
 
 
@@ -1793,7 +1740,7 @@ main (int argc, char *argv[])
        //ingress interface
 
        Ptr<MyApp> app = CreateObject<MyApp> ();
-       app->Setup (ingressNode,Ipv4Address (intIP[0].c_str()),Ipv4Address ("10.1.8.5"), 10000,10000,INGRESS_NODE,maxParallelSessions,DER,AggregatorIP,intIP);
+       app->Setup (ingressNode,Ipv4Address (intIP[0].c_str()),Ipv4Address ("10.1.8.5"), 7001,7001,INGRESS_NODE,maxParallelSessions,DER,AggregatorIP,intIP);
        ingressNode->AddApplication (app);
        app->SetStartTime (Seconds (1.));
        app->SetStopTime (Seconds (stopTime));
@@ -1832,9 +1779,9 @@ main (int argc, char *argv[])
 
        Ptr<MyApp> appAggregatorIntern = CreateObject<MyApp> ();
        appAggregatorIntern->Setup (Aggregator,Ipv4Address ("10.1.8.5"),Ipv4Address (intIP[1].c_str()), 7001,7001,AGGREGATOR_NODE,maxParallelSessions,DER,AggregatorIP,intIP);
-              Aggregator->AddApplication (appAggregatorIntern);
-              appAggregatorIntern->SetStartTime (Seconds (1.));
-              appAggregatorIntern->SetStopTime (Seconds (stopTime));
+       Aggregator->AddApplication (appAggregatorIntern);
+       appAggregatorIntern->SetStartTime (Seconds (1.));
+       appAggregatorIntern->SetStopTime (Seconds (stopTime));
 
        Ptr<MyApp> appDER1Intern = CreateObject<MyApp> ();
        appDER1Intern->Setup (DERs.Get(0),Ipv4Address ("10.1.7.3"),Ipv4Address (intIP[1].c_str()), 7001,7001,FORWARDING_NODE,maxParallelSessions,DER,AggregatorIP,intIP);
@@ -1865,113 +1812,84 @@ main (int argc, char *argv[])
 
        //Attacker Node to generate DoS traffic towards node0
 
-       dosEnabled =  false;
-if (dosEnabled){
-	NS_LOG_INFO ("Enable DoS");
-    uint16_t port = 7001;   // Discard port (RFC 863)
-    Ptr<TcpSynFlood> appSynFlood = CreateObject<TcpSynFlood>();
-    appSynFlood->Setup(Attackers.Get(0),Ipv4Address ("10.1.8.5"),Ipv4Address ("10.1.7.1"), port,interSynTime );
-    Attackers.Get(0)->AddApplication(appSynFlood);
-    appSynFlood->SetStartTime (Seconds (100.));
-    appSynFlood->SetStopTime (Seconds (110));
+
+       if (dosEnabled){
+    	   NS_LOG_INFO ("Enable DoS");
+    	   uint16_t port = 7001;   // Discard port (RFC 863)
+    	   Ptr<TcpSynFlood> appSynFlood = CreateObject<TcpSynFlood>();
+    	   appSynFlood->Setup(Attackers.Get(0),Ipv4Address ("10.1.8.5"),Ipv4Address ("10.1.7.1"), port,interSynTime );
+    	   Attackers.Get(0)->AddApplication(appSynFlood);
+    	   appSynFlood->SetStartTime (Seconds (20.));
+    	   appSynFlood->SetStopTime (Seconds (30));
 
 
-}
+       }
 
 
 
 
 
-//Setting up the egress node
+       //Setting up the egress node
 
        Ptr<MyApp> app2 = CreateObject<MyApp> ();
-               app2->Setup (egressNode,Ipv4Address (intIP[1].c_str()),Ipv4Address (DER[1].c_str()), 7001,7001,EGRESS_NODE,maxParallelSessions,DER,AggregatorIP,intIP);
-               egressNode->AddApplication (app2);
-               app2->SetStartTime (Seconds (1.));
-               app2->SetStopTime (Seconds (stopTime));
+       app2->Setup (egressNode,Ipv4Address (intIP[1].c_str()),Ipv4Address (DER[1].c_str()), 7001,7001,EGRESS_NODE,maxParallelSessions,DER,AggregatorIP,intIP);
+       egressNode->AddApplication (app2);
+       app2->SetStartTime (Seconds (1.));
+       app2->SetStopTime (Seconds (stopTime));
 
 
 
-              // Create static routes from A to C
+
+       AnimationInterface anim("rtds-dos-sim.xml");
+       anim.EnablePacketMetadata (true);
+       anim.SetConstantPosition (n.Get (0), 10 , 10);
+
+       anim.UpdateNodeDescription(n.Get (0),"CSMA");
+       anim.UpdateNodeDescription(n.Get (1),"Router1");
+       anim.UpdateNodeDescription(n.Get (2),"Router2");
+       anim.UpdateNodeDescription(n.Get (3),"Router3");
+       anim.UpdateNodeImage (0, anim.AddResource ("/home/rtds/repos/ns-3-allinone/netanim/attacker.png") );
+       anim.UpdateNodeSize (0, 2.0,2.0 );
+       anim.UpdateNodeImage (1, anim.AddResource ("/home/rtds/repos/ns-3-allinone/netanim/switch.png") );
+       anim.UpdateNodeSize (1, 2.0,2.0 );
+       anim.SetConstantPosition (n.Get (1), 15 , 10);
+       anim.UpdateNodeImage (2, anim.AddResource ("/home/rtds/repos/ns-3-allinone/netanim/router.png") );
+       anim.UpdateNodeSize (2, 2.0,2.0 );
+       anim.SetConstantPosition (n.Get (2), 10 , 15);
+       anim.UpdateNodeImage (3, anim.AddResource ("/home/rtds/repos/ns-3-allinone/netanim/router.png") );
+       anim.UpdateNodeSize (3, 2.0,2.0 );
+       anim.SetConstantPosition (n.Get (3), 15 , 20);
+       anim.UpdateNodeImage (4, anim.AddResource ("/home/rtds/repos/ns-3-allinone/netanim/router.png") );
+       anim.UpdateNodeSize (4, 2.0,2.0 );
+
+       anim.SetConstantPosition (DERs.Get (0), 5.0 , 0.0);
+       anim.UpdateNodeDescription(DERs.Get (0),"DER1");
+       anim.SetConstantPosition (DERs.Get (1), 5 , 5);
+       anim.UpdateNodeDescription(DERs.Get (1),"DER2");
+       anim.SetConstantPosition (DERs.Get (2), 5 , 10);
+       anim.UpdateNodeDescription(DERs.Get (2),"DER3");
+       anim.SetConstantPosition (DERs.Get (3), 5 , 15);
+       anim.UpdateNodeDescription(DERs.Get (3),"DER4");
 
 
-//              ipv4RoutingHelper.PrintRoutingTableAt(Seconds(10), n.Get (1), routingStream);
-//              ipv4RoutingHelper.PrintRoutingTableAt(Seconhttps://en.wikipedia.org/wiki/List_of_IP_protocol_numbersds(10), n.Get (3), routingStream);
+       anim.SetConstantPosition (ingressNode, 0 , 25);
+       anim.UpdateNodeDescription(ingressNode,"ingressNode");
+       anim.SetConstantPosition (egressNode, 25 , 25);
+       anim.UpdateNodeDescription(egressNode,"egressNode");
+       anim.SetConstantPosition (Aggregator, 20 , 25);
+       anim.UpdateNodeDescription(Aggregator,"Aggregator");
+       anim.SetStartTime (Seconds(1.0));
+       anim.SetStopTime (Seconds(stopTime));
 
-  //device 0 is sta and device 1 is ap
+       emu.EnablePcapAll ("rtds-dos-sim-emu", true);
+       //  emu.EnableAsciiAll ("rtds-dos-sim-1.tr");
+       p2p.EnablePcapAll ("rtds-dos-sim-p2p", true);
+       csma.EnablePcapAll ("rtds-dos-sim-csma", true);
+       //    emu2.EnableAsciiAll ("frtds-dos-sim-2.tr");
 
-  /*PacketSinkHelper packetSinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), 8080));
-  ApplicationContainer sinkApps = packetSinkHelper.Install (n.Get (0));
-  sinkApps.Start (Seconds (0.));
-  sinkApps.Stop (Seconds (20.));
-
-  PacketSinkHelper packetSinkHelper2 ("ns3::UdpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), 8085));
-  ApplicationContainer sinkApps2 = packetSinkHelper2.Install (nodes.Get (1));
-  sinkApps2.Start (Seconds (0.));
-  sinkApps2.Stop (Seconds (20.));
-
-  Ptr<MyApp> app = CreateObject<MyApp> ();
-  app->Setup (n.Get(1),InetSocketAddress (i1.GetAddress (1), 8085),InetSocketAddress (interfaces.GetAddress (0), 49153), 1040, 5, DataRate ("1Mbps"));
-  n.Get (1)->AddApplication (app);
-  app->SetStartTime (Seconds (1.));
-  app->SetStopTime (Seconds (20.));
-
-  Ptr<MyApp> app2 = CreateObject<MyApp> ();
-  app2->Setup (nodes.Get(0),InetSocketAddress (interfaces.GetAddress (0),8080), InetSocketAddress (interfaces.GetAddress (1), 49153), 1040, 5, DataRate ("1Mbps"));
-  nodes.Get (0)->AddApplication (app2);
-  app2->SetStartTime (Seconds (1.));
-  app2->SetStopTime (Seconds (20.));*/
-//
-  AnimationInterface anim("rtds-dos-sim.xml");
-  anim.EnablePacketMetadata (true);
-  anim.SetConstantPosition (n.Get (0), 10 , 10);
-
-  anim.UpdateNodeDescription(n.Get (0),"CSMA");
-  	anim.UpdateNodeDescription(n.Get (1),"Router1");
-  	anim.UpdateNodeDescription(n.Get (2),"Router2");
-  	anim.UpdateNodeDescription(n.Get (3),"Router3");
-  	anim.UpdateNodeImage (0, anim.AddResource ("/home/rtds-cybersec/repos/ns-3-allinone/netanim/attacker.png") );
-  	  	anim.UpdateNodeSize (0, 2.0,2.0 );
-  	anim.UpdateNodeImage (1, anim.AddResource ("/home/rtds-cybersec/repos/ns-3-allinone/netanim/switch.png") );
-  	anim.UpdateNodeSize (1, 2.0,2.0 );
-  	anim.SetConstantPosition (n.Get (1), 15 , 10);
-  	anim.UpdateNodeImage (2, anim.AddResource ("/home/rtds-cybersec/repos/ns-3-allinone/netanim/router.png") );
-  	anim.UpdateNodeSize (2, 2.0,2.0 );
-  	anim.SetConstantPosition (n.Get (2), 10 , 15);
-  	anim.UpdateNodeImage (3, anim.AddResource ("/home/rtds-cybersec/repos/ns-3-allinone/netanim/router.png") );
-  	anim.UpdateNodeSize (3, 2.0,2.0 );
-  	anim.SetConstantPosition (n.Get (3), 15 , 20);
-  	anim.UpdateNodeImage (4, anim.AddResource ("/home/rtds-cybersec/repos/ns-3-allinone/netanim/router.png") );
-  	anim.UpdateNodeSize (4, 2.0,2.0 );
-
-  	anim.SetConstantPosition (DERs.Get (0), 5 , 0);
-  	anim.UpdateNodeDescription(DERs.Get (0),"DER1");
-  	anim.SetConstantPosition (DERs.Get (1), 5 , 5);
-  	  	anim.UpdateNodeDescription(DERs.Get (1),"DER2");
-  	  anim.SetConstantPosition (DERs.Get (2), 5 , 10);
-  	  	anim.UpdateNodeDescription(DERs.Get (2),"DER3");
-  	  anim.SetConstantPosition (DERs.Get (3), 5 , 15);
-  	  	anim.UpdateNodeDescription(DERs.Get (3),"DER4");
-
-
-  	  anim.SetConstantPosition (ingressNode, 0 , 25);
-  	  anim.UpdateNodeDescription(ingressNode,"ingressNode");
-  	anim.SetConstantPosition (egressNode, 25 , 25);
-  	  		  anim.UpdateNodeDescription(egressNode,"egressNode");
-  	  		anim.SetConstantPosition (Aggregator, 20 , 25);
-  	  		  anim.UpdateNodeDescription(Aggregator,"Aggregator");
-  anim.SetStartTime (Seconds(1.0));
-  anim.SetStopTime (Seconds(stopTime));
-
-  emu.EnablePcapAll ("rtds-dos-sim-emu", true);
-//  emu.EnableAsciiAll ("rtds-dos-sim-1.tr");
-  p2p.EnablePcapAll ("rtds-dos-sim-p2p", true);
-  csma.EnablePcapAll ("rtds-dos-sim-csma", true);
-//    emu2.EnableAsciiAll ("frtds-dos-sim-2.tr");
-
-  Simulator::Stop (Seconds (stopTime+10));
-  Simulator::Run ();
-  Simulator::Destroy ();
+       Simulator::Stop (Seconds (stopTime+10));
+       Simulator::Run ();
+       Simulator::Destroy ();
 
   return 0;
 }

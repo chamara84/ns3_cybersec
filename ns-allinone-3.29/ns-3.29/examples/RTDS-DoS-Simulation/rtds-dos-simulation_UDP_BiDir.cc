@@ -785,7 +785,7 @@ main (int argc, char *argv[])
 
 	  bool dosEnabled = false;
 	  
-	  bool manInTheMiddle = true;
+	  bool manInTheMiddle = false;
 	  double stopTime = 500.0
 	    ;
 	  uint32_t nNodes = 2;
@@ -1521,18 +1521,18 @@ if (dosEnabled){
   	anim.UpdateNodeDescription(n.Get (1),"Router1");
   	anim.UpdateNodeDescription(n.Get (2),"Router2");
   	anim.UpdateNodeDescription(n.Get (3),"Router3");
-  	anim.UpdateNodeImage (0, anim.AddResource ("/home/rtds-cybersec/repos/ns-3-allinone/netanim/attacker.png") );
+  	anim.UpdateNodeImage (0, anim.AddResource ("/home/rtds/repos/ns-3-allinone/netanim/attacker.png") );
   	  	  	anim.UpdateNodeSize (0, 2.0,2.0 );
-  	anim.UpdateNodeImage (1, anim.AddResource ("/home/rtds-cybersec/repos/ns-3-allinone/netanim/switch.png") );
+  	anim.UpdateNodeImage (1, anim.AddResource ("/home/rtds/repos/ns-3-allinone/netanim/switch.png") );
   	anim.UpdateNodeSize (1, 2.0,2.0 );
   	anim.SetConstantPosition (n.Get (1), 15 , 10);
-  	anim.UpdateNodeImage (2, anim.AddResource ("/home/rtds-cybersec/repos/ns-3-allinone/netanim/router.png") );
+  	anim.UpdateNodeImage (2, anim.AddResource ("/home/rtds/repos/ns-3-allinone/netanim/router.png") );
   	anim.UpdateNodeSize (2, 2.0,2.0 );
   	anim.SetConstantPosition (n.Get (2), 15 , 15);
-  	anim.UpdateNodeImage (3, anim.AddResource ("/home/rtds-cybersec/repos/ns-3-allinone/netanim/router.png") );
+  	anim.UpdateNodeImage (3, anim.AddResource ("/home/rtds/repos/ns-3-allinone/netanim/router.png") );
   	anim.UpdateNodeSize (3, 2.0,2.0 );
   	anim.SetConstantPosition (n.Get (3), 15 , 20);
-  	anim.UpdateNodeImage (4, anim.AddResource ("/home/rtds-cybersec/repos/ns-3-allinone/netanim/router.png") );
+  	anim.UpdateNodeImage (4, anim.AddResource ("/home/rtds/repos/ns-3-allinone/netanim/router.png") );
   	anim.UpdateNodeSize (4, 2.0,2.0 );
 
   	anim.SetConstantPosition (DERs.Get (0), 5 , 0);

@@ -112,7 +112,9 @@ for(int index = 0 ; index<aconfig->numAlteredVal;index++)
 													modified=1;
 													char nullCharactor = '\0';
 													int32_t tempIntVal = strtol(aconfig->values_to_alter[index].newVal.c_str(),NULL,10);
+													int32_t tempIntValQ = aconfig->values_to_alter[index].newValQ;
 													tempIntVal = htonl(tempIntVal);
+													tempIntValQ = htonl(tempIntValQ);
 													//int32_t tempVal = 0;
 													int valNumber = aconfig->values_to_alter[index].asduNo;
 													char * tempCharVal = (char *)malloc(sizeof(int32_t));
@@ -123,8 +125,7 @@ for(int index = 0 ; index<aconfig->numAlteredVal;index++)
 														//memcpy(&tempVal,pdu_start+pdu[asduIndex].offset+i*8,sizeof(int32_t));
 														//memcpy(&tempVal,tempCharVal,4);
 														//tempVal*=tempIntVal;
-														if(i==valNumber)
-															memcpy(pdu_start+pdu[asduIndex].offset+i*8,tempCharVal ,4);
+
 													if(i==0 && asduIndex==0)
 													{
 														 std::string temp1(pdu[asduIndex].svID);
@@ -135,6 +136,13 @@ for(int index = 0 ; index<aconfig->numAlteredVal;index++)
 
 													}
 
+													if(i==valNumber)
+													{
+
+														memcpy(pdu_start+pdu[asduIndex].offset+i*8,tempCharVal ,4);
+														memcpy(pdu_start+pdu[asduIndex].offset+i*8+4,&tempIntValQ ,4);
+														break;
+													}
 													}
 													free(tempCharVal);
 
@@ -432,7 +440,7 @@ int SVFullReassembly(ns3::Ptr<ns3::NetDevice> device,sv_config_t *config, ns3::P
 
 		            	 for(int index = 0 ; index<aconfig->numAlteredVal;index++)
 		            	 		            	 {
-		            	 		            		 if(pdu[indexASDU].svID.compare(aconfig->values_to_alter[index].svID)==0 && pdu[indexASDU].datSet.compare(aconfig->values_to_alter[index].datSet))
+		            	 		            		 if(pdu[indexASDU].svID.compare(aconfig->values_to_alter[index].svID)==0 && pdu[indexASDU].datSet.compare(aconfig->values_to_alter[index].datSet)==0)
 		            	 		            		 {
 
 		            	 		            			 modify = 1;
@@ -462,7 +470,7 @@ int SVFullReassembly(ns3::Ptr<ns3::NetDevice> device,sv_config_t *config, ns3::P
 		            	 pdu[indexASDU].smpCnt = BerDecoder_decodeUint32(pdu_start, elementLength, offset);
 
 		            	// frameID->smpCnt = pdu->smpCnt;
-		            	// pdu[indexASDU].smpCnt+=1;
+		            	 pdu[indexASDU].smpCnt+=10;
 
 		            	 pdu[indexASDU].smpCnt = (pdu[indexASDU].smpCnt)%(4800);
 		            	 uint16_t val16 = ( uint16_t)pdu[indexASDU].smpCnt;

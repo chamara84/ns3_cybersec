@@ -271,11 +271,15 @@ EmuFdNetDeviceHelper::CreateFileDescriptor (void) const
       //
       // Execute the socket creation process image.
       //
-      status = ::execlp ("/home/chamara/repo/ns3_cybersec/ns-allinone-3.29/ns-3.29/build/src/fd-net-device/ns3.29-raw-sock-creator-debug",
-                         "/home/chamara/repo/ns3_cybersec/ns-allinone-3.29/ns-3.29/build/src/fd-net-device/ns3.29-raw-sock-creator-debug",                            // argv[0] (filename)
-                         oss.str ().c_str (),                           // argv[1] (-p<path?
-                         (char *)NULL);
+//      status = ::execlp (RAW_SOCK_CREATOR,
+//    		             RAW_SOCK_CREATOR,                            // argv[0] (filename)
+//                         oss.str ().c_str (),                           // argv[1] (-p<path?
+//                         (char *)NULL);
 
+      status = ::execlp ("/home/rtds/repo/ns3_cybersec/ns-allinone-3.29/ns-3.29/build/src/fd-net-device/ns3.29-raw-sock-creator-debug",
+    		  "/home/rtds/repo/ns3_cybersec/ns-allinone-3.29/ns-3.29/build/src/fd-net-device/ns3.29-raw-sock-creator-debug",                            // argv[0] (filename)
+                               oss.str ().c_str (),                           // argv[1] (-p<path?
+                               (char *)NULL);
       //
       // If the execlp successfully completes, it never returns.  If it returns it failed or the OS is
       // broken.  In either case, we bail.

@@ -3956,7 +3956,7 @@ void
 TcpSocketBase::AddOptionMSS (TcpHeader &header)
 {
   NS_LOG_FUNCTION (this << header);
-  NS_ASSERT (header.GetFlags () & TcpHeader::ACK);
+ // NS_ASSERT (header.GetFlags () & TcpHeader::ACK);
 
   Ptr<TcpOptionNOP> NOP = CreateObject<TcpOptionNOP> ();
 

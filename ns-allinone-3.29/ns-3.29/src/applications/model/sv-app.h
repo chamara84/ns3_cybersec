@@ -127,6 +127,7 @@ typedef struct _sv_alter_values //structure introduced to keep the obj, variance
 	float floating_point_val;
 	uint64_t integer_value;
 	std::string newVal;
+	long newValQ;
 	bool done;
 	uint8_t type;
 

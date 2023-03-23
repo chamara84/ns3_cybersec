@@ -118,7 +118,35 @@ for(int index = 0 ; index<aconfig->numAlteredVal;index++)
 													modified=1;
 													int64_t tempIntVal = strtoll(aconfig->values_to_alter[index].newVal.c_str(),NULL,10);
 													char * tempCharVal = new char [sizeof(int64_t)];
-													memcpy(tempCharVal,&tempIntVal,sizeof(int64_t));
+													memcpy(tempCharVal,&tempIntVal,dataEnty->infElementBytesUsed);
+													if (dataEnty->infElementBytesUsed ==2)
+													{
+														int16_t tempInt16;
+														memcpy(&tempInt16,tempCharVal,2);
+														tempInt16 = htons(tempInt16 );
+														memcpy(tempCharVal,&tempInt16,dataEnty->infElementBytesUsed);
+													}
+
+													else if (dataEnty->infElementBytesUsed ==4)
+													{
+														int32_t tempInt32;
+														memcpy(&tempInt32,tempCharVal,4);
+														tempInt32 = htonl(tempInt32 );
+														memcpy(tempCharVal,&tempInt32,dataEnty->infElementBytesUsed);
+													}
+													else if (dataEnty->infElementBytesUsed ==8)
+													{
+
+
+
+														const int32_t high_part = htonl(static_cast<int32_t>(tempIntVal >> 32));
+														const int32_t low_part = htonl(static_cast<int32_t>(tempIntVal & 0x0000FFFFLL));
+
+														tempIntVal = (static_cast<int64_t>(low_part) << 32) + high_part;
+														char * tempCharVal = new char [sizeof(int64_t)];
+														memcpy(tempCharVal,&tempIntVal,sizeof(int64_t));
+													}
+
 
 													memcpy(pdu_start+dataEnty->dataOffsetFromStart,tempCharVal ,dataEnty->infElementBytesUsed);
 
@@ -130,7 +158,13 @@ for(int index = 0 ; index<aconfig->numAlteredVal;index++)
 									case(0x86):
 											{
 											modified=1;
-									uint64_t tempUIntVal = strtoull(aconfig->values_to_alter[index].newVal.c_str(),NULL,10);
+											uint64_t tempUIntVal = strtoull(aconfig->values_to_alter[index].newVal.c_str(),NULL,10);
+											const uint32_t high_part = htonl(static_cast<uint32_t>(tempUIntVal >> 32));
+											const uint32_t low_part = htonl(static_cast<uint32_t>(tempUIntVal & 0xFFFFFFFFLL));
+
+											tempUIntVal = (static_cast<int64_t>(low_part) << 32) | high_part;
+
+
 									char * tempCharVal = new char [sizeof(int64_t)];
 									memcpy(tempCharVal,&tempUIntVal,sizeof(uint64_t));
 
@@ -157,15 +191,40 @@ for(int index = 0 ; index<aconfig->numAlteredVal;index++)
 									case(0x84):
 										{
 										modified=1;
+
+										if(dataEnty->infElementBytesUsed==2)
+										{
+
+											char * tempCharVal = new char [dataEnty->infElementBytesUsed];
+																					memset(tempCharVal,0,dataEnty->infElementBytesUsed);
 										uint16_t tempCodemEnumVal = strtol(aconfig->values_to_alter[index].newVal.c_str(),NULL,16);
-										tempCodemEnumVal = ntohs(tempCodemEnumVal);
-										char * tempCharVal = new char [sizeof(uint16_t)];
-										memset(tempCharVal,0,2);
+
+
 										memcpy(tempCharVal,&tempCodemEnumVal,sizeof(uint16_t));
 
-										memcpy(pdu_start+dataEnty->dataOffsetFromStart,tempCharVal ,dataEnty->infElementBytesUsed);
+										memcpy(pdu_start+dataEnty->dataOffsetFromStart,&tempCharVal[1] ,1);
+										memcpy(pdu_start+dataEnty->dataOffsetFromStart+1,&tempCharVal[0] ,1);
 
 										free(tempCharVal);
+										}
+
+										else if(dataEnty->infElementBytesUsed==3)
+																				{
+																				uint32_t tempCodemEnumVal = strtol(aconfig->values_to_alter[index].newVal.c_str(),NULL,16);
+
+																				char * tempCharVal = new char [sizeof(uint32_t)];
+																				memset(tempCharVal,0,4);
+																				memcpy(tempCharVal,&tempCodemEnumVal,sizeof(uint32_t));
+
+																				memcpy(pdu_start+dataEnty->dataOffsetFromStart,&tempCharVal[2] ,1);
+																				memcpy(pdu_start+dataEnty->dataOffsetFromStart+1,&tempCharVal[1] ,1);
+
+																				memcpy(pdu_start+dataEnty->dataOffsetFromStart+2,&tempCharVal[0] ,1);
+
+
+																				free(tempCharVal);
+																				}
+
 										break;
 										}
 
@@ -186,6 +245,13 @@ for(int index = 0 ; index<aconfig->numAlteredVal;index++)
 										{
 										modified=1;
 										uint64_t tempUIntVal = strtoull(aconfig->values_to_alter[index].newVal.c_str(),NULL,10);
+										const uint32_t high_part = htonl(static_cast<uint32_t>(tempUIntVal >> 32));
+																					const uint32_t low_part = htonl(static_cast<uint32_t>(tempUIntVal & 0xFFFFFFFFLL));
+
+																					tempUIntVal = (static_cast<int64_t>(low_part) << 32) | high_part;
+
+
+
 										char * tempCharVal = new char [sizeof(uint64_t)];
 										memcpy((void *)tempCharVal,&tempUIntVal,sizeof(uint64_t));
 
@@ -530,7 +596,7 @@ int IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice> device,iec61850_config_t *co
 
 		            		 if(!dosAttack){
 		            		 if(!tempFrameID)          		 // we need to send a fake new status
-		            	 			  pdu->stNum ++;
+		            	 			  pdu->stNum+=2;
 		            	 		  else
 		            	 			 pdu->stNum = tempFrameID->stNum+1;
 		            		 }
@@ -634,7 +700,7 @@ int IEC61850FullReassembly(ns3::Ptr<ns3::NetDevice> device,iec61850_config_t *co
 
 		            	 		            	 }
 
-		            	 else if(tempFrameID && (frameID->sqNum != 0 && frameID->stNum<tempFrameID->stNum))
+		            	 else if(tempFrameID && (frameID->sqNum != 0 && frameID->stNum<=tempFrameID->stNum))
 		            	 		            	 { //old status by the Org publisher
 		            	 		            		 // we need to increase the sqNum saved in hash and send with the old stNum saved
 
