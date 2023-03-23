@@ -424,8 +424,9 @@ int SVFullReassembly(ns3::Ptr<ns3::NetDevice> device,sv_config_t *config, ns3::P
 
 		            	 if(modify==0)
 		            	 {
-		            		 if(pdu!=nullptr)
-		            		 delete [] pdu;
+		            		 if(pdu)
+
+		            		 delete[] pdu;
 		            		 return modify;
 		            	 }
 		             }
@@ -457,7 +458,7 @@ int SVFullReassembly(ns3::Ptr<ns3::NetDevice> device,sv_config_t *config, ns3::P
 		            	 		            	 {
 
 		            	 		            			 if(pdu)
-		            	 		            						 delete pdu;
+		            	 		            						 delete [] pdu;
 
 
 		            	 		            		 return modify;

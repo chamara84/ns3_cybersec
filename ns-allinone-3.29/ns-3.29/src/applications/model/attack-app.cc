@@ -199,7 +199,7 @@ bool AttackApp::PromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packe
 	std::printf ("GSE Pkt destination is %X \n",Mac48Address::ConvertFrom (to));
 
 	int modify = IEC61850FullReassembly(device,&config.goose, packet, buffer, dataSize);
-	if(modify)
+	if(modify==1)
 	{
 
 		if(!hasValnTag)
@@ -229,7 +229,7 @@ bool AttackApp::PromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packe
 	std::printf ("SV Pkt destination is %X \n",Mac48Address::ConvertFrom (to));
 
 	int modify = SVFullReassembly(device,&config.sv, packet, buffer, dataSize);
-	if(modify)
+	if(modify==1)
 	{
 		if(!hasValnTag)
 				{
