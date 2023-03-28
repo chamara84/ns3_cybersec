@@ -1464,8 +1464,8 @@ if (dosEnabled){
        //onoff.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=" + ON_TIME + "]"));
          //onoff.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=" + OFF_TIME + "]"));
        ApplicationContainer onOffapps = onoff.Install (n.Get(2));
-      onOffapps.Start (Seconds (10.0));
-       onOffapps.Stop (Seconds (200.0));
+      onOffapps.Start (Seconds (40.0));
+       onOffapps.Stop (Seconds (50.0));
 
 }
 
