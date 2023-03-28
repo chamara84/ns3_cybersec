@@ -1489,22 +1489,22 @@ if(ipProtocol == 17 && (udpHdr1.GetDestinationPort()==7001 || udpHdr1.GetSourceP
 		      		bufferFloat[i] = ntohl(bufferFloat[i]);
 				memcpy(&floatingPointData, &bufferFloat[i], 4);
 				printf("dataValue = %f-%d\n", floatingPointData,i);
-				if(integerData==7){
+//				if(integerData==7){
 
-					if(i==3){
-						floatingPointData = 3.0; //PGen
-					}
-					else if(i==4)
-						floatingPointData = 3.0; //QGen
+//					if(i==3){
+//						floatingPointData = 3.0; //PGen
+//					}
+//					else if(i==4)
+//						floatingPointData = 3.0; //QGen
+//
+//					else if(i==5){
+//						floatingPointData = 4.5; //Pload
+//					}
+//					else
+//						floatingPointData = 4.0; //Qload
+//				}
 
-					else if(i==5){
-						floatingPointData = 4.5; //Pload
-					}
-					else
-						floatingPointData = 4.0; //Qload
-				}
-
-				else
+				if(integerData==8)
 				{
 					if(i==3){
 						floatingPointData = 0.0;
