@@ -819,8 +819,9 @@ main (int argc, char *argv[])
 	   std::string deviceName2 ("enp5s0"); //edit the name corresponding to the device name
 	  std::string encapMode ("Dix");
 
-	  int subnet;
-	  subnet = 2;
+	  std::string subnet = "255.255.255.0";
+
+
 	  
 	  cmd.AddValue ("deviceName1", "device name1", deviceName1);
 	  cmd.AddValue ("deviceName2", "device name1", deviceName2);
@@ -843,7 +844,7 @@ main (int argc, char *argv[])
 	  cmd.AddValue("Gateway","IP address of the gateway",gateway);
 	  
 	  //cmd.AddValue ("nNodes", "number of nodes to create (>= 2)", nNodes);
- cmd.AddValue("Subnet","Sub net: 1) /8 2)/16 or 3)/24",subnet );
+ cmd.AddValue("Subnet","Sub net address",subnet );
 	  cmd.Parse (argc, argv);
 
 	  GlobalValue::Bind ("SimulatorImplementationType",
@@ -862,7 +863,6 @@ main (int argc, char *argv[])
 	  NS_LOG_INFO ("Create nodes.");
 	  NodeContainer n;
 	  n.Create (nNodes);
-
 
 
 //create the DERs, ingress, egress, and the aggregator nodes
@@ -1027,37 +1027,46 @@ main (int argc, char *argv[])
        EmuFdNetDeviceHelper emu;
            emu.SetDeviceName (deviceName1);
            emu.SetAttribute ("EncapsulationMode", StringValue (encapMode));
- std::stringstream ss(intIP[0]);
-           std::vector<string> tokenizedIP;
-           	std::string s;
-           	while (std::getline(ss, s, '.')) {
-           		tokenizedIP.push_back(s);
-           	}
-           	string netID;
-           	string netMask;
-           	string hostID;
-           	vector<string>::iterator it = tokenizedIP.begin();
 
-           	if(subnet==1)
-           	{
-           		netID = *it+".0.0.0";
-           		netMask="255.0.0.0";
-           		hostID = "0."+*(it+1)+"."+*(it+2)+"."+*(it+3);
-           	}
-           	else if(subnet==2)
-           	{
-           		netID = *it+"."+*(it+1)+".0.0";
-           		netMask="255.255.0.0";
-           		hostID = "0.0."+*(it+2)+"."+*(it+3);
-           	}
-           	else if(subnet==3)
-           	{
-           		netID = *it+"."+*(it+1)+"."+*(it+2)+".0";
-           		netMask="255.255.255.0";
-           		hostID = "0.0.0."+*(it+3);
-           	}
 
-           address.SetBase (netID.c_str(), netMask.c_str(), hostID.c_str());
+           struct sockaddr_in subnetwork;
+		   struct sockaddr_in hostID, hostID2;
+           struct sockaddr_in networkID;
+           struct sockaddr_in int1ip, int2ip;
+
+
+
+             memset(&int1ip, '\0', sizeof(int1ip));
+             memset(&int2ip, '\0', sizeof(int2ip));
+             memset(&subnetwork, '\0', sizeof(subnetwork));
+             int1ip.sin_addr.s_addr = inet_addr(intIP[0].c_str());
+             int2ip.sin_addr.s_addr = inet_addr(intIP[1].c_str());
+             subnetwork.sin_addr.s_addr = inet_addr(subnet.c_str());
+
+             uint32_t int1ipInt = int1ip.sin_addr.s_addr;
+             uint32_t int2ipInt = int2ip.sin_addr.s_addr;
+             uint32_t subnetInt = subnetwork.sin_addr.s_addr;
+             uint32_t networkIdInt = int1ipInt & subnetInt;
+             uint32_t hostIdInt = int1ipInt & ~subnetInt;
+             uint32_t hostId2Int = int2ipInt & ~subnetInt;
+
+             networkID.sin_addr.s_addr = networkIdInt;
+             hostID.sin_addr.s_addr = hostIdInt;
+             hostID2.sin_addr.s_addr = hostId2Int;
+
+
+             const  char*  netID = inet_ntoa(networkID.sin_addr);
+             string netIDString, netMaskString, hostIdString , hostId2String;
+             netIDString.append(netID);
+             const  char* netMask = inet_ntoa(subnetwork.sin_addr);
+             netMaskString.append(netMask);
+             const  char* hostIDchar = inet_ntoa(hostID.sin_addr);
+             hostIdString.append(hostIDchar);
+             const  char* hostID2char = inet_ntoa(hostID2.sin_addr);
+             hostId2String.append(hostID2char);
+
+
+           address.SetBase (netIDString.c_str(), netMaskString.c_str(), hostIdString.c_str());
        d0 = emu.Install (ingressNode);
 
            
@@ -1187,36 +1196,8 @@ main (int argc, char *argv[])
              emu2.SetDeviceName (deviceName2);
              emu2.SetAttribute ("EncapsulationMode", StringValue (encapMode2));
 
-                     std::stringstream ss1(intIP[1]);
-                        tokenizedIP.clear();
 
-                        	while (std::getline(ss1, s, '.')) {
-                        		tokenizedIP.push_back(s);
-                        	}
-					string netID1;
-           	string netMask1;
-           	string hostID1;
-           	vector<string>::iterator it1 = tokenizedIP.begin();
-
-                        	if(subnet==1)
-                        	{
-                        		netID1 = *it1+".0.0.0";
-                        		netMask1="255.0.0.0";
-                        		hostID1 = "0."+*(it1+1)+"."+*(it1+2)+"."+*(it1+3);
-                        	}
-                        	else if(subnet==2)
-                        	{
-                        		netID1 = *it1+"."+*(it1+1)+".0.0";
-                        		netMask1="255.255.0.0";
-                        		hostID1 = "0.0."+*(it1+2)+"."+*(it1+3);
-                        	}
-                        	else if(subnet==3)
-                        	{
-                        		netID1 = *it1+"."+*(it1+1)+"."+*(it1+2)+".0";
-                        		netMask1="255.255.255.0";
-                        		hostID1 = "0.0.0."+*(it1+3);
-                        	}
-                        	address.SetBase (netID1.c_str(), netMask1.c_str(), hostID1.c_str());
+             address.SetBase (netIDString.c_str(), netMaskString.c_str(), hostId2String.c_str());
              d1 = emu2.Install (egressNode);
 
 
