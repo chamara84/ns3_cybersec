@@ -419,4 +419,19 @@ ArpL3Protocol::SendArpReply (Ptr<const ArpCache> cache, Ipv4Address myIp, Ipv4Ad
   m_tc->Send (cache->GetDevice (), Create<ArpQueueDiscItem> (packet, toMac, PROT_NUMBER, arp));
 }
 
+void
+ArpL3Protocol::SendGratituousArpReply (Ptr<const ArpCache> cache, Ipv4Address myIp, Ipv4Address toIp, Address toMac)
+{
+  NS_LOG_FUNCTION (this << cache << myIp << toIp << toMac);
+  ArpHeader arp;
+  NS_LOG_LOGIC ("ARP: sending reply from node "<<m_node->GetId ()<<
+                "|| src: " << cache->GetDevice ()->GetAddress () <<
+                " / " << myIp <<
+                " || dst: " << toMac << " / " << toIp);
+  arp.SetReply (cache->GetDevice ()->GetAddress (), myIp, ns3::Mac48Address("ff:ff:ff:ff:ff:ff"), myIp);
+  Ptr<Packet> packet = Create<Packet> ();
+  NS_ASSERT (m_tc != 0);
+  m_tc->Send (cache->GetDevice (), Create<ArpQueueDiscItem> (packet, toMac, PROT_NUMBER, arp));
+}
+
 } // namespace ns3

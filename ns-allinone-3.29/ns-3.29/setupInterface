@@ -14,31 +14,31 @@ sudo ip link set dev tap00 up
 sudo ip link set dev tap01 address 00:00:00:00:01:21
 sudo ip address add 0.0.0.0 dev tap01
 
-sudo ip link set dev enp7s0 down
-sudo ip address add 0.0.0.0 dev enp7s0
-sudo ip link set dev enp7s0 up
+sudo ip link set dev enp4s0 down
+sudo ip address add 0.0.0.0 dev enp4s0
+sudo ip link set dev enp4s0 up
 
-sudo ip link set dev enp8s0 down
-sudo ip address add 0.0.0.0 dev enp8s0
-sudo ip link set dev enp8s0 up
+sudo ip link set dev enp6s0 down
+sudo ip address add 0.0.0.0 dev enp6s0
+sudo ip link set dev enp6s0 up
 
-sudo ip link set dev enp11s0 down
-sudo ip address add 0.0.0.0 dev enp11s0
-sudo ip link set dev enp11s0 up
+sudo ip link set dev enp5s0 down
+sudo ip address add 0.0.0.0 dev enp5s0
+sudo ip link set dev enp5s0 up
 
 
 sudo ip link set dev tap01 promisc on
 sudo ip link set dev tap01 up
 
 sudo ip link set dev tap00 master br0
-sudo ip link set dev enp7s0 master br0
+sudo ip link set dev enp4s0 master br0
 
 
 sudo ip link set dev tap01 master br1
-sudo ip link set dev enp8s0 master br1
+sudo ip link set dev enp5s0 master br1
 
 sudo ip link set dev br0 up
 sudo ip link set dev  br1 up
-sudo ip link set dev  enp7s0 promisc on
-sudo ip link set dev  enp8s0 promisc on
+sudo ip link set dev  enp4s0 promisc on
+sudo ip link set dev  enp5s0 promisc on
 

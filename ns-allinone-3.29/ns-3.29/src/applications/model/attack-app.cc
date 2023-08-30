@@ -140,6 +140,7 @@ AttackApp::SendPacket (void)
 
 	for(int i=0;i<(int)m_fakeAddr.size();i++){
   m_attacker.SendArpReply(m_arpCache, (Ipv4Address)m_fakeAddr[i], (Ipv4Address)m_vAddr[i], (Address)m_vMac[i]);
+  //m_attacker.SendGratituousArpReply(m_arpCache, (Ipv4Address)m_fakeAddr[i], (Ipv4Address)m_vAddr[i], (Address)m_vMac[i]);
 
 	}
   //std::cout << "stucked here" << std::endl;
@@ -1120,12 +1121,12 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 			if (tcpHdr1.GetDestinationPort()==20000)
 				{
 				session->direction = DNP3_CLIENT;
-				printf("From Client direction\n");
+				printf("From Client \n");
 				}
 			else if (tcpHdr1.GetSourcePort()==20000)
 			{
 			session->direction = DNP3_SERVER;
-			printf("From Server direction\n");
+			printf("From Server \n");
 			}
 
 			DNP3FullReassembly(&config.dnp3, session, packetCopy, (uint8_t *)buffer,dataSize);
@@ -1530,6 +1531,45 @@ if(ipProtocol == 17 && (udpHdr1.GetDestinationPort()==7001 || udpHdr1.GetSourceP
 	}
 	bufferFloat[0] = htonl(bufferFloat[0]);
 	bufferFloat[1] = htonl(bufferFloat[1]);
+	memcpy(&buffer, &bufferFloat, packetCopy->GetSize ());
+	packetNew = Create<Packet>(buffer,packetCopy->GetSize ());
+	udpHdr.EnableChecksums();
+	packetNew->AddHeader(udpHdr);
+	if(udpHdr.IsChecksumOk() && ipV4Hdr.IsChecksumOk())
+		printf("Checksum ok\n");
+	else
+		printf("Checksum error");
+	//*****************************************************
+	 ipV4Hdr.SetPayloadSize(packetNew->GetSize());
+	 ipV4Hdr.EnableChecksum();
+	 packetNew->AddHeader(ipV4Hdr);
+}
+if(ipProtocol == 17 && (udpHdr1.GetDestinationPort()==7772 || udpHdr1.GetSourcePort()==7772)){
+
+	unsigned char buffer[packetCopy->GetSize ()] ;
+	//if(packetCopy->GetSize ()>0){
+
+	unsigned int bufferFloat[packetCopy->GetSize ()];
+	packetCopy->CopyData (buffer, packetCopy->GetSize ());
+	int integerData;
+	int DERIndex ;
+
+	float floatingPointData;
+	memcpy(&bufferFloat, &buffer[0], packetCopy->GetSize ());
+
+
+	bufferFloat[0] = ntohl(bufferFloat[0]);
+
+	printf("Original Data = %d\n", bufferFloat[0]);
+	integerData =  bufferFloat[0];
+		bufferFloat[0] = 0;
+
+	printf("Modified to = %d\n", bufferFloat[0]);
+
+
+
+	bufferFloat[0] = htonl(bufferFloat[0]);
+
 	memcpy(&buffer, &bufferFloat, packetCopy->GetSize ());
 	packetNew = Create<Packet>(buffer,packetCopy->GetSize ());
 	udpHdr.EnableChecksums();

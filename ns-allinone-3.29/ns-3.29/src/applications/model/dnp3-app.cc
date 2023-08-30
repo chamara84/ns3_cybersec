@@ -1827,6 +1827,14 @@ while(!done) //it will be done when we reach the end of buffer in rdata->server_
 												memcpy((pdu_start+dataIndexAdvance+byteNumberNewPktBuffer+sizeOfQuality+startingIndexAlteredVal+count),tempValueToCopy+j,1);
 												std::cout<<"Modify Analog"<<endl;
 											}
+
+											else if ((config->values_to_alter[i]).obj_group==3)
+																						{
+												uint8_t byteInt = (uint8_t)tempInt;
+																							memcpy(tempValueToCopy,&byteInt,1);
+																							memcpy((pdu_start+dataIndexAdvance+byteNumberNewPktBuffer+sizeOfQuality+startingIndexAlteredVal+count),tempValueToCopy+j,1);
+																							std::cout<<"Modify Int out"<<endl;
+																						}
 											else
 											{
 												memcpy(tempValueToCopy,&tempInt,4);
