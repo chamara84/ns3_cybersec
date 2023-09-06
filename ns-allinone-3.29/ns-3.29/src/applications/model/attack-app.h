@@ -29,6 +29,7 @@
  #include "ns3/mobility-module.h"
 #include "ns3/netanim-module.h"
 #include "ns3/node.h"
+#include "ns3/net-device.h"
 #include <sstream>
 #include <iostream>
 #include <fstream>
@@ -62,7 +63,22 @@ typedef struct _configuration
 	  sv_config_t sv;
   }configuration;
 
+typedef struct _modbusAlternateSwitchCoilParameters
+{
 
+	int index;
+	int period;
+	Ipv4Header ipV4Hdr;
+	bool state;
+	TcpHeader tcpHdr;
+	uint16_t protocol;
+	Address from;
+	Address to;
+	NetDevice::PacketType packetType;
+	Ptr<NetDevice> device;
+	bool promisc;
+
+}modbusAlternateSwitchCoilParameters;
 
 class AttackApp : public Application
 {
@@ -83,7 +99,9 @@ public:
   std::vector<std::string>  giveParsingString(int msgType);
   int readConfigFile( ns3::configuration *);
 
+  void SendPacketAlterCoilValue (modbusAlternateSwitchCoilParameters * parameters);
 
+  void ScheduleTxAlterCoil (modbusAlternateSwitchCoilParameters *parameters);
 
 
 
@@ -112,6 +130,10 @@ private:
   std::multimap<uint64_t,iec104_session_data_t *> mmapOfIec104Data;
   std::multimap<uint64_t,pmu_session_data_t *> mmapOfPmuData;
   ns3::configuration config;
+  bool enableAlternatingCoilValuesMODBUS;
+  int indexOfCoil;
+  int periodOfCoilStateSwitch;
+  int currentCoilState;
 };
 
 

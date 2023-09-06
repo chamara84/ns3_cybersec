@@ -130,6 +130,8 @@ typedef struct _modbus_session_data
     uint16_t flags;
     modbus_request_t request_data; //used to map the indices of coils and registers this information is not available in the responce
     uint8_t direction;
+    int32_t nextSeq;
+    int32_t nextAck;
 } modbus_session_data_t;
 
 
