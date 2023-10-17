@@ -103,6 +103,10 @@ public:
 
   void ScheduleTxAlterCoil (modbusAlternateSwitchCoilParameters *parameters);
 
+  void SendPacketAlterBinaryOutputValue (modbusAlternateSwitchCoilParameters * parameters);
+
+    void ScheduleTxAlterBinaryOutput(modbusAlternateSwitchCoilParameters *parameters);
+
 
 
 private:

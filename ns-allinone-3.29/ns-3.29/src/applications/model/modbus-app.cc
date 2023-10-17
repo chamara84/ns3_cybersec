@@ -329,7 +329,7 @@ static void ModbusCheckResponseLengths(modbus_session_data_t *session, uint8_t *
         case MODBUS_FUNC_GET_COMM_EVENT_COUNTER:
         case MODBUS_FUNC_WRITE_MULTIPLE_COILS:
         case MODBUS_FUNC_WRITE_MULTIPLE_REGISTERS:
-            if (modbus_payload_len == MODBUS_FOUR_DATA_BYTES)
+            if (modbus_payload_len >=MODBUS_WRITE_MULTIPLE_MIN_SIZE )
                 check_passed = 1;
             break;
 
@@ -477,6 +477,7 @@ static int modifyData(modbus_config_t *config, modbus_session_data_t *session,ui
 	uint8_t mask = 0;
 	uint8_t n =0;
 	uint8_t p=0;
+
 	header = (modbus_header_t *) pdu_start;
 	if(header->transaction_id!=(session->request_data).transactionID)
 	{
@@ -583,7 +584,7 @@ static int modifyData(modbus_config_t *config, modbus_session_data_t *session,ui
 
 												 memcpy(pdu_start+MODBUS_MIN_LEN+2,&(temp),2);
 												 modified = 1;
-												 printf("Modify WriteCoils id=%d value=%d\n",(config->values_to_alter[index]).identifier,temp );
+												 printf("Modify WriteRegisters id=%d value=%d\n",(config->values_to_alter[index]).identifier,temp );
 													}
 
 
@@ -592,7 +593,6 @@ static int modifyData(modbus_config_t *config, modbus_session_data_t *session,ui
 			case MODBUS_FUNC_GET_COMM_EVENT_COUNTER:
 			case MODBUS_FUNC_WRITE_MULTIPLE_COILS:
 			case MODBUS_FUNC_WRITE_MULTIPLE_REGISTERS:
-
 
 			case MODBUS_FUNC_READ_EXCEPTION_STATUS:
 
@@ -635,12 +635,13 @@ static int modifyWriteData(modbus_config_t *config, modbus_session_data_t *sessi
 	uint8_t p=0;
 	uint16_t bit_cnt = 0, byte_cnt = 0;
 	header = (modbus_header_t *) pdu_start;
-	if(header->transaction_id!=(session->request_data).transactionID)
-	{
-		printf("Transaction is missed\n");
-		return 0;
-	}
+	uint16_t zeros[8] = {0,0,0,0,0,0,0,0};
 
+	if(header->transaction_id!=(session->request_data).transactionID)
+		{
+			printf("Transaction is missed\n");
+			return 0;
+		}
 	start = (session->request_data).address;
 	stop = (session->request_data).address+(session->request_data).quantity-1;
 
@@ -736,7 +737,9 @@ static int modifyWriteData(modbus_config_t *config, modbus_session_data_t *sessi
 				break;
 			}
 			case MODBUS_FUNC_WRITE_MULTIPLE_REGISTERS:
-
+				printf("Modify Multiple registers\n");
+								memcpy(pdu_start+MODBUS_MIN_LEN+5,&zeros[0],16); //copy the data
+								break;
 
 			case MODBUS_FUNC_READ_EXCEPTION_STATUS:
 

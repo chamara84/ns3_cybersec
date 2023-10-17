@@ -147,7 +147,7 @@ Ipv4AddressHelper ipv4;
 
 
 
-ipv4.SetBase ("10.103.32.0", "255.255.252.0","0.0.1.71"); //this is the outer network
+ipv4.SetBase ("10.103.40.0", "255.255.254.0","0.0.0.91"); //this is the outer network
 Ipv4InterfaceContainer ipn0n1n2n3 = ipv4.Assign (dn0n1n2n3);
 
 
@@ -217,9 +217,9 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
 
                                 Ptr<AttackApp> attacker = CreateObject<AttackApp> ();
-                                std::vector<Ipv4Address> spoofedIPs{Ipv4Address ("10.103.32.183")};
-                                                                std::vector<Ipv4Address>victimIPs{Ipv4Address ("10.103.33.84")};
-                                                                std::vector<Address>victimMACs{ns3::Mac48Address("10:65:30:05:D8:FF")};
+                                std::vector<Ipv4Address> spoofedIPs{Ipv4Address ("10.103.41.224"),};
+                                                                std::vector<Ipv4Address>victimIPs{Ipv4Address ("10.103.41.83"),Ipv4Address ("10.103.41.84"),Ipv4Address ("10.103.41.85"),Ipv4Address ("10.103.41.86")};
+                                                                std::vector<Address>victimMACs{ns3::Mac48Address("00:50:c2:4f:9a:75"),ns3::Mac48Address("00:50:c2:4f:9a:75"),ns3::Mac48Address("00:50:c2:4f:9a:75"),ns3::Mac48Address("00:50:c2:4f:9a:75")};
 
                                attacker->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface, spoofedIPs, victimIPs, victimMACs);
                                 n0n1n2n3.Get (attackerId)->AddApplication (attacker);
@@ -237,9 +237,9 @@ Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
 
                                                                 Ptr<AttackApp> attacker2 = CreateObject<AttackApp> ();
-                                                                std::vector<Ipv4Address> spoofedIPs1{Ipv4Address ("10.103.33.84")};
-                                                                std::vector<Ipv4Address>victimIPs1{Ipv4Address ("10.103.32.183")};
-                                                                std::vector<Address>victimMACs1{ns3::Mac48Address("60:15:92:10:13:47")};
+                                                                std::vector<Ipv4Address> spoofedIPs1{Ipv4Address ("10.103.41.83"),Ipv4Address ("10.103.41.84"),Ipv4Address ("10.103.41.85"),Ipv4Address ("10.103.41.86")};
+                                                                std::vector<Ipv4Address>victimIPs1{Ipv4Address ("10.103.41.224"),Ipv4Address ("10.103.41.224"),Ipv4Address ("10.103.41.224"),Ipv4Address ("10.103.41.224")};
+                                                                std::vector<Address>victimMACs1{ns3::Mac48Address("10:65:30:f5:c9:a5"),ns3::Mac48Address("10:65:30:f5:c9:a5"),ns3::Mac48Address("10:65:30:f5:c9:a5"),ns3::Mac48Address("10:65:30:f5:c9:a5")};
 
                                                                attacker2->Setup(n0n1n2n3.Get(attackerId), dn0n1n2n3.Get(attackerId), iface,  spoofedIPs1, victimIPs1,victimMACs1);
                                                                 n0n1n2n3.Get (attackerId)->AddApplication (attacker2);
