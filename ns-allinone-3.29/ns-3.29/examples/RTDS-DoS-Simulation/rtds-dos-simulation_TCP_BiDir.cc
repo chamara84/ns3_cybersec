@@ -1202,25 +1202,25 @@ main (int argc, char *argv[])
 	MobilityHelper mobility;
 	mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
 	string DER[4];
-	DER[0]="172.24.9.240";
-	DER[1]="172.24.9.241";
-	DER[2]="172.24.9.242";
-	DER[3]="172.2.9.254";
+	DER[0]="10.103.41.71";
+	DER[1]="10.103.41.72";
+	DER[2]="10.103.41.73";
+	DER[3]="10.103.41.74";
 	string AggregatorIP[4];
-	AggregatorIP[0]="172.24.9.244";
-	AggregatorIP[1]="172.24.9.245";
-	AggregatorIP[2]="172.24.9.246";
-	AggregatorIP[3]="172.24.9.247";
+	AggregatorIP[0]="10.103.41.75";
+	AggregatorIP[1]="10.103.41.76";
+	AggregatorIP[2]="10.103.41.77";
+	AggregatorIP[3]="10.103.41.78";
 
 	string intIP[2];
-	intIP[0]="172.24.2.205";
-	intIP[1] = "172.24.2.199";
+	intIP[0]="10.103.40.29";
+	intIP[1] = "10.103.40.30";
 	string intMAC[2];
 	intMAC[0]="00:e0:4c:67:77:d3";
 	intMAC[1] ="00:e0:4c:67:77:d4" ;
-	string gateway = "172.24.0.1";
+	string gateway = "10.103.40.1";
 
-	 std::string subnet = "255.255.255.0";
+	 std::string subnet = "255.255.254.0";
 
 	//
 	// Allow the user to override any of the defaults at run-time, via command-line

@@ -2,7 +2,7 @@
 sudo apt-get install g++ python3
 sudo apt-get install g++ python3 python3-dev pkg-config sqlite3
 sudo apt-get install python3-setuptools git
-sudo apt-get install qt5-default mercurial
+sudo apt-get install qtbase5-dev qt5-qmake qttools5-dev qttools5-dev-tools qtwebengine5-dev libqt5svg5-dev libqt5websockets5-dev mercurial
 sudo apt-get install graphviz graphviz-dev python3-kiwisolver
 sudo apt-get install gir1.2-goocanvas-2.0 python3-gi python3-gi-cairo python3-pygraphviz gir1.2-gtk-3.0 ipython ipython3
 sudo apt-get install openmpi-bin openmpi-common openmpi-doc libopenmpi-dev
