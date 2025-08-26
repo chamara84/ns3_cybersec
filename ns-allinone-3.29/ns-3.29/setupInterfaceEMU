@@ -1,0 +1,17 @@
+#!/bin/bash
+# Setup Interfaces for EMU simulation of NS-3 the TCP and UDP peak shave
+
+sudo ip link set dev enp4s0 down
+sudo ip addr flush dev enp4s0
+sudo ip address add 172.24.4.190/24  dev enp4s0
+sudo ip link set dev enp4s0 up
+
+sudo ip link set dev enp6s0 down
+sudo ip addr flush dev enp6s0
+sudo ip address add 172.24.4.191/24  dev enp6s0
+sudo ip link set dev enp6s0 up
+
+
+sudo ip link set dev  enp4s0 promisc on
+sudo ip link set dev  enp6s0 promisc on
+
